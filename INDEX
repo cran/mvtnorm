@@ -1,0 +1,3 @@
+mvt                      Internal mvtnorm function
+pmvnorm                  Multivariate Normal Distribution
+pmvt                     Multivariate t Distribution
