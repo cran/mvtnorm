@@ -1,6 +1,6 @@
 
-R : Copyright 2002, The R Development Core Team
-Version 1.7.0 Under development (unstable) (2002-11-21)
+R : Copyright 2003, The R Development Core Team
+Version 1.8.0 Under development (unstable) (2003-06-15)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -151,19 +151,18 @@ attr(,"msg")
 > df <- 130
 > C <- c(1,1,1,0,0,-1,0,0,1,0,0,-1,0,0,1,0,0,0,-1,-1,0,0,-1,0,0)
 > C <- matrix(C, ncol=5)
+> ### covariance matrix 
 > cv <- C %*% V %*% t(C)
-> cr <- matrix(rep(0, ncol(cv)^2), ncol=ncol(cv))
-> for (i in 1:5) {
-+   for (j in 1:5) {
-+     cr[i,j] <- cv[i,j]/sqrt(cv[i,i]*cv[j,j] )
-+   }
-+ }
+> ### correlation matrix
+> dv <- t(1/sqrt(diag(cv)))
+> cr <- cv * (t(dv) %*% dv)
 > delta <- rep(0,5)
 > 
 > myfct <- function(q, alpha) {
 +   lower <- rep(-q, ncol(cv))
 +   upper <- rep(q, ncol(cv))
-+   pmvt(lower=lower, upper=upper, delta=delta, df=df, corr=cr, abseps=0.0001) - alpha
++   pmvt(lower=lower, upper=upper, delta=delta, df=df, 
++        corr=cr, abseps=0.0001) - alpha
 + }
 > 
 > round(uniroot(myfct, lower=1, upper=5, alpha=0.95)$root, 3)
@@ -181,9 +180,9 @@ attr(,"error")
 attr(,"msg")
 [1] "Normal Completion"
 > b
-[1] 0.4211365
+[1] 0.4211395
 attr(,"error")
-[1] 8.298725e-06
+[1] 9.459467e-06
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -198,9 +197,9 @@ attr(,"msg")
 > attributes(a) <- NULL
 > attributes(b) <- NULL
 > a
-[1] 0.5654049
+[1] 0.5653962
 > b
-[1] 0.5654141
+[1] 0.5653998
 > stopifnot(all.equal(round(a,3) , round(b, 3)))
 > 
 > 
@@ -209,7 +208,7 @@ attr(,"msg")
 > 
 > 
 > cat("Time elapsed: ", proc.time() - get("ptime", env = .CheckExEnv),"\n")
-Time elapsed:  7.15 0.02 7.59 0 0 
+Time elapsed:  6.53 0.04 7.52 0 0 
 > dev.off(); quit('no')
 null device 
           1 

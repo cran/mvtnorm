@@ -118,19 +118,18 @@ V <- diag(1/n)
 df <- 130
 C <- c(1,1,1,0,0,-1,0,0,1,0,0,-1,0,0,1,0,0,0,-1,-1,0,0,-1,0,0)
 C <- matrix(C, ncol=5)
+### covariance matrix 
 cv <- C %*% V %*% t(C)
-cr <- matrix(rep(0, ncol(cv)^2), ncol=ncol(cv))
-for (i in 1:5) {
-  for (j in 1:5) {
-    cr[i,j] <- cv[i,j]/sqrt(cv[i,i]*cv[j,j] )
-  }
-}
+### correlation matrix
+dv <- t(1/sqrt(diag(cv)))
+cr <- cv * (t(dv) %*% dv)
 delta <- rep(0,5)
 
 myfct <- function(q, alpha) {
   lower <- rep(-q, ncol(cv))
   upper <- rep(q, ncol(cv))
-  pmvt(lower=lower, upper=upper, delta=delta, df=df, corr=cr, abseps=0.0001) - alpha
+  pmvt(lower=lower, upper=upper, delta=delta, df=df, 
+       corr=cr, abseps=0.0001) - alpha
 }
 
 round(uniroot(myfct, lower=1, upper=5, alpha=0.95)$root, 3)
