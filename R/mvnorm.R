@@ -1,4 +1,4 @@
-# $Id: mvnorm.R,v 1.3 2003/11/14 08:33:41 hothorn Exp $
+# $Id: mvnorm.R,v 1.4 2004/01/22 14:30:50 hothorn Exp $
 
 rmvnorm <- function(n, mean=rep(0, nrow(sigma)),
                       sigma=diag(length(mean))){

@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f,v 1.8 2003/07/21 16:59:27 hothorn Exp $
+*    $Id: mvt.f,v 1.9 2004/05/27 09:40:05 hothorn Exp $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &           MAXPTS, ABSEPS, RELEPS, TOL, ERROR, VALUE, INFORM )       
@@ -1116,20 +1116,65 @@
 *     Third order Schroeder correction to R for MVCHNV
 *
       INTEGER N, I
-      DOUBLE PRECISION P, R, LKN, DF, RR, RP, PF, MVPHI
-      PARAMETER ( RP = 0.79788456080286535588D0 )
+      DOUBLE PRECISION P, R, LKN, DF, RR, RN, CHI, MVPHI
+      DOUBLE PRECISION LRP, TWO, AL, DL, AI, BI, CI, DI, EPS
+      PARAMETER ( LRP = -.22579135264472743235D0, TWO = 2, EPS = 1D-14 )
+*                 LRP =   LOG( SQRT( 2/PI ) )
       RR = R*R
-      PF = 1
-      DO I = N - 2, 2, -2
-         PF = 1 + RR*PF/I
-      END DO
-      IF ( MOD( N, 2 ) .EQ. 0 ) THEN
-         DF = ( P             - EXP( LOG(      PF ) - RR/2 ) )
+      IF ( N .LT. 2 ) THEN
+         CHI = 2*MVPHI(-R)
+      ELSE IF ( N .LT. 100 ) THEN
+*
+*        Use standard Chi series
+*
+         RN = 1
+         DO I = N - 2, 2, -2
+            RN = 1 + RR*RN/I
+         END DO
+         RR = RR/2
+         IF ( MOD( N, 2 ) .EQ. 0 ) THEN
+            CHI = EXP(       LOG(   RN ) - RR )
+         ELSE
+            CHI = EXP( LRP + LOG( R*RN ) - RR ) + 2*MVPHI(-R)
+         ENDIF
       ELSE
-         DF = ( P - 2*MVPHI(-R) - EXP( LOG( RP*R*PF ) - RR/2 ) )
-      ENDIF
-      DF =  DF/EXP( LKN + (N-1)*LOG(R) - RR/2 )
-      MVCHNC = R - DF*( 1 - DF*( R - (N-1)/R )/2 )   
+         RR = RR/2
+         AL = N/TWO
+         CHI = EXP( -RR + AL*LOG(RR) + LKN + LOG(TWO)*( N - 2 )/2 )
+         IF ( RR .LT. AL + 1 ) THEN 
+*
+*           Use Incomplete Gamma series
+*
+            DL = CHI
+            DO I = 1, 1000
+               DL = DL*RR/( AL + I ) 
+               CHI = CHI + DL
+               IF ( ABS( DL*RR/( AL + I + 1 - RR ) ) .LT. EPS ) EXIT
+            END DO
+            CHI = 1 - CHI/AL
+         ELSE
+*
+*           Use Incomplete Gamma continued fraction
+*
+            BI = RR + 1 - AL
+            CI = 1/EPS
+            DI = BI
+            CHI = CHI/BI 
+            DO I = 1, 250
+               AI = I*( AL - I )
+               BI = BI + 2
+               CI = BI + AI/CI
+               IF ( CI .EQ. 0 ) CI = EPS 
+               DI = BI + AI/DI
+               IF ( DI .EQ. 0 ) DI = EPS 
+               DL = CI/DI
+               CHI = CHI*DL
+               IF ( ABS( DL - 1 ) .LT. EPS ) EXIT
+            END DO
+         END IF
+      END IF
+      DF =  ( P - CHI )/EXP( LKN + ( N - 1 )*LOG(R) - RR )
+      MVCHNC = R - DF*( 1 - DF*( R - ( N - 1 )/R )/2 )   
       END
 *
       SUBROUTINE MVKBRV( NDIM, MINVLS, MAXVLS, NF, FUNSUB, 

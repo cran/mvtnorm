@@ -65,3 +65,15 @@ pnorm(2)^90
 pmvnorm(lower=rep(-Inf, 90), upper=rep(2,90), sigma = diag(90))
 pnorm(2)^199
 pmvnorm(lower=rep(-Inf, 199), upper=rep(2,199), sigma = diag(199))
+
+# larger dimensions, again. Spotted by Chihiro Kuroki <kuroki@oak.dti.ne.jp>
+# Alan's fix to MVCHNC solves this problem
+cr = matrix(0.5, nr = 4, nc = 4)
+diag(cr) = 1
+cr
+a <- pmvt(low = -rep(1, 4), upp = rep(1, 4), df = 999, corr = cr)
+b <- pmvt(low = -rep(1, 4), upp = rep(1, 4), df = 4999, corr = cr)
+b
+attributes(a) <- NULL
+attributes(b) <- NULL
+stopifnot(all.equal(round(a, 3), round(b, 3)))

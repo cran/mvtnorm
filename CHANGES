@@ -1,4 +1,8 @@
-# $Id: CHANGES,v 1.27 2003/11/14 08:33:46 hothorn Exp $
+# $Id: CHANGES,v 1.29 2004/05/27 09:46:57 hothorn Exp $
+
+	0.6-7 (27.05.2004)
+
+	Alan's fix to MVCHNC solves problems with large degree of freedom
 
 	0.6-6 (22.01.2004)
 

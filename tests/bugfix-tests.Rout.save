@@ -1,17 +1,18 @@
 
-R : Copyright 2003, The R Development Core Team
-Version 1.7.0  (2003-04-16)
+R : Copyright 2004, The R Foundation for Statistical Computing
+Version 1.9.0  (2004-04-12), ISBN 3-900051-00-3
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
-Type `license()' or `licence()' for distribution details.
+Type 'license()' or 'licence()' for distribution details.
 
 R is a collaborative project with many contributors.
-Type `contributors()' for more information.
+Type 'contributors()' for more information and
+'citation()' on how to cite R in publications.
 
-Type `demo()' for some demos, `help()' for on-line help, or
-`help.start()' for a HTML browser interface to help.
-Type `q()' to quit R.
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for a HTML browser interface to help.
+Type 'q()' to quit R.
 
 > invisible(options(echo = TRUE))
 > library(mvtnorm)
@@ -143,4 +144,26 @@ attr(,"error")
 [1] 0
 attr(,"msg")
 [1] "Normal Completion"
+> 
+> # larger dimensions, again. Spotted by Chihiro Kuroki <kuroki@oak.dti.ne.jp>
+> # Alan's fix to MVCHNC solves this problem
+> cr = matrix(0.5, nr = 4, nc = 4)
+> diag(cr) = 1
+> cr
+     [,1] [,2] [,3] [,4]
+[1,]  1.0  0.5  0.5  0.5
+[2,]  0.5  1.0  0.5  0.5
+[3,]  0.5  0.5  1.0  0.5
+[4,]  0.5  0.5  0.5  1.0
+> a <- pmvt(low = -rep(1, 4), upp = rep(1, 4), df = 999, corr = cr)
+> b <- pmvt(low = -rep(1, 4), upp = rep(1, 4), df = 4999, corr = cr)
+> b
+[1] 0.2892533
+attr(,"error")
+[1] 0.0002804597
+attr(,"msg")
+[1] "Normal Completion"
+> attributes(a) <- NULL
+> attributes(b) <- NULL
+> stopifnot(all.equal(round(a, 3), round(b, 3)))
 > 
