@@ -1,6 +1,6 @@
 
 R : Copyright 2003, The R Development Core Team
-Version 1.8.0 Under development (unstable) (2003-06-15)
+Version 1.7.0  (2003-04-16)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -117,4 +117,30 @@ attr(,"msg")
 [1] "univariate: using pnorm"
 > pnorm(2)
 [1] 0.9772499
+> 
+> # larger dimensions
+> pnorm(2)^2
+[1] 0.9550173
+> pmvnorm(lower=rep(-Inf, 2), upper=rep(2,2), sigma = diag(2))
+[1] 0.9550173
+attr(,"error")
+[1] 1e-15
+attr(,"msg")
+[1] "Normal Completion"
+> pnorm(2)^90
+[1] 0.1260393
+> pmvnorm(lower=rep(-Inf, 90), upper=rep(2,90), sigma = diag(90))
+[1] 0.1260393
+attr(,"error")
+[1] 0
+attr(,"msg")
+[1] "Normal Completion"
+> pnorm(2)^199
+[1] 0.01025932
+> pmvnorm(lower=rep(-Inf, 199), upper=rep(2,199), sigma = diag(199))
+[1] 0.01025932
+attr(,"error")
+[1] 0
+attr(,"msg")
+[1] "Normal Completion"
 > 

@@ -1,8 +1,8 @@
 *
-*    $Id: mvt.f,v 1.7 2003/06/25 07:09:53 hothorn Exp $
+*    $Id: mvt.f,v 1.6 2003/06/17 07:58:51 hothorn Exp $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
-     &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
+     &           MAXPTS, ABSEPS, RELEPS, TOL, ERROR, VALUE, INFORM )       
 *
 *     A subroutine for computing non-central multivariate t probabilities.
 *     This subroutine uses an algorithm (QRSVN) described in the paper
@@ -39,6 +39,7 @@
 *            increase MAXPTS if ERROR is too large.
 *     ABSEPS DOUBLE PRECISION absolute error tolerance.
 *     RELEPS DOUBLE PRECISION relative error tolerance.
+*     TOL    DOUBLE PRECISION singularity tolerance.
 *     ERROR  DOUBLE PRECISION estimated absolute error, 
 *            with 99% confidence level.
 *     VALUE  DOUBLE PRECISION estimated value for the integral
@@ -47,22 +48,22 @@
 *            if INFORM = 1, completion with ERROR > EPS and MAXPTS 
 *                           function vaules used; increase MAXPTS to 
 *                           decrease ERROR;
-*            if INFORM = 2, N > 100 or N < 1.
+*            if INFORM = 2, N > 1000 or N < 1.
 *            if INFORM = 3, correlation matrix not positive semi-definite.
 *
       EXTERNAL MVSUBR
       INTEGER N, ND, NU, INFIN(*), MAXPTS, INFORM, IVLS
       DOUBLE PRECISION CORREL(*), LOWER(*), UPPER(*), DELTA(*), RELEPS, 
-     &                 ABSEPS, ERROR, VALUE, E(1), V(1)
+     &                 ABSEPS, TOL, ERROR, VALUE, E(1), V(1)
       COMMON /PTBLCK/IVLS
       IVLS = 0
-      IF ( N .GT. 100 .OR. N .LT. 1 ) THEN
+      IF ( N .GT. 1000 .OR. N .LT. 1 ) THEN
          VALUE = 0
          ERROR = 1
          INFORM = 2
       ELSE
          CALL MVINTS( N, NU, CORREL, LOWER, UPPER, DELTA, INFIN,
-     &                   ND, VALUE, ERROR, INFORM )
+     &                TOL, ND, VALUE, ERROR, INFORM )
          IF ( INFORM .EQ. 0 .AND. ND .GT. 0 ) THEN
 *
 *           Call the lattice rule integration subroutine
@@ -81,10 +82,11 @@
 *
       INTEGER N, NF, NUIN, INFIN(*), NL
       DOUBLE PRECISION W(*),F(*), LOWER(*),UPPER(*), CORREL(*), DELTA(*)
-      PARAMETER ( NL = 100 )
+      PARAMETER ( NL = 1000 )
       INTEGER INFI(NL), NU, ND, INFORM, NY 
       DOUBLE PRECISION COV(NL*(NL+1)/2), A(NL), B(NL), DL(NL), Y(NL)
       DOUBLE PRECISION MVCHNV, SNU, R, VL, ER, DI, EI
+      DOUBLE PRECISION TOL      
       SAVE NU, SNU, INFI, A, B, DL, COV
       IF ( NU .LE. 0 ) THEN
          R = 1
@@ -97,12 +99,12 @@
 *
 *     Entry point for intialization.
 *
-      ENTRY MVINTS( N, NUIN, CORREL, LOWER, UPPER, DELTA, INFIN, 
+      ENTRY MVINTS( N, NUIN, CORREL, LOWER, UPPER, DELTA, INFIN, TOL, 
      &     ND, VL, ER, INFORM )
 *
 *     Initialization and computation of covariance Cholesky factor.
 *
-      CALL MVSORT( N, LOWER, UPPER, DELTA, CORREL, INFIN, Y, .TRUE.,
+      CALL MVSORT( N, LOWER, UPPER, DELTA, CORREL, INFIN,TOL, Y, .TRUE.,
      &            ND,     A,     B,    DL,    COV,  INFI, INFORM )
       NU = NUIN
       CALL MVSPCL( ND, NU, A, B, DL, COV, INFI, SNU, VL, ER, INFORM )
@@ -235,19 +237,21 @@
       END DO
       END
 *
-      SUBROUTINE MVSORT( N, LOWER, UPPER, DELTA, CORREL, INFIN, Y,PIVOT,
+      SUBROUTINE MVSORT( N, LOWER, UPPER,DELTA,CORREL,INFIN,TOL,Y,PIVOT,
      &                  ND,     A,     B,    DL,    COV,  INFI, INFORM )
 *
 *     Subroutine to sort integration limits and determine Cholesky factor.
 *
       INTEGER N, ND, INFIN(*), INFI(*), INFORM
       LOGICAL PIVOT
+      DOUBLE PRECISION TOL 
       DOUBLE PRECISION     A(*),     B(*),    DL(*),    COV(*), 
      &                 LOWER(*), UPPER(*), DELTA(*), CORREL(*), Y(*)
       INTEGER I, J, K, L, M, II, IJ, IL, JL, JMIN
       DOUBLE PRECISION SUMSQ, AJ, BJ, SUM, EPS, EPSI, D, E
       DOUBLE PRECISION CVDIAG, AMIN, BMIN, DEMIN, MVTDNS
-      PARAMETER ( EPS = 1D-6 )
+*      PARAMETER ( EPS = 1D-6 )
+      EPS = TOL
       INFORM = 0
       IJ = 0
       II = 0
@@ -1187,7 +1191,7 @@
       DOUBLE PRECISION ABSEPS, RELEPS, FINEST(*), ABSERR, ONE
       INTEGER NDIM, NF, MINVLS, MAXVLS, INFORM, NP, PLIM, 
      &        NLIM, FLIM, SAMPLS, I, K, INTVLS, MINSMP, KMX
-      PARAMETER ( PLIM = 28, NLIM = 100, FLIM = 5000, MINSMP = 8 )
+      PARAMETER ( PLIM = 28, NLIM = 1000, FLIM = 5000, MINSMP = 8 )
       INTEGER P(PLIM), C(PLIM,NLIM-1), PR(NLIM) 
       DOUBLE PRECISION DIFINT, FINVAL(FLIM), VARSQR(FLIM), VAREST(FLIM), 
      &     VARPRD, X(NLIM), R(NLIM), VK(NLIM), VALUES(FLIM), FS(FLIM)

@@ -161,18 +161,32 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
 
     error <- 0; value <- 0; inform <- 0
 
-    ret <- .Fortran("mvtdst", as.integer(n), as.integer(df),
-                        as.double(lower), as.double(upper), as.integer(infin),
-                        as.double(corrF), as.double(delta), as.integer(maxpts),
-                        as.double(abseps), as.double(releps),  
-                        error = as.double(error), value = as.double(value),
-                        inform = as.integer(inform), PACKAGE="mvtnorm")
+    ### TOL argument re-added in version 0.6-3
+    ### not yet exported
+
+    tol <- 1e-10
+
+    ret <- .Fortran("mvtdst", N = as.integer(n), 
+                              NU = as.integer(df),
+                              LOWER = as.double(lower), 
+                              UPPER = as.double(upper), 
+                              INFIN = as.integer(infin),
+                              CORREL = as.double(corrF), 
+                              DELTA = as.double(delta), 
+                              MAXPTS = as.integer(maxpts),
+                              ABSEPS = as.double(abseps), 
+                              RELEPS = as.double(releps),  
+                              TOL = as.double(tol),
+                              error = as.double(error), 
+                              value = as.double(value),
+                              inform = as.integer(inform), PACKAGE="mvtnorm")
     
     error <- ret$error; value <- ret$value; inform <- ret$inform
 
     msg <- NULL
     if (inform == 0) msg <- "Normal Completion"
     if (inform == 1) msg <- "Completion with error > abseps"
+    if (inform == 2) msg <- "N greater 1000 or N < 1"
     if (inform == 3) msg <- "Covariance matrix not positive semidefinite"
     if (is.null(msg)) msg <- inform
     

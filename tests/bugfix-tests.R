@@ -57,3 +57,11 @@ pmvt(lower=c(-100,-100), upper=c(2,2), delta=c(0, 0), df=2500, corr=diag(2))
 pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=0, corr=diag(2))
 pmvt(lower=-Inf, upper = 2, delta=0, df=0, corr=1)
 pnorm(2)
+
+# larger dimensions
+pnorm(2)^2
+pmvnorm(lower=rep(-Inf, 2), upper=rep(2,2), sigma = diag(2))
+pnorm(2)^90
+pmvnorm(lower=rep(-Inf, 90), upper=rep(2,90), sigma = diag(90))
+pnorm(2)^199
+pmvnorm(lower=rep(-Inf, 199), upper=rep(2,199), sigma = diag(199))
