@@ -1,4 +1,4 @@
-# $Id: mvt.R,v 1.23 2002/11/22 13:52:47 hothorn Exp $ 
+# $Id: mvt.R,v 1.24 2003/01/21 08:03:12 hothorn Exp $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -31,6 +31,8 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
              if (length(corr) == 1) {
                  UNI <- TRUE
                  corr <- corr[1,1]
+                 if (length(lower) != 1)
+                   stop("corr and lower are of different length")
              } else {
                  if (length(diag(corr)) != length(lower))        
                      stop("diag(corr) and lower are of different length")
@@ -47,9 +49,12 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
             if (length(sigma) == 1) {
                 UNI <- TRUE       
                 sigma <- sigma[1,1]
+                if (length(lower) != 1) 
+                  stop("sigma and lower are of different length")
+            } else {
+              if (length(diag(sigma)) != length(lower))                     
+                 stop("diag(sigma) and lower are of different length")
             }
-            if (length(diag(sigma)) != length(lower))                     
-               stop("diag(sigma) and lower are of different length")
          }
     }
     list(lower=lower, upper=upper, mean=mean, corr=corr, sigma=sigma, uni=UNI)
@@ -99,7 +104,7 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
                        sigma=sigma)
     if (is.null(df))
         stop("df not specified")
-    if (df < 1)
+    if (any(df < 1))
         stop("cannot compute multivariate t distribution with df < 1")
     if (carg$uni) {
         RET <- list(value = pt(carg$upper, df=df, ncp=carg$mean) -
