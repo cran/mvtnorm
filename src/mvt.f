@@ -136,6 +136,7 @@
          IF ( ND .EQ. 1 ) THEN
             IF ( INFI(1) .NE. 1 ) VL = MVSTDT( NU, B(1) ) 
             IF ( INFI(1) .NE. 0 ) VL = VL - MVSTDT( NU, A(1) ) 
+            IF ( VL .LT. 0 ) VL = 0
             ER = 1D-16
          END IF
          IF ( NU .GT. 0 ) SNU = SQRT( DBLE(NU) )
