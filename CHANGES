@@ -1,4 +1,8 @@
-# $Id: CHANGES,v 1.26 2003/10/06 16:04:51 hothorn Exp $
+# $Id: CHANGES,v 1.27 2003/11/14 08:33:46 hothorn Exp $
+
+	0.6-6 (22.01.2004)
+
+	`La.eigen' is deprecated and `eigen' replaces it in R-1.9.0
 
 	0.6-5 (14.11.2003)
 

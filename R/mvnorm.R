@@ -1,4 +1,4 @@
-# $Id: mvnorm.R,v 1.2 2003/02/13 10:24:02 hothorn Exp $
+# $Id: mvnorm.R,v 1.3 2003/11/14 08:33:41 hothorn Exp $
 
 rmvnorm <- function(n, mean=rep(0, nrow(sigma)),
                       sigma=diag(length(mean))){
@@ -44,8 +44,8 @@ dmvnorm <- function (x, mean, sigma, log=FALSE)
         stop("mean and sigma have non-conforming size")
     }
     distval <- mahalanobis(x, center = mean, cov = sigma)
-    logdet <- sum(log(La.eigen(sigma, symmetric=TRUE,
-                                      only.values=TRUE)$values))
+    logdet <- sum(log(eigen(sigma, symmetric=TRUE,
+                                   only.values=TRUE)$values))
     logretval <- -(ncol(x)*log(2*pi) + logdet + distval)/2
     if(log) return(logretval)
     exp(logretval)
