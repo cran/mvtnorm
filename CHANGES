@@ -1,4 +1,8 @@
-# $Id: CHANGES,v 1.15 2003/02/13 10:24:34 hothorn Exp $
+# $Id: CHANGES,v 1.17 2003/04/23 14:59:29 hothorn Exp $
+
+	0.5-10 (23.04.2003)
+
+	mvtnorm is now in a NAMESPACE
 
 	0.5-9 (13.02.2003)
 
