@@ -1,4 +1,4 @@
-# $Id: mvt.R,v 1.20 2002/04/09 14:16:48 hothorn Exp $ 
+# $Id: mvt.R,v 1.21 2002/07/03 08:19:54 hothorn Exp $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -156,7 +156,7 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
                         as.double(corrF), as.double(delta), as.integer(maxpts),
                         as.double(abseps), as.double(releps),  
                         error = as.double(error), value = as.double(value),
-                        inform = as.integer(inform))
+                        inform = as.integer(inform), PACKAGE="mvtnorm")
     
     error <- ret$error; value <- ret$value; inform <- ret$inform
 

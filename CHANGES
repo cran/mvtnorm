@@ -1,4 +1,8 @@
-# $Id: CHANGES,v 1.9 2002/04/09 14:16:47 hothorn Exp $
+# $Id: CHANGES,v 1.10 2002/07/03 08:19:53 hothorn Exp $
+
+	0.5-5 (03.07.2002)
+
+	use .Fortran(..., PACKAGE="mvtnorm")
 
 	0.5-4 (09.04.2002)
 
