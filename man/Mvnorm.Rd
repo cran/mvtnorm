@@ -9,7 +9,7 @@
   generates random deviates.
 }
 \usage{
-dmvnorm(x, mean, sigma)
+dmvnorm(x, mean, sigma, log=FALSE)
 rmvnorm(n, mean, sigma)
 }
 \arguments{
@@ -18,6 +18,7 @@ rmvnorm(n, mean, sigma)
  \item{n}{Number of observations.}
  \item{mean}{Mean vector, default is \code{rep(0, length = ncol(x))}.}
  \item{sigma}{Covariance matrix, default is \code{diag(ncol(x))}.}
+ \item{log}{Logical; if \code{TRUE}, densities d are given as log(d).}
 }
 \author{Friedrich Leisch <Friedrich.Leisch@ci.tuwien.ac.at> }
 \seealso{\link{pmvnorm},\link{rnorm}}

@@ -1,6 +1,6 @@
 
 R : Copyright 2003, The R Development Core Team
-Version 1.7.0 Under development (unstable) (2003-01-19)
+Version 1.7.0 Under development (unstable) (2003-02-11)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -58,4 +58,13 @@ attr(,"msg")
 > attributes(a) <- NULL
 > stopifnot(all.equal(a, pnorm(2, sd=sqrt(.5))))
 > 
+> # log argument added by Jerome Asselin <jerome@hivnet.ubc.ca>
+> dmvnorm(x=c(0,0), mean=c(1,1),log=TRUE)
+[1] -2.837877
+> dmvnorm(x=c(0,0), mean=c(25,25),log=TRUE)
+[1] -626.8379
+> dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE)
+[1] -901.8379
+> stopifnot(all.equal(dmvnorm(x=0, mean=30,log=TRUE), 
++                     dnorm(0,30,log=TRUE)))
 > 

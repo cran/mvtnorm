@@ -38,3 +38,9 @@ a <- pmvnorm(lower=-Inf,upper=2,mean=0,sigma=.5)
 attributes(a) <- NULL
 stopifnot(all.equal(a, pnorm(2, sd=sqrt(.5))))
 
+# log argument added by Jerome Asselin <jerome@hivnet.ubc.ca>
+dmvnorm(x=c(0,0), mean=c(1,1),log=TRUE)
+dmvnorm(x=c(0,0), mean=c(25,25),log=TRUE)
+dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE)
+stopifnot(all.equal(dmvnorm(x=0, mean=30,log=TRUE), 
+                    dnorm(0,30,log=TRUE)))

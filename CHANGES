@@ -1,4 +1,9 @@
-# $Id: CHANGES,v 1.14 2003/01/21 08:04:02 hothorn Exp $
+# $Id: CHANGES,v 1.15 2003/02/13 10:24:34 hothorn Exp $
+
+	0.5-9 (13.02.2003)
+
+	log argument added to dmvnorm, thanks to 
+        Jerome Asselin <jerome@hivnet.ubc.ca>
 
 	0.5-8 (21.01.2003)
 
