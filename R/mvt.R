@@ -104,8 +104,8 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
                        sigma=sigma)
     if (is.null(df))
         stop("df not specified")
-    if (any(df < 1))
-        stop("cannot compute multivariate t distribution with df < 1")
+    if (any(df < 0))
+        stop("cannot compute multivariate t distribution with df < 0")
     if (carg$uni) {
         RET <- list(value = pt(carg$upper, df=df, ncp=carg$mean) -
                             pt(carg$lower, df=df, ncp=carg$mean),
