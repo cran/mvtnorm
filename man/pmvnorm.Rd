@@ -72,7 +72,11 @@ corr[upper.tri(corr)] <- 0.5
 prob <- pmvnorm(lower, upper, mean, corr)
 print(prob)
 
-pmvnorm(0, 1, -Inf, 3)$value == pnorm(3)
+stopifnot(pmvnorm(lower=-Inf, upper=3, mean=0, corr=1)$value == pnorm(3))
+
+a <- pmvnorm(lower=rep(-Inf,2),upper=c(.3,.5),mean=c(2,4),diag(2))$value
+
+stopifnot(round(a,16) == round(prod(pnorm(c(.3,.5),c(2,4))),16))
 
 # Example from R News paper (original by Genz, 1992):
 

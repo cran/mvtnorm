@@ -4,7 +4,7 @@ pmvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
 {
     if (df < 1) 
         stop("cannot compute multivariate t distribution with df < 1")
-    if (is.null(ncol(corr))) 
+    if (is.null(ncol(corr)) || length(lower) == 1) 
         return(list(value = pt(upper, df=df, ncp=delta) -
                             pt(lower, df=df, ncp=delta),
                     error = 0, msg="univariate: using pt"))
@@ -14,9 +14,12 @@ pmvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
 pmvnorm <- function(lower, upper, mean, corr, maxpts = 25000,
                     abseps = 0.001, releps = 0)
 {
-    delta <- mean
+    # delta <- mean # FIXME!
+    delta <- rep(0, length(mean))
     if (length(mean) != length(lower)) stop("wrong dimensions")
-    if (is.null(ncol(corr)))
+    lower <- lower - mean
+    upper <- upper - mean
+    if (is.null(ncol(corr)) || length(mean) == 1)
         return(list(value = pnorm(upper, mean=mean, sd=corr) -
                             pnorm(lower, mean=mean, sd=corr),
                     error = 0, msg="univariate: using pnorm"))
@@ -27,7 +30,7 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
                 abseps = 0.001, releps = 0)
 {
     n <- ncol(corr)
-    if (is.null(n)) stop("dimension less then n = 2")
+    if (is.null(n) || n < 2) stop("dimension less then n = 2")
 
     if (length(lower) != n) stop("wrong dimensions")
     if (length(upper) != n) stop("wrong dimensions")
