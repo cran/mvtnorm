@@ -148,6 +148,10 @@ a
 b
 stopifnot(all.equal(round(a,3) , round(b, 3)))
 
+a <- pmvt(0, 1,df=10)
+attributes(a) <- NULL
+b <- pt(1, df=10) - pt(0, df=10)
+stopifnot(all.equal(round(a,10) , round(b, 10)))
 
 
 }

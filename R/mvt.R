@@ -1,4 +1,4 @@
-# $Id: mvt.R,v 1.16 2001/12/10 13:44:40 hothorn Exp $ 
+# $Id: mvt.R,v 1.17 2002/01/24 12:18:11 hothorn Exp $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -28,8 +28,13 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
              if (length(corr) != length(lower))
                stop("diag(corr) and lower are of different length")
          } else {
-             if (length(diag(corr)) != length(lower))        
-               stop("diag(corr) and lower are of different length")
+             if (length(corr) == 1) {
+                 UNI <- TRUE
+                 corr <- corr[1,1]
+             } else {
+                 if (length(diag(corr)) != length(lower))        
+                     stop("diag(corr) and lower are of different length")
+             }
          }
     }
     if (!is.null(sigma)) {
@@ -39,6 +44,10 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
             if (length(sigma) != length(lower))        
                stop("diag(sigma) and lower are of different length")
          } else {
+            if (length(sigma) == 1) {
+                UNI <- TRUE       
+                sigma <- sigma[1,1]
+            }
             if (length(diag(sigma)) != length(lower))                     
                stop("diag(sigma) and lower are of different length")
          }
@@ -92,25 +101,21 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
         stop("df not specified")
     if (df < 1)
         stop("cannot compute multivariate t distribution with df < 1")
-    if (!is.null(carg$corr)) {
-      if (carg$uni) {
-          stop("sigma not specified: cannot compute pt")
-      } else {
-          RET <- mvt(lower=carg$lower, upper=carg$upper, df=df, corr=carg$corr,
-                     delta=carg$mean,  maxpts=maxpts, abseps=abseps,releps=releps)
-      }
-    } else {
-      if (carg$uni) {
+    if (carg$uni) {
         RET <- list(value = pt(carg$upper, df=df, ncp=carg$mean) -
                             pt(carg$lower, df=df, ncp=carg$mean),
                     error = 0, msg="univariate: using pt")
-      } else {
-          lower <- carg$lower/sqrt(diag(carg$sigma))
-          upper <- carg$upper/sqrt(diag(carg$sigma))
-          corr <- t(t(sigma)/diag(carg$sigma))
-          RET <- mvt(lower=lower, upper=upper, df=df, corr=corr,
-                     delta=carg$mean, maxpts=maxpts, abseps=abseps,releps=releps)
-      }
+    } else {
+        if (!is.null(carg$corr)) {
+            RET <- mvt(lower=carg$lower, upper=carg$upper, df=df, corr=carg$corr,
+                       delta=carg$mean,  maxpts=maxpts, abseps=abseps,releps=releps)
+        } else {
+            lower <- carg$lower/sqrt(diag(carg$sigma))
+            upper <- carg$upper/sqrt(diag(carg$sigma))
+            corr <- t(t(sigma)/diag(carg$sigma))
+            RET <- mvt(lower=lower, upper=upper, df=df, corr=corr,
+                       delta=carg$mean, maxpts=maxpts, abseps=abseps,releps=releps)
+        }
     }
     attr(RET$value, "error") <- RET$error
     attr(RET$value, "msg") <- RET$msg
