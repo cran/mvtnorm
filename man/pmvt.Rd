@@ -73,6 +73,8 @@ contrasts. \emph{Journal of Statistical Computation and Simulation},
 Genz, A. and Bretz, F. (2001), Methods for the computation of multivariate
 t-probabilities. \emph{(submitted)}
 
+Edwards D. and Berry, Jack J. (1987), The efficiency of simulation-based 
+multiple comparisons. \emph{Biometrics}, \bold{43}, 913--928
 
 }
 
@@ -93,6 +95,31 @@ prob <- pmvt(lower, upper, df, corr , delta)
 print(prob)
 
 pmvt(-Inf, 3, df = 3, corr = 0)$value == pt(3, 3)
+
+# Example from R News paper (original by Edwards and Berry, 1987)
+
+n <- c(26, 24, 20, 33, 32)
+V <- diag(1/n)
+df <- 130
+C <- c(1,1,1,0,0,-1,0,0,1,0,0,-1,0,0,1,0,0,0,-1,-1,0,0,-1,0,0)
+C <- matrix(C, ncol=5)
+cv <- C \%*\% V \%*\% t(C)
+cr <- matrix(rep(0, ncol(cv)^2), ncol=ncol(cv))
+for (i in 1:5) {
+  for (j in 1:5) {
+    cr[i,j] <- cv[i,j]/sqrt(cv[i,i]*cv[j,j] )
+  }
+}
+delta <- rep(0,5)
+
+myfct <- function(q, alpha) {
+  lower <- rep(-q, ncol(cv))
+  upper <- rep(q, ncol(cv))
+  pmvt(lower, upper, df, cr, delta, abseps=0.0001)$value - alpha
+}
+
+round(uniroot(myfct, lower=1, upper=5, alpha=0.95)$root, 3)
+
 
 }
 

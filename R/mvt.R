@@ -11,7 +11,7 @@ pmvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
     return(mvt(lower, upper, df, corr, delta, maxpts, abseps,releps))
 }
 
-pmvnorm <- function(mean, corr, lower, upper, maxpts = 25000,
+pmvnorm <- function(lower, upper, mean, corr, maxpts = 25000,
                     abseps = 0.001, releps = 0)
 {
     delta <- mean
@@ -54,13 +54,15 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
                         as.double(corrF), as.double(delta), as.integer(maxpts),
                         as.double(abseps), as.double(releps),
                         error = as.double(error), value = as.double(value),
-                        inform = as.double(inform))
+                        inform = as.integer(inform))
     
     error <- ret$error; value <- ret$value; inform <- ret$inform
 
+    msg <- NULL
     if (inform == 0) msg <- "Normal Completion"
     if (inform == 1) msg <- "Completion with error > abseps"
     if (inform == 3) msg <- "Covariance matrix not positive semidefinite"
+    if (is.null(msg)) msg <- inform
     
     out <- list(value = value, error = error, msg = msg)
     return(out)

@@ -9,13 +9,13 @@ based on algorithms by Genz and Bretz.
 
 }
 \usage{
-pmvnorm(mean, corr, lower, upper, maxpts = 25000, abseps =0.001, releps = 0)
+pmvnorm(lower, upper, mean, corr, maxpts = 25000, abseps =0.001, releps = 0)
 }
 \arguments{
-  \item{mean}{ the mean vector of length n.}
-  \item{corr}{ the correlation matrix of dimension n.}
   \item{lower}{ the vector of lower limits of length n.}
   \item{upper}{ the vector of upper limits of length n.}
+  \item{mean}{ the mean vector of length n.}
+  \item{corr}{ the correlation matrix of dimension n.}
   \item{maxpts}{ maximum number of function values as integer. }
   \item{abseps}{ absolute error tolerance as double. }
   \item{releps}{ relative error tolerance as double. }
@@ -68,10 +68,20 @@ lower <- rep(-1, 5)
 upper <- rep(3, 5)
 corr <- diag(5)
 corr[lower.tri(corr)] <- 0.5
-prob <- pmvnorm(mean, corr, lower, upper)
+corr[upper.tri(corr)] <- 0.5
+prob <- pmvnorm(lower, upper, mean, corr)
 print(prob)
 
 pmvnorm(0, 1, -Inf, 3)$value == pnorm(3)
+
+# Example from R News paper (original by Genz, 1992):
+
+m <- 3
+sigma <- diag(3)
+sigma[2,1] <- 3/5
+sigma[3,1] <- 1/3
+sigma[3,2] <- 11/15
+pmvnorm(lower=rep(-Inf, m), upper=c(1,4,2), mean=rep(0, m), sigma)
 
 }
 
