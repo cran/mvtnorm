@@ -1,6 +1,6 @@
 
 R : Copyright 2003, The R Development Core Team
-Version 1.7.0 Under development (unstable) (2003-02-11)
+Version 1.8.0 Under development (unstable) (2003-06-15)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -67,4 +67,38 @@ attr(,"msg")
 [1] -901.8379
 > stopifnot(all.equal(dmvnorm(x=0, mean=30,log=TRUE), 
 +                     dnorm(0,30,log=TRUE)))
+> 
+> pnorm(2)^2
+[1] 0.9550173
+> pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=25, corr=diag(2))
+[1] 0.9446454
+attr(,"error")
+[1] 1e-15
+attr(,"msg")
+[1] "Normal Completion"
+> pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=250, corr=diag(2))
+[1] 0.9539846
+attr(,"error")
+[1] 1e-15
+attr(,"msg")
+[1] "Normal Completion"
+> pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=1340, corr=diag(2))
+[1] 0.9548248
+attr(,"error")
+[1] 1e-15
+attr(,"msg")
+[1] "Normal Completion"
+> pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=2500, corr=diag(2))
+[1] 0.9549141
+attr(,"error")
+[1] 1e-15
+attr(,"msg")
+[1] "Normal Completion"
+> pmvt(lower=c(-100,-100), upper=c(2,2), delta=c(0, 0), df=2500, corr=diag(2))
+[1] 0.9549141
+attr(,"error")
+[1] 1e-15
+attr(,"msg")
+[1] "Normal Completion"
+> 
 > 

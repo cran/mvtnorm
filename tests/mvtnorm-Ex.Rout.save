@@ -72,9 +72,9 @@ Type `q()' to quit R.
 > corr[upper.tri(corr)] <- 0.5
 > prob <- pmvnorm(lower, upper, mean, corr)
 > print(prob)
-[1] 0.5800004
+[1] 0.5802364
 attr(,"error")
-[1] 0.000609452
+[1] 0.0002670681
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -96,9 +96,9 @@ attr(,"msg")
 > sigma[3,1] <- 1/3
 > sigma[3,2] <- 11/15
 > pmvnorm(lower=rep(-Inf, m), upper=c(1,4,2), mean=rep(0, m), corr=sigma)
-[1] 0.8279848
+[1] 0.8279851
 attr(,"error")
-[1] 4.560147e-07
+[1] 1.128370e-06
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -135,9 +135,9 @@ attr(,"msg")
 > delta <- rep(0, 5)
 > prob <- pmvt(lower=lower, upper=upper, delta=delta, df=df, corr=corr)
 > print(prob)
-[1] 0.5066816
+[1] 0.5067526
 attr(,"error")
-[1] 0.0007847963
+[1] 0.0006674454
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -180,9 +180,9 @@ attr(,"error")
 attr(,"msg")
 [1] "Normal Completion"
 > b
-[1] 0.4211395
+[1] 0.4211456
 attr(,"error")
-[1] 9.459467e-06
+[1] 2.866669e-05
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -197,9 +197,9 @@ attr(,"msg")
 > attributes(a) <- NULL
 > attributes(b) <- NULL
 > a
-[1] 0.5653962
+[1] 0.56536
 > b
-[1] 0.5653998
+[1] 0.5653965
 > stopifnot(all.equal(round(a,3) , round(b, 3)))
 > 
 > 
@@ -208,7 +208,7 @@ attr(,"msg")
 > 
 > 
 > cat("Time elapsed: ", proc.time() - get("ptime", env = .CheckExEnv),"\n")
-Time elapsed:  6.53 0.04 7.52 0 0 
+Time elapsed:  8.89 0.03 9.06 0 0 
 > dev.off(); quit('no')
 null device 
           1 

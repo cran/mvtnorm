@@ -17,7 +17,7 @@
 *
 *  Parameters
 *
-*     N      INTEGER, the number of variables.
+*     N      INTEGER, the number of variables.    
 *     NU     INTEGER, the number of degrees of freedom.
 *            If NU < 1, then an MVN probability is computed.
 *     LOWER  DOUBLE PRECISION, array of lower integration limits.
@@ -50,82 +50,117 @@
 *            if INFORM = 2, N > 100 or N < 1.
 *            if INFORM = 3, correlation matrix not positive semi-definite.
 *
-      EXTERNAL MVFUNC
+      EXTERNAL MVSUBR
       INTEGER N, ND, NU, INFIN(*), MAXPTS, INFORM, IVLS
       DOUBLE PRECISION CORREL(*), LOWER(*), UPPER(*), DELTA(*), RELEPS, 
-     &                 ABSEPS, ERROR, VALUE, MVINIT, MVFUNC
+     &                 ABSEPS, ERROR, VALUE, E(1), V(1)
       COMMON /PTBLCK/IVLS
       IVLS = 0
-      IF ( N .GT. 1000 .OR. N .LT. 1 ) THEN
-         INFORM = 2
+      IF ( N .GT. 100 .OR. N .LT. 1 ) THEN
          VALUE = 0
          ERROR = 1
+         INFORM = 2
       ELSE
-         INFORM = MVINIT( N, NU, CORREL, LOWER, UPPER, DELTA, INFIN,
-     &                   ND, VALUE, ERROR )
-         IF ( INFORM .EQ. 0 .AND. ND .GT. 1 ) THEN
+         CALL MVINTS( N, NU, CORREL, LOWER, UPPER, DELTA, INFIN,
+     &                   ND, VALUE, ERROR, INFORM )
+         IF ( INFORM .EQ. 0 .AND. ND .GT. 0 ) THEN
 *
-*             Call the lattice rule integration subroutine
+*           Call the lattice rule integration subroutine
 *
-            IF ( NU .GT. 0 ) THEN
-               CALL MVKBRC( ND, IVLS, MAXPTS, MVFUNC, ABSEPS, RELEPS, 
-     &                      ERROR, VALUE, INFORM )
-            ELSE IF ( ND .GT. 2 ) THEN
-               CALL MVKBRC( ND-1, IVLS, MAXPTS, MVFUNC, ABSEPS, RELEPS, 
-     &                      ERROR, VALUE, INFORM )
-            ENDIF
+            CALL MVKBRV( ND, IVLS, MAXPTS, 1, MVSUBR, ABSEPS, RELEPS, 
+     &                    E, V, INFORM )
+            ERROR = E(1)
+            VALUE = V(1)
          ENDIF
       ENDIF
       END
 *
-      DOUBLE PRECISION FUNCTION MVFUNC( N, W )
+      SUBROUTINE MVSUBR( N, W, NF, F )
 *     
 *     Integrand subroutine
 *
-      INTEGER N, NUIN, NU, INFIN(*), ND, NL, INFORM  
-      DOUBLE PRECISION W(*), LOWER(*), UPPER(*), CORREL(*), DELTA(*)
-      PARAMETER ( NL = 1000 )
-      DOUBLE PRECISION COV(NL*(NL+1)/2), A(NL),B(NL), DL(NL), Y(NL), SNU
-      INTEGER INFI(NL)
-      DOUBLE PRECISION MVINIT, MVCHNV, MVFNVL, MVBVN, MVSTDT, R, VL, ER
-      SAVE NU, SNU, A, B, DL, INFI, COV
-      IF ( NU .LT. 1 ) THEN
+      INTEGER N, NF, NUIN, INFIN(*), NL
+      DOUBLE PRECISION W(*),F(*), LOWER(*),UPPER(*), CORREL(*), DELTA(*)
+      PARAMETER ( NL = 100 )
+      INTEGER INFI(NL), NU, ND, INFORM, NY 
+      DOUBLE PRECISION COV(NL*(NL+1)/2), A(NL), B(NL), DL(NL), Y(NL)
+      DOUBLE PRECISION MVCHNV, SNU, R, VL, ER, DI, EI
+      SAVE NU, SNU, INFI, A, B, DL, COV
+      IF ( NU .LE. 0 ) THEN
          R = 1
-         MVFUNC = MVFNVL( N+1, W, R, DL, INFI, A, B, COV, Y )
+         CALL MVVLSB( N+1, W, R, DL,INFI,A,B,COV, Y, DI,EI, NY, F(1) )
       ELSE
          R = MVCHNV( NU, W(N) )/SNU
-         MVFUNC = MVFNVL( N, W, R, DL, INFI, A, B, COV, Y )
+         CALL MVVLSB( N  , W, R, DL,INFI,A,B,COV, Y, DI,EI, NY, F(1) )
       END IF
       RETURN
 *
 *     Entry point for intialization.
 *
-      ENTRY MVINIT( N, NUIN, CORREL, LOWER, UPPER, DELTA, INFIN, 
-     &             ND, VL, ER )
+      ENTRY MVINTS( N, NUIN, CORREL, LOWER, UPPER, DELTA, INFIN, 
+     &     ND, VL, ER, INFORM )
 *
 *     Initialization and computation of covariance Cholesky factor.
 *
-      CALL MVSORT( N, LOWER, UPPER, DELTA, CORREL, INFIN, Y, 
+      CALL MVSORT( N, LOWER, UPPER, DELTA, CORREL, INFIN, Y, .TRUE.,
      &            ND,     A,     B,    DL,    COV,  INFI, INFORM )
-      MVINIT = INFORM
-      IF ( INFORM .EQ. 0 ) THEN
-         NU = NUIN
-         VL = 1
+      NU = NUIN
+      CALL MVSPCL( ND, NU, A, B, DL, COV, INFI, SNU, VL, ER, INFORM )
+      END
+*
+      SUBROUTINE MVSPCL( ND, NU, A,B,DL, COV, INFI, SNU, VL,ER, INFORM )
+*
+*     Special cases subroutine
+*
+      DOUBLE PRECISION COV(*), A(*), B(*), DL(*), SNU, R, VL, ER
+      INTEGER ND, NU, INFI(*), INFORM
+      DOUBLE PRECISION MVBVT, MVSTDT
+      IF ( INFORM .GT. 0 ) THEN
+         VL = 0
+         ER = 1
+      ELSE
+*     
+*        Special cases
+*
          IF ( ND .EQ. 0 ) THEN
             ER = 0
-         ELSE IF ( ND .EQ. 2 .AND. NU .LT. 1 ) THEN
+         ELSE IF ( ND.EQ.1 .AND. ( NU.LT.1 .OR. ABS(DL(1)).EQ.0 ) ) THEN
+*     
+*           1-d case for normal or central t
+*
+            VL = 1
+            IF ( INFI(1) .NE. 1 ) VL = MVSTDT( NU, B(1) - DL(1) ) 
+            IF ( INFI(1) .NE. 0 ) VL = VL - MVSTDT( NU, A(1) - DL(1) ) 
+            IF ( VL .LT. 0 ) VL = 0
+            ER = 2D-16
+            ND = 0
+         ELSE IF ( ND .EQ. 2 .AND. 
+     &            ( NU .LT. 1 .OR. ABS(DL(1))+ABS(DL(2)) .EQ. 0 ) ) THEN
+*     
+*           2-d case for normal or central t
+*
+            IF ( INFI(1) .NE. 0 ) A(1) = A(1) - DL(1)
+            IF ( INFI(1) .NE. 1 ) B(1) = B(1) - DL(1)
+            IF ( INFI(2) .NE. 0 ) A(2) = A(2) - DL(2)
+            IF ( INFI(2) .NE. 1 ) B(2) = B(2) - DL(2)
             IF ( ABS( COV(3) ) .GT. 0 ) THEN
+*     
+*              2-d nonsingular case
+*
                R = SQRT( 1 + COV(2)**2 )
-               IF ( INFI(2) .NE. 0 ) A(2) = ( A(2) - DL(2) )/R
-               IF ( INFI(2) .NE. 1 ) B(2) = ( B(2) - DL(2) )/R
+               IF ( INFI(2) .NE. 0 ) A(2) = A(2)/R
+               IF ( INFI(2) .NE. 1 ) B(2) = B(2)/R
                COV(2) = COV(2)/R
-               VL = MVBVN( A, B, INFI, COV(2) )
+               VL = MVBVT( NU, A, B, INFI, COV(2) )
                ER = 1D-15
             ELSE
+*     
+*              2-d singular case
+*
                IF ( INFI(1) .NE. 0 ) THEN
                   IF ( INFI(2) .NE. 0 ) A(1) = MAX( A(1), A(2) )
                ELSE
-                  IF ( INFI(2) .NE. 0 ) A(1) = A(2) 
+                  IF ( INFI(2) .NE. 0 ) A(1) = A(2)
                END IF
                IF ( INFI(1) .NE. 1 ) THEN
                   IF ( INFI(2) .NE. 1 ) B(1) = MIN( B(1), B(2) ) 
@@ -133,40 +168,41 @@
                   IF ( INFI(2) .NE. 1 ) B(1) = B(2)
                END IF
                IF ( INFI(1) .NE. INFI(2) ) INFI(1) = 2
-               ND = 1
+               VL = 1
+               IF ( INFI(1) .NE. 1 ) VL = MVSTDT( NU, B(1)-DL(1) ) 
+               IF ( INFI(1) .NE. 0 ) VL = VL - MVSTDT( NU, A(1)-DL(1) )
+               IF ( VL .LT. 0 ) VL = 0
+               ER = 2D-16
+            END IF
+            ND = 0
+         ELSE
+            IF ( NU .GT. 0 ) THEN
+               SNU = SQRT( DBLE(NU) ) 
+            ELSE 
+               ND = ND - 1
             END IF
          END IF
-         IF ( ND .EQ. 1 ) THEN
-            IF ( INFI(1) .NE. 1 ) VL = MVSTDT( NU, B(1) ) 
-            IF ( INFI(1) .NE. 0 ) VL = VL - MVSTDT( NU, A(1) ) 
-            IF ( VL .LT. 0 ) VL = 0
-            ER = 1D-16
-         END IF
-         IF ( NU .GT. 0 ) SNU = SQRT( DBLE(NU) )
-      ELSE
-         VL = 0
-         ER = 1
       END IF
       END
 *
-      DOUBLE PRECISION FUNCTION MVFNVL( N, W, R, DL, INFI, A,B, COV, Y )
+      SUBROUTINE MVVLSB( N,W,R,DL,INFI, A,B,COV, Y, DI,EI, ND, VALUE )      
 *     
 *     Integrand subroutine
 *
-      INTEGER N, INFI(*)
+      INTEGER N, INFI(*), ND
       DOUBLE PRECISION W(*), R, DL(*), A(*), B(*), COV(*), Y(*)
-      INTEGER I, J, IJ, IK, INFA, INFB
-      DOUBLE PRECISION SUM, AI, BI, DI, EI, MVPHNV
-      MVFNVL = 1
+      INTEGER I, J, IJ, INFA, INFB
+      DOUBLE PRECISION SUM, AI, BI, DI, EI, MVPHNV, VALUE
+      VALUE = 1
       INFA = 0
       INFB = 0
-      IK = 1
+      ND = 0
       IJ = 0
       DO I = 1, N
          SUM = DL(I)
          DO J = 1, I-1
             IJ = IJ + 1
-            IF ( J .LT. IK ) SUM = SUM + COV(IJ)*Y(J)
+            IF ( J .LE. ND ) SUM = SUM + COV(IJ)*Y(J)
          END DO
          IF ( INFI(I) .NE. 0 ) THEN
             IF ( INFA .EQ. 1 ) THEN
@@ -185,15 +221,15 @@
             END IF
          END IF
          IJ = IJ + 1
-         IF ( I .EQ. N .OR. COV(IJ+IK+1) .GT. 0 ) THEN 
+         IF ( I .EQ. N .OR. COV(IJ+ND+2) .GT. 0 ) THEN 
             CALL MVLIMS( AI, BI, INFA + INFA + INFB - 1, DI, EI )
             IF ( DI .GE. EI ) THEN
-               MVFNVL = 0
+               VALUE = 0
                RETURN
             ELSE
-               MVFNVL = MVFNVL*( EI - DI )
-               IF ( I .LT. N ) Y(IK) = MVPHNV( DI + W(IK)*( EI - DI ) )
-               IK = IK + 1
+               VALUE = VALUE*( EI - DI )
+               ND = ND + 1
+               IF ( I .LT. N ) Y(ND) = MVPHNV( DI + W(ND)*( EI - DI ) )
                INFA = 0
                INFB = 0
             END IF
@@ -201,18 +237,19 @@
       END DO
       END
 *
-      SUBROUTINE MVSORT( N, LOWER, UPPER, DELTA, CORREL, INFIN, Y, 
+      SUBROUTINE MVSORT( N, LOWER, UPPER, DELTA, CORREL, INFIN, Y,PIVOT,
      &                  ND,     A,     B,    DL,    COV,  INFI, INFORM )
 *
 *     Subroutine to sort integration limits and determine Cholesky factor.
 *
       INTEGER N, ND, INFIN(*), INFI(*), INFORM
+      LOGICAL PIVOT
       DOUBLE PRECISION     A(*),     B(*),    DL(*),    COV(*), 
      &                 LOWER(*), UPPER(*), DELTA(*), CORREL(*), Y(*)
-      INTEGER I, J, K, L, M, II, IJ, IL, JMIN
-      DOUBLE PRECISION SUMSQ, AJ, BJ, SUM, SQTWPI, EPS, EPSI, D, E
-      DOUBLE PRECISION CVDIAG, AMIN, BMIN, DEMIN, YL, YU
-      PARAMETER ( SQTWPI = 2.50662 82746 31001D0, EPS = 1D-14 )
+      INTEGER I, J, K, L, M, II, IJ, IL, JL, JMIN
+      DOUBLE PRECISION SUMSQ, AJ, BJ, SUM, EPS, EPSI, D, E
+      DOUBLE PRECISION CVDIAG, AMIN, BMIN, DEMIN, MVTDNS
+      PARAMETER ( EPS = 1D-6 )
       INFORM = 0
       IJ = 0
       II = 0
@@ -255,6 +292,7 @@
 *     Sort remaining limits and determine Cholesky factor.
 *
          II = 0
+         JL = ND
          DO I = 1, ND
 *
 *        Determine the integration limits for variable with minimum
@@ -265,7 +303,8 @@
             CVDIAG = 0
             IJ = II
             EPSI = EPS*I*I
-            DO J = I, ND
+            IF ( .NOT. PIVOT ) JL = I
+            DO J = I, JL
                IF ( COV(IJ+J) .GT. EPSI ) THEN
                   SUMSQ = SQRT( COV(IJ+J) )
                   SUM = DL(J) 
@@ -290,7 +329,6 @@
             END IF
             IF ( COV(II+I) .LT. -EPSI ) THEN
                INFORM = 3
-               RETURN
             END IF
             COV(II+I) = CVDIAG
 *
@@ -309,12 +347,16 @@
                   END DO
                   IL = IL + L
                END DO
+* 
+*              Expected Y = -( density(b) - density(a) )/( b - a )
+* 
                IF ( DEMIN .GT. EPSI ) THEN
-                  YL = 0
-                  YU = 0
-                  IF ( INFI(I) .NE. 0 ) YL = -EXP( -AMIN**2/2 )/SQTWPI
-                  IF ( INFI(I) .NE. 1 ) YU = -EXP( -BMIN**2/2 )/SQTWPI
-                  Y(I) = ( YU - YL )/DEMIN
+                  Y(I) = 0
+                  IF ( INFI(I) .NE. 0 ) Y(I) =        MVTDNS( 0, AMIN )
+   
+                  IF ( INFI(I) .NE. 1 ) Y(I) = Y(I) - MVTDNS( 0, BMIN )
+   
+                  Y(I) = Y(I)/DEMIN
                ELSE
                   IF ( INFI(I) .EQ. 0 ) Y(I) = BMIN
                   IF ( INFI(I) .EQ. 1 ) Y(I) = AMIN
@@ -377,6 +419,28 @@
             END IF
          END DO
       ENDIF
+      END
+*
+      DOUBLE PRECISION FUNCTION MVTDNS( NU, X )
+      INTEGER NU, I
+      DOUBLE PRECISION X, PROD, PI, SQTWPI
+      PARAMETER (     PI = 3.141592653589793D0 )
+      PARAMETER ( SQTWPI = 2.506628274631001D0 )
+      MVTDNS = 0
+      IF ( NU .GT. 0 ) THEN
+         PROD = 1/SQRT( DBLE(NU) )
+         DO I = NU - 2, 1, -2
+            PROD = PROD*( I + 1 )/I
+         END DO
+         IF ( MOD( NU, 2 ) .EQ. 0 ) THEN
+            PROD = PROD/2
+         ELSE
+            PROD = PROD/PI
+         END IF
+         MVTDNS = PROD/SQRT( 1 + X*X/NU )**( NU + 1 )
+      ELSE
+        IF ( ABS(X) .LT. 10 ) MVTDNS = EXP( -X*X/2 )/SQTWPI
+      END IF
       END
 *
       SUBROUTINE MVLIMS( A, B, INFIN, LOWER, UPPER )
@@ -493,6 +557,7 @@
       IF ( Z .GT. 0 ) P = 1 - P
       MVPHI = P
       END
+*
       DOUBLE PRECISION FUNCTION MVPHNV(P)
 *
 *	ALGORITHM AS241  APPL. STATIST. (1988) VOL. 37, NO. 3
@@ -647,18 +712,17 @@
       END 
       DOUBLE PRECISION FUNCTION MVBVU( SH, SK, R )
 *
-*     A function for computing bivariate normal probabilities.
-*
-*       Yihong Ge
-*       Department of Computer Science and Electrical Engineering
-*       Washington State University
-*       Pullman, WA 99164-2752
-*     and
-*       Alan Genz
-*       Department of Mathematics
-*       Washington State University
-*       Pullman, WA 99164-3113
-*       Email : alangenz@wsu.edu
+*     A function for computing bivariate normal probabilities;
+*       developed using 
+*         Drezner, Z. and Wesolowsky, G. O. (1989),
+*         On the Computation of the Bivariate Normal Integral,
+*         J. Stat. Comput. Simul.. 35 pp. 101-107.
+*       with extensive modications for double precisions by    
+*         Alan Genz and Yihong Ge
+*         Department of Mathematics
+*         Washington State University
+*         Pullman, WA 99164-3113
+*         Email : alangenz@wsu.edu
 *
 * BVN - calculate the probability that X is larger than SH and Y is
 *       larger than SK.
@@ -672,7 +736,7 @@
 *
       DOUBLE PRECISION BVN, SH, SK, R, ZERO, TWOPI 
       INTEGER I, LG, NG
-      PARAMETER ( ZERO = 0, TWOPI = 6.2831 85307 179586 ) 
+      PARAMETER ( ZERO = 0, TWOPI = 6.283185307179586D0 ) 
       DOUBLE PRECISION X(10,3), W(10,3), AS, A, B, C, D, RS, XS
       DOUBLE PRECISION MVPHI, SN, ASR, H, K, BS, HS, HK
 *     Gauss Legendre Points and Weights, N =  6
@@ -800,6 +864,200 @@
       ENDIF
       END
 *
+      DOUBLE PRECISION FUNCTION MVBVT( NU, LOWER, UPPER, INFIN, CORREL )      
+*
+*     A function for computing bivariate normal and t probabilities.
+*
+*  Parameters
+*
+*     NU     INTEGER degrees of freedom parameter; NU < 1 gives normal case.
+*     LOWER  REAL, array of lower integration limits.
+*     UPPER  REAL, array of upper integration limits.
+*     INFIN  INTEGER, array of integration limits flags:
+*            if INFIN(I) = 0, Ith limits are (-infinity, UPPER(I)];
+*            if INFIN(I) = 1, Ith limits are [LOWER(I), infinity);
+*            if INFIN(I) = 2, Ith limits are [LOWER(I), UPPER(I)].
+*     CORREL REAL, correlation coefficient.
+*
+      DOUBLE PRECISION LOWER(*), UPPER(*), CORREL, MVBVN, MVBVTL
+      INTEGER NU, INFIN(*)
+      IF ( NU .LT. 1 ) THEN
+            MVBVT =  MVBVN ( LOWER, UPPER, INFIN, CORREL )
+      ELSE
+         IF ( INFIN(1) .EQ. 2  .AND. INFIN(2) .EQ. 2 ) THEN
+            MVBVT =  MVBVTL ( NU, UPPER(1), UPPER(2), CORREL )
+     +           - MVBVTL ( NU, UPPER(1), LOWER(2), CORREL )
+     +           - MVBVTL ( NU, LOWER(1), UPPER(2), CORREL )
+     +           + MVBVTL ( NU, LOWER(1), LOWER(2), CORREL )
+         ELSE IF ( INFIN(1) .EQ. 2  .AND. INFIN(2) .EQ. 1 ) THEN
+            MVBVT =  MVBVTL ( NU, -LOWER(1), -LOWER(2), CORREL )
+     +           - MVBVTL ( NU, -UPPER(1), -LOWER(2), CORREL )
+         ELSE IF ( INFIN(1) .EQ. 1  .AND. INFIN(2) .EQ. 2 ) THEN
+            MVBVT =  MVBVTL ( NU, -LOWER(1), -LOWER(2), CORREL )
+     +           - MVBVTL ( NU, -LOWER(1), -UPPER(2), CORREL )
+         ELSE IF ( INFIN(1) .EQ. 2  .AND. INFIN(2) .EQ. 0 ) THEN
+            MVBVT =  MVBVTL ( NU, UPPER(1), UPPER(2), CORREL )
+     +           - MVBVTL ( NU, LOWER(1), UPPER(2), CORREL )
+         ELSE IF ( INFIN(1) .EQ. 0  .AND. INFIN(2) .EQ. 2 ) THEN
+            MVBVT =  MVBVTL ( NU, UPPER(1), UPPER(2), CORREL )
+     +           - MVBVTL ( NU, UPPER(1), LOWER(2), CORREL )
+         ELSE IF ( INFIN(1) .EQ. 1  .AND. INFIN(2) .EQ. 0 ) THEN
+            MVBVT =  MVBVTL ( NU, -LOWER(1), UPPER(2), -CORREL )
+         ELSE IF ( INFIN(1) .EQ. 0  .AND. INFIN(2) .EQ. 1 ) THEN
+            MVBVT =  MVBVTL ( NU, UPPER(1), -LOWER(2), -CORREL )
+         ELSE IF ( INFIN(1) .EQ. 1  .AND. INFIN(2) .EQ. 1 ) THEN
+            MVBVT =  MVBVTL ( NU, -LOWER(1), -LOWER(2), CORREL )
+         ELSE IF ( INFIN(1) .EQ. 0  .AND. INFIN(2) .EQ. 0 ) THEN
+            MVBVT =  MVBVTL ( NU, UPPER(1), UPPER(2), CORREL )
+         END IF
+      END IF
+      END
+*
+      DOUBLE PRECISION FUNCTION MVBVTC( NU, L, U, INFIN, RHO )      
+*
+*     A function for computing complementary bivariate normal and t 
+*       probabilities.
+*
+*  Parameters
+*
+*     NU     INTEGER degrees of freedom parameter.
+*     L      REAL, array of lower integration limits.
+*     U      REAL, array of upper integration limits.
+*     INFIN  INTEGER, array of integration limits flags:
+*            if INFIN(1) INFIN(2),        then MVBVTC computes
+*                 0         0              P( X>U(1), Y>U(2) )
+*                 1         0              P( X<L(1), Y>U(2) )
+*                 0         1              P( X>U(1), Y<L(2) )
+*                 1         1              P( X<L(1), Y<L(2) )
+*                 2         0      P( X>U(1), Y>U(2) ) + P( X<L(1), Y>U(2) )
+*                 2         1      P( X>U(1), Y<L(2) ) + P( X<L(1), Y<L(2) )
+*                 0         2      P( X>U(1), Y>U(2) ) + P( X>U(1), Y<L(2) )
+*                 1         2      P( X<L(1), Y>U(2) ) + P( X<L(1), Y<L(2) )
+*                 2         2      P( X>U(1), Y<L(2) ) + P( X<L(1), Y<L(2) )
+*                               +  P( X>U(1), Y>U(2) ) + P( X<L(1), Y>U(2) )
+*
+*     RHO    REAL, correlation coefficient.
+*
+      DOUBLE PRECISION L(*), U(*), LW(2), UP(2), B, RHO, MVBVT
+      INTEGER I, NU, INFIN(*), INF(2)
+*
+      DO I = 1, 2
+         IF ( MOD( INFIN(I), 2 ) .EQ. 0 ) THEN
+            INF(I) = 1
+            LW(I) = U(I) 
+         ELSE
+            INF(I) = 0
+            UP(I) = L(I) 
+         END IF
+      END DO
+      B = MVBVT( NU, LW, UP, INF, RHO )
+      DO I = 1, 2
+         IF ( INFIN(I) .EQ. 2 ) THEN
+            INF(I) = 0
+            UP(I) = L(I) 
+            B = B + MVBVT( NU, LW, UP, INF, RHO )
+         END IF
+      END DO
+      IF ( INFIN(1) .EQ. 2 .AND. INFIN(2) .EQ. 2 ) THEN
+         INF(1) = 1
+         LW(1) = U(1) 
+         B = B + MVBVT( NU, LW, UP, INF, RHO )
+      END IF
+      MVBVTC = B
+      END
+*
+      double precision function mvbvtl( nu, dh, dk, r )
+*
+*     a function for computing bivariate t probabilities.
+*
+*       Alan Genz
+*       Department of Mathematics
+*       Washington State University
+*       Pullman, Wa 99164-3113
+*       Email : alangenz@wsu.edu
+*
+*    this function is based on the method described by 
+*        Dunnett, C.W. and M. Sobel, (1954),
+*        A bivariate generalization of Student's t-distribution
+*        with tables for certain special cases,
+*        Biometrika 41, pp. 153-169.
+*
+* mvbvtl - calculate the probability that x < dh and y < dk. 
+*
+* parameters
+*
+*   nu number of degrees of freedom
+*   dh 1st lower integration limit
+*   dk 2nd lower integration limit
+*   r   correlation coefficient
+*
+      integer nu, j, hs, ks
+      double precision dh, dk, r
+      double precision tpi, pi, ors, hrk, krh, bvt, snu 
+      double precision gmph, gmpk, xnkh, xnhk, qhrk, hkn, hpk, hkrn
+      double precision btnckh, btnchk, btpdkh, btpdhk, one
+      parameter ( pi = 3.14159265358979323844d0, tpi = 2*pi, one = 1 )
+      snu = sqrt( dble(nu) )
+      ors = 1 - r*r  
+      hrk = dh - r*dk  
+      krh = dk - r*dh  
+      if ( abs(hrk) + ors .gt. 0 ) then
+         xnhk = hrk**2/( hrk**2 + ors*( nu + dk**2 ) ) 
+         xnkh = krh**2/( krh**2 + ors*( nu + dh**2 ) ) 
+      else
+         xnhk = 0
+         xnkh = 0  
+      end if
+      hs = sign( one, dh - r*dk )  
+      ks = sign( one, dk - r*dh ) 
+      if ( mod( nu, 2 ) .eq. 0 ) then
+         bvt = atan2( sqrt(ors), -r )/tpi 
+         gmph = dh/sqrt( 16*( nu + dh**2 ) )  
+         gmpk = dk/sqrt( 16*( nu + dk**2 ) )  
+         btnckh = 2*atan2( sqrt( xnkh ), sqrt( 1 - xnkh ) )/pi  
+         btpdkh = 2*sqrt( xnkh*( 1 - xnkh ) )/pi 
+         btnchk = 2*atan2( sqrt( xnhk ), sqrt( 1 - xnhk ) )/pi  
+         btpdhk = 2*sqrt( xnhk*( 1 - xnhk ) )/pi 
+         do j = 1, nu/2
+            bvt = bvt + gmph*( 1 + ks*btnckh ) 
+            bvt = bvt + gmpk*( 1 + hs*btnchk ) 
+            btnckh = btnckh + btpdkh  
+            btpdkh = 2*j*btpdkh*( 1 - xnkh )/( 2*j + 1 )  
+            btnchk = btnchk + btpdhk  
+            btpdhk = 2*j*btpdhk*( 1 - xnhk )/( 2*j + 1 )  
+            gmph = gmph*( 2*j - 1 )/( 2*j*( 1 + dh**2/nu ) ) 
+            gmpk = gmpk*( 2*j - 1 )/( 2*j*( 1 + dk**2/nu ) ) 
+         end do
+      else
+         qhrk = sqrt( dh**2 + dk**2 - 2*r*dh*dk + nu*ors )  
+         hkrn = dh*dk + r*nu  
+         hkn = dh*dk - nu  
+         hpk = dh + dk 
+         bvt = atan2(-snu*(hkn*qhrk+hpk*hkrn),hkn*hkrn-nu*hpk*qhrk)/tpi  
+         if ( bvt .lt. -1d-15 ) bvt = bvt + 1
+         gmph = dh/( tpi*snu*( 1 + dh**2/nu ) )  
+         gmpk = dk/( tpi*snu*( 1 + dk**2/nu ) )  
+         btnckh = sqrt( xnkh )  
+         btpdkh = btnckh 
+         btnchk = sqrt( xnhk )  
+         btpdhk = btnchk  
+         do j = 1, ( nu - 1 )/2
+            bvt = bvt + gmph*( 1 + ks*btnckh ) 
+            bvt = bvt + gmpk*( 1 + hs*btnchk ) 
+            btpdkh = ( 2*j - 1 )*btpdkh*( 1 - xnkh )/( 2*j )  
+            btnckh = btnckh + btpdkh  
+            btpdhk = ( 2*j - 1 )*btpdhk*( 1 - xnhk )/( 2*j )  
+            btnchk = btnchk + btpdhk  
+            gmph = 2*j*gmph/( ( 2*j + 1 )*( 1 + dh**2/nu ) ) 
+            gmpk = 2*j*gmpk/( ( 2*j + 1 )*( 1 + dk**2/nu ) ) 
+         end do
+      end if
+      mvbvtl = bvt 
+*
+*     end mvbvtl
+*
+      end
+*
       DOUBLE PRECISION FUNCTION MVCHNV( N, P )
 *
 *                  MVCHNV
@@ -807,7 +1065,7 @@
 *               N  0
 *
       INTEGER I, N, NO
-      DOUBLE PRECISION P, TWO, R, RO, LRP, LKN, MVPHNV, MVCHNC, TO
+      DOUBLE PRECISION P, TWO, R, RO, LRP, LKN, MVPHNV, MVCHNC
       PARAMETER ( LRP = -.22579135264472743235D0, TWO = 2 )
 *                 LRP =   LOG( SQRT( 2/PI ) )
       SAVE NO, LKN
@@ -852,7 +1110,7 @@
 *
       DOUBLE PRECISION FUNCTION MVCHNC( LKN, N, P, R )
 *
-*     Third order correction to R for MVCHNV
+*     Third order Schroeder correction to R for MVCHNV
 *
       INTEGER N, I
       DOUBLE PRECISION P, R, LKN, DF, RR, RP, PF, MVPHI
@@ -867,11 +1125,12 @@
       ELSE
          DF = ( P - 2*MVPHI(-R) - EXP( LOG( RP*R*PF ) - RR/2 ) )
       ENDIF
-      MVCHNC = R - DF/( EXP(LKN+(N-1)*LOG(R)-RR/2) + DF*(R-(N-1)/R)/2 )   
+      DF =  DF/EXP( LKN + (N-1)*LOG(R) - RR/2 )
+      MVCHNC = R - DF*( 1 - DF*( R - (N-1)/R )/2 )   
       END
 *
-      SUBROUTINE MVKBRC( NDIM, MINVLS, MAXVLS, FUNCTN, ABSEPS, RELEPS,
-     &                   ABSERR, FINEST, INFORM )
+      SUBROUTINE MVKBRV( NDIM, MINVLS, MAXVLS, NF, FUNSUB, 
+     &                   ABSEPS, RELEPS, ABSERR, FINEST, INFORM )
 *
 *  Automatic Multidimensional Integration Subroutine
 *               
@@ -881,14 +1140,15 @@
 *                 Pulman, WA 99164-3113
 *                 Email: AlanGenz@wsu.edu
 *
-*         Last Change: 10/15/99
+*         Last Change: 12/15/00
 *
-*  MVKBRC computes an approximation to the integral
+*  MVKBRV computes an approximation to the integral
 *
 *      1  1     1
 *     I  I ... I       F(X)  dx(NDIM)...dx(2)dx(1)
 *      0  0     0
 *
+*    F(X) is a real NF-vector of integrands.
 *
 *  It uses randomized Korobov rules. The primary references are
 *   "Randomization of Number Theoretic Methods for Multiple Integration"
@@ -899,45 +1159,48 @@
 *   
 ***************  Parameters ********************************************
 ****** Input parameters
-*  NDIM    Number of variables, must exceed 1, but not exceed 40
+*  NDIM    Number of variables, must exceed 1, but not exceed 100
 *  MINVLS  Integer minimum number of function evaluations allowed.
 *          MINVLS must not exceed MAXVLS.  If MINVLS < 0 then the
 *          routine assumes a previous call has been made with 
-*          the same integrand and continues that calculation.
+*          the same integrands and continues that calculation.
 *  MAXVLS  Integer maximum number of function evaluations allowed.
-*  FUNCTN  EXTERNALly declared user defined function to be integrated.
-*          It must have parameters (NDIM,Z), where Z is a real array
-*          of dimension NDIM.
+*  NF      Number of integrands, must exceed 1, but not exceed 5000
+*  FUNSUB  EXTERNALly declared user defined integrand subroutine.
+*          It must have parameters ( NDIM, Z, NF, FUNVLS ), where 
+*          Z is a real NDIM-vector and FUNVLS is a real NF-vector.
 *                                     
 *  ABSEPS  Required absolute accuracy.
 *  RELEPS  Required relative accuracy.
 ****** Output parameters
 *  MINVLS  Actual number of function evaluations used.
-*  ABSERR  Estimated absolute accuracy of FINEST.
-*  FINEST  Estimated value of integral.
+*  ABSERR  Maximum norm of estimated absolute accuracy of FINEST.
+*  FINEST  Estimated NF-vector of values of the integrals.
 *  INFORM  INFORM = 0 for normal exit, when 
-*                     ABSERR <= MAX(ABSEPS, RELEPS*ABS(FINEST))
+*                     ABSERR <= MAX(ABSEPS, RELEPS*||FINEST||)
 *                  and 
 *                     INTVLS <= MAXCLS.
 *          INFORM = 1 If MAXVLS was too small to obtain the required 
 *          accuracy. In this case a value FINEST is returned with 
 *          estimated absolute accuracy ABSERR.
 ************************************************************************
-      EXTERNAL FUNCTN
-      INTEGER NDIM, MINVLS, MAXVLS, INFORM, NP, PLIM, NLIM,
-     &        SAMPLS, I, INTVLS, MINSMP
-      PARAMETER ( PLIM = 25, NLIM = 1000, MINSMP = 8 )
-      INTEGER P(PLIM), C(PLIM,NLIM-1) 
-      DOUBLE PRECISION FUNCTN, ABSEPS, RELEPS, FINEST, ABSERR, DIFINT, 
-     &                 FINVAL, VARSQR, VAREST, VARPRD, VALUE
-      DOUBLE PRECISION X(2*NLIM), VK(NLIM), ONE
+      EXTERNAL FUNSUB
+      DOUBLE PRECISION ABSEPS, RELEPS, FINEST(*), ABSERR, ONE
+      INTEGER NDIM, NF, MINVLS, MAXVLS, INFORM, NP, PLIM, 
+     &        NLIM, FLIM, SAMPLS, I, K, INTVLS, MINSMP, KMX
+      PARAMETER ( PLIM = 28, NLIM = 100, FLIM = 5000, MINSMP = 8 )
+      INTEGER P(PLIM), C(PLIM,NLIM-1), PR(NLIM) 
+      DOUBLE PRECISION DIFINT, FINVAL(FLIM), VARSQR(FLIM), VAREST(FLIM), 
+     &     VARPRD, X(NLIM), R(NLIM), VK(NLIM), VALUES(FLIM), FS(FLIM)
       PARAMETER ( ONE = 1 )
       SAVE P, C, SAMPLS, NP, VAREST
       INFORM = 1
       INTVLS = 0
       IF ( MINVLS .GE. 0 ) THEN
-         FINEST = 0
-         VAREST = 0
+         DO K = 1, NF
+            FINEST(K) = 0
+            VAREST(K) = 0
+         END DO
          SAMPLS = MINSMP 
          DO I = 1, PLIM
             NP = I
@@ -949,20 +1212,31 @@
       DO I = 2, NDIM
          VK(I) = MOD( C(NP, NDIM-1 )*VK(I-1), ONE )
       END DO
-      FINVAL = 0
-      VARSQR = 0
-      DO I = 1, SAMPLS
-         CALL MVKSRC( NDIM, VALUE, P(NP), VK, FUNCTN, X )
-         DIFINT = ( VALUE - FINVAL )/I
-         FINVAL = FINVAL + DIFINT
-         VARSQR = ( I - 2 )*VARSQR/I + DIFINT**2
+      DO K = 1, NF
+         FINVAL(K) = 0
+         VARSQR(K) = 0
       END DO
+*
+      DO I = 1, SAMPLS
+         CALL MVKRSV( NDIM, VALUES, P(NP), VK, NF, FUNSUB, X,R,PR,FS )
+         DO K = 1, NF
+            DIFINT = ( VALUES(K) - FINVAL(K) )/I
+            FINVAL(K) = FINVAL(K) + DIFINT
+            VARSQR(K) = ( I - 2 )*VARSQR(K)/I + DIFINT**2
+         END DO
+      END DO
+*
       INTVLS = INTVLS + 2*SAMPLS*P(NP)
-      VARPRD = VAREST*VARSQR
-      FINEST = FINEST + ( FINVAL - FINEST )/( 1 + VARPRD )
-      IF ( VARSQR .GT. 0 ) VAREST = ( 1 + VARPRD )/VARSQR
-      ABSERR = 7*SQRT( VARSQR/( 1 + VARPRD ) )/2
-      IF ( ABSERR .GT. MAX( ABSEPS, ABS(FINEST)*RELEPS ) ) THEN
+      KMX = 1
+      DO K = 1, NF
+         VARPRD = VAREST(K)*VARSQR(K)
+         FINEST(K) = FINEST(K) + ( FINVAL(K) - FINEST(K) )/( 1+VARPRD )      
+         IF ( VARSQR(K) .GT. 0 ) VAREST(K) = ( 1 + VARPRD )/VARSQR(K)
+         ABSERR = MAX( ABSERR, 7*SQRT( VARSQR(K)/( 1 + VARPRD ) )/2 )
+         IF ( ABS(FINEST(K)) .GT. ABS(FINEST(KMX)) ) KMX = K
+      END DO
+      ABSERR = 7*SQRT( VARSQR(KMX)/( 1 + VARPRD ) )/2
+      IF ( ABSERR .GT. MAX( ABSEPS, ABS(FINEST(KMX))*RELEPS ) ) THEN
          IF ( NP .LT. PLIM ) THEN
             NP = NP + 1
          ELSE
@@ -975,232 +1249,188 @@
       ENDIF
       MINVLS = INTVLS
 *
-      DATA P( 1), (C( 1,I), I = 1, 99)/      31,  1*     12,  2*      9,
-     &        1*     13,  8*     12,  3*      3,  1*     12,  2*      7,
-     &        9*     12,  3*      3,  1*     12,  2*      7,  9*     12,
-     &        3*      3,  1*     12,  2*      7,  9*     12,  3*      3,
-     &        1*     12,  2*      7,  8*     12,  1*      7,  3*      3,
-     &        3*      7, 21*      3/
-      DATA P( 2), (C( 2,I), I = 1, 99)/      47,  1*     13,  1*     11,
-     &        1*     17,  1*     10,  6*     15,  1*     22,  2*     15,
-     &        3*      6,  2*     15,  1*      9,  1*     13,  3*      2,
-     &        1*     13,  2*     11,  1*     10,  9*     15,  3*      6,
-     &        2*     15,  1*      9,  1*     13,  3*      2,  1*     13,
-     &        2*     11,  1*     10,  9*     15,  3*      6,  2*     15,
-     &        1*      9,  1*     13,  3*      2,  1*     13,  2*     11,
-     &        2*     10,  8*     15,  1*      6,  1*      2,  1*      3,
-     &        1*      2,  1*      3, 12*      2/
-      DATA P( 3), (C( 3,I), I = 1, 99)/      73,  1*     27,  1*     28,
-     &        1*     10,  2*     11,  1*     20,  2*     11,  1*     28,
-     &        2*     13,  1*     28,  3*     13, 16*     14,  2*     31,
-     &        3*      5,  1*     31,  1*     13,  6*     11,  7*     13,
-     &       16*     14,  2*     31,  3*      5,  1*     11,  1*     13,
-     &        7*     11,  2*     13,  1*     11,  1*     13,  4*      5,
-     &        1*     14,  1*     13,  8*      5/
-      DATA P( 4), (C( 4,I), I = 1, 99)/     113,  1*     35,  2*     27,
-     &        1*     36,  1*     22,  2*     29,  1*     20,  1*     45,
-     &        3*      5, 16*     21,  1*     29, 10*     17, 12*     23,
-     &        1*     21,  1*     27,  3*      3,  1*     24,  2*     27,
-     &        1*     17,  3*     29,  1*     17,  4*      5, 16*     21,
-     &        3*     17,  1*      6,  2*     17,  1*      6,  1*      3,
-     &        2*      6,  5*      3/
-      DATA P( 5), (C( 5,I), I = 1, 99)/     173,  1*     64,  1*     66,
-     &        2*     28,  2*     44,  1*     55,  1*     67,  6*     10,
-     &        2*     38,  5*     10, 12*     49,  2*     38,  1*     31,
-     &        2*      4,  1*     31,  1*     64,  3*      4,  1*     64,
-     &        6*     45, 19*     66,  1*     11,  9*     66,  1*     45,
-     &        1*     11,  1*      7,  1*      3,  3*      2,  1*     27,
-     &        1*      5,  2*      3,  2*      5,  7*      2/
-      DATA P( 6), (C( 6,I), I = 1, 99)/     263,  1*    111,  1*     42,
-     &        1*     54,  1*    118,  1*     20,  2*     31,  1*     72,
-     &        1*     17,  1*     94,  2*     14,  1*     11,  3*     14,
-     &        1*     94,  4*     10,  7*     14,  3*     11,  7*      8,
-     &        5*     18,  1*    113,  2*     62,  2*     45, 17*    113,
-     &        2*     63,  1*     53,  1*     63, 15*     67,  5*     51,
-     &        1*     12,  1*     51,  1*     12,  1*     51,  1*      5,
-     &        2*      3,  2*      2,  1*      5/
-      DATA P( 7), (C( 7,I), I = 1, 99)/     397,  1*    163,  1*    154,
-     &        1*     83,  1*     43,  1*     82,  1*     92,  1*    150,
-     &        1*     59,  2*     76,  1*     47,  2*     11,  1*    100,
-     &        1*    131,  6*    116,  9*    138, 21*    101,  6*    116,
-     &        5*    100,  5*    138, 19*    101,  8*     38,  5*      3/
-      DATA P( 8), (C( 8,I), I = 1, 99)/     593,  1*    246,  1*    189,
-     &        1*    242,  1*    102,  2*    250,  1*    102,  1*    250,
-     &        1*    280,  1*    118,  1*    196,  1*    118,  1*    191,
-     &        1*    215,  2*    121, 12*     49, 34*    171,  8*    161,
-     &       17*     14,  6*     10,  1*    103,  4*     10,  1*      5/
-      DATA P( 9), (C( 9,I), I = 1, 99)/     907,  1*    347,  1*    402,
-     &        1*    322,  1*    418,  1*    215,  1*    220,  3*    339,
-     &        1*    337,  1*    218,  4*    315,  4*    167,  1*    361,
-     &        1*    201, 11*    124,  2*    231, 14*     90,  4*     48,
-     &       23*     90, 10*    243,  9*    283,  1*     16,  1*    283,
-     &        1*     16,  2*    283/
-      DATA P(10), (C(10,I), I = 1, 99)/    1361,  1*    505,  1*    220,
-     &        1*    601,  1*    644,  1*    612,  1*    160,  3*    206,
-     &        1*    422,  1*    134,  1*    518,  2*    134,  1*    518,
-     &        1*    652,  1*    382,  1*    206,  1*    158,  1*    441,
-     &        1*    179,  1*    441,  1*     56,  2*    559, 14*     56,
-     &        2*    101,  1*     56,  8*    101,  7*    193, 21*    101,
-     &       17*    122,  4*    101/
-      DATA P(11), (C(11,I), I = 1, 99)/    2053,  1*    794,  1*    325,
-     &        1*    960,  1*    528,  2*    247,  1*    338,  1*    366,
-     &        1*    847,  2*    753,  1*    236,  2*    334,  1*    461,
-     &        1*    711,  1*    652,  3*    381,  1*    652,  7*    381,
-     &        1*    226,  7*    326,  1*    126, 10*    326,  2*    195,
-     &       19*     55,  7*    195, 11*    132, 13*    387/
-      DATA P(12), (C(12,I), I = 1, 99)/    3079,  1*   1189,  1*    888,
-     &        1*    259,  1*   1082,  1*    725,  1*    811,  1*    636,
-     &        1*    965,  2*    497,  2*   1490,  1*    392,  1*   1291,
-     &        2*    508,  2*   1291,  1*    508,  1*   1291,  2*    508,
-     &        4*    867,  1*    934,  7*    867,  9*   1284,  4*    563,
-     &        3*   1010,  1*    208,  1*    838,  3*    563,  2*    759,
-     &        1*    564,  2*    759,  4*    801,  5*    759,  8*    563,
-     &       22*    226/
-      DATA P(13), (C(13,I), I = 1, 99)/    4621,  1*   1763,  1*   1018,
-     &        1*   1500,  1*    432,  1*   1332,  1*   2203,  1*    126,
-     &        1*   2240,  1*   1719,  1*   1284,  1*    878,  1*   1983,
-     &        4*    266,  2*    747,  2*    127,  1*   2074,  1*    127,
-     &        1*   2074,  1*   1400, 10*   1383,  1*   1400,  7*   1383,
-     &        1*    507,  4*   1073,  5*   1990,  9*    507, 17*   1073,
-     &        6*     22,  1*   1073,  6*    452,  1*    318,  4*    301,
-     &        2*     86,  1*     15/
-      DATA P(14), (C(14,I), I = 1, 99)/    6947,  1*   2872,  1*   3233,
-     &        1*   1534,  1*   2941,  1*   2910,  1*    393,  1*   1796,
-     &        1*    919,  1*    446,  2*    919,  1*   1117,  7*    103,
-     &        1*   2311,  1*   3117,  1*   1101,  2*   3117,  5*   1101,
-     &        8*   2503,  7*    429,  3*   1702,  5*    184, 34*    105,
-     &       13*    784/
-      DATA P(15), (C(15,I), I = 1, 99)/   10427,  1*   4309,  1*   3758,
-     &        1*   4034,  1*   1963,  1*    730,  1*    642,  1*   1502,
-     &        1*   2246,  1*   3834,  1*   1511,  2*   1102,  2*   1522,
-     &        2*   3427,  1*   3928,  2*    915,  4*   3818,  3*   4782,
-     &        1*   3818,  1*   4782,  2*   3818,  7*   1327,  9*   1387,
-     &       13*   2339, 18*   3148,  3*   1776,  3*   3354,  1*    925,
-     &        2*   3354,  5*    925,  8*   2133/
-      DATA P(16), (C(16,I), I = 1, 99)/   15641,  1*   6610,  1*   6977,
-     &        1*   1686,  1*   3819,  1*   2314,  1*   5647,  1*   3953,
-     &        1*   3614,  1*   5115,  2*    423,  1*   5408,  1*   7426,
-     &        2*    423,  1*    487,  1*   6227,  1*   2660,  1*   6227,
-     &        1*   1221,  1*   3811,  1*    197,  1*   4367,  1*    351,
-     &        1*   1281,  1*   1221,  3*    351,  1*   7245,  1*   1984,
-     &        6*   2999,  1*   3995,  4*   2063,  1*   1644,  1*   2063,
-     &        1*   2077,  3*   2512,  4*   2077, 19*    754,  2*   1097,
-     &        4*    754,  1*    248,  1*    754,  4*   1097,  4*    222,
-     &        1*    754, 11*   1982/
-      DATA P(17), (C(17,I), I = 1, 99)/   23473,  1*   9861,  1*   3647,
-     &        1*   4073,  1*   2535,  1*   3430,  1*   9865,  1*   2830,
-     &        1*   9328,  1*   4320,  1*   5913,  1*  10365,  1*   8272,
-     &        1*   3706,  1*   6186,  3*   7806,  1*   8610,  1*   2563,
-     &        2*  11558,  1*   9421,  1*   1181,  1*   9421,  3*   1181,
-     &        1*   9421,  2*   1181,  2*  10574,  5*   3534,  3*   2898,
-     &        1*   3450,  7*   2141, 15*   7055,  1*   2831, 24*   8204,
-     &        3*   4688,  8*   2831/
-      DATA P(18), (C(18,I), I = 1, 99)/   35221,  1*  10327,  1*   7582,
-     &        1*   7124,  1*   8214,  1*   9600,  1*  10271,  1*  10193,
-     &        1*  10800,  1*   9086,  1*   2365,  1*   4409,  1*  13812,
-     &        1*   5661,  2*   9344,  1*  10362,  2*   9344,  1*   8585,
-     &        1*  11114,  3*  13080,  1*   6949,  3*   3436,  1*  13213,
-     &        2*   6130,  2*   8159,  1*  11595,  1*   8159,  1*   3436,
-     &       18*   7096,  1*   4377,  1*   7096,  5*   4377,  2*   5410,
-     &       32*   4377,  2*    440,  3*   1199/
-      DATA P(19), (C(19,I), I = 1, 99)/   52837,  1*  19540,  1*  19926,
-     &        1*  11582,  1*  11113,  1*  24585,  1*   8726,  1*  17218,
-     &        1*    419,  3*   4918,  1*  15701,  1*  17710,  2*   4037,
-     &        1*  15808,  1*  11401,  1*  19398,  2*  25950,  1*   4454,
-     &        1*  24987,  1*  11719,  1*   8697,  5*   1452,  2*   8697,
-     &        1*   6436,  1*  21475,  1*   6436,  1*  22913,  1*   6434,
-     &        1*  18497,  4*  11089,  2*   3036,  4*  14208,  8*  12906,
-     &        4*   7614,  6*   5021, 24*  10145,  6*   4544,  4*   8394/
-      DATA P(20), (C(20,I), I = 1, 99)/   79259,  1*  34566,  1*   9579,
-     &        1*  12654,  1*  26856,  1*  37873,  1*  38806,  1*  29501,
-     &        1*  17271,  1*   3663,  1*  10763,  1*  18955,  1*   1298,
-     &        1*  26560,  2*  17132,  2*   4753,  1*   8713,  1*  18624,
-     &        1*  13082,  1*   6791,  1*   1122,  1*  19363,  1*  34695,
-     &        4*  18770,  1*  15628,  4*  18770,  1*  33766,  6*  20837,
-     &        5*   6545, 14*  12138,  5*  30483, 19*  12138,  1*   9305,
-     &       13*  11107,  2*   9305/
-      DATA P(21), (C(21,I), I = 1, 99)/  118891,  1*  31929,  1*  49367,
-     &        1*  10982,  1*   3527,  1*  27066,  1*  13226,  1*  56010,
-     &        1*  18911,  1*  40574,  2*  20767,  1*   9686,  2*  47603,
-     &        2*  11736,  1*  41601,  1*  12888,  1*  32948,  1*  30801,
-     &        1*  44243,  2*  53351,  1*  16016,  2*  35086,  1*  32581,
-     &        2*   2464,  1*  49554,  2*   2464,  2*  49554,  1*   2464,
-     &        1*     81,  1*  27260,  1*  10681,  7*   2185,  5*  18086,
-     &        2*  17631,  3*  18086,  1*  37335,  3*  37774, 13*  26401,
-     &        1*  12982,  6*  40398,  3*   3518,  9*  37799,  4*   4721,
-     &        4*   7067/
-      DATA P(22), (C(22,I), I = 1, 99)/  178349,  1*  40701,  1*  69087,
-     &        1*  77576,  1*  64590,  1*  39397,  1*  33179,  1*  10858,
-     &        1*  38935,  1*  43129,  2*  35468,  1*   5279,  2*  61518,
-     &        1*  27945,  2*  70975,  2*  86478,  2*  20514,  2*  73178,
-     &        2*  43098,  1*   4701,  2*  59979,  1*  58556,  1*  69916,
-     &        2*  15170,  2*   4832,  1*  43064,  1*  71685,  1*   4832,
-     &        3*  15170,  3*  27679,  2*  60826,  2*   6187,  5*   4264,
-     &        1*  45567,  4*  32269,  9*  62060, 13*   1803, 12*  51108,
-     &        2*  55315,  5*  54140,  1*  13134/
-      DATA P(23), (C(23,I), I = 1, 99)/  267523,  1* 103650,  1* 125480,
-     &        1*  59978,  1*  46875,  1*  77172,  1*  83021,  1* 126904,
-     &        1*  14541,  1*  56299,  1*  43636,  1*  11655,  1*  52680,
-     &        1*  88549,  1*  29804,  1* 101894,  1* 113675,  1*  48040,
-     &        1* 113675,  1*  34987,  1*  48308,  1*  97926,  1*   5475,
-     &        1*  49449,  1*   6850,  2*  62545,  1*   9440,  1*  33242,
-     &        1*   9440,  1*  33242,  1*   9440,  1*  33242,  1*   9440,
-     &        1*  62850,  3*   9440,  3*  90308,  9*  47904,  7*  41143,
-     &        5*  36114,  1*  24997, 14*  65162,  7*  47650,  7*  40586,
-     &        4*  38725,  5*  88329/
-      DATA P(24), (C(24,I), I = 1, 99)/  401287,  1* 165843,  1*  90647,
-     &        1*  59925,  1* 189541,  1*  67647,  1*  74795,  1*  68365,
-     &        1* 167485,  1* 143918,  1*  74912,  1* 167289,  1*  75517,
-     &        1*   8148,  1* 172106,  1* 126159,  3*  35867,  1* 121694,
-     &        1*  52171,  1*  95354,  2* 113969,  1*  76304,  2* 123709,
-     &        1* 144615,  1* 123709,  2*  64958,  1*  32377,  2* 193002,
-     &        1*  25023,  1*  40017,  1* 141605,  2* 189165,  1* 141605,
-     &        2* 189165,  3* 141605,  1* 189165, 20* 127047, 10* 127785,
-     &        6*  80822, 16* 131661,  1*   7114,  1* 131661/
-      DATA P(25), (C(25,I), I = 1, 99)/  601942,  1* 130365,  1* 236711,
-     &        1* 110235,  1* 125699,  1*  56483,  1*  93735,  1* 234469,
-     &        1*  60549,  1*   1291,  1*  93937,  1* 245291,  1* 196061,
-     &        1* 258647,  1* 162489,  1* 176631,  1* 204895,  1*  73353,
-     &        1* 172319,  1*  28881,  1* 136787,  2* 122081,  1* 275993,
-     &        1*  64673,  3* 211587,  2* 282859,  1* 211587,  1* 242821,
-     &        3* 256865,  1* 122203,  1* 291915,  1* 122203,  2* 291915,
-     &        1* 122203,  2*  25639,  1* 291803,  1* 245397,  1* 284047,
-     &        7* 245397,  1*  94241,  2*  66575, 19* 217673, 10* 210249,
-     &       15*  94453/
+*    Optimal Paramters for Lattice Rules
+*
+      DATA P( 1),(C( 1,I),I = 1,99)/     31, 12, 2*9, 13, 8*12, 3*3, 12,
+     & 2*7, 9*12, 3*3, 12, 2*7, 9*12, 3*3, 12, 2*7, 9*12, 3*3, 12, 2*7,
+     & 8*12, 7, 3*3, 3*7, 21*3/
+      DATA P( 2),(C( 2,I),I = 1,99)/    47, 13, 11, 17, 10, 6*15,
+     & 22, 2*15, 3*6, 2*15, 9, 13, 3*2, 13, 2*11, 10, 9*15, 3*6, 2*15,
+     & 9, 13, 3*2, 13, 2*11, 10, 9*15, 3*6, 2*15, 9, 13, 3*2, 13, 2*11,
+     & 2*10, 8*15, 6, 2, 3, 2, 3, 12*2/
+      DATA P( 3),(C( 3,I),I = 1,99)/    73, 27, 28, 10, 2*11, 20,
+     & 2*11, 28, 2*13, 28, 3*13, 16*14, 2*31, 3*5, 31, 13, 6*11, 7*13,
+     & 16*14, 2*31, 3*5, 11, 13, 7*11, 2*13, 11, 13, 4*5, 14, 13, 8*5/
+      DATA P( 4),(C( 4,I),I = 1,99)/   113, 35, 2*27, 36, 22, 2*29,
+     & 20, 45, 3*5, 16*21, 29, 10*17, 12*23, 21, 27, 3*3, 24, 2*27,
+     & 17, 3*29, 17, 4*5, 16*21, 3*17, 6, 2*17, 6, 3, 2*6, 5*3/
+      DATA P( 5),(C( 5,I),I = 1,99)/   173, 64, 66, 2*28, 2*44, 55,
+     & 67, 6*10, 2*38, 5*10, 12*49, 2*38, 31, 2*4, 31, 64, 3*4, 64,
+     & 6*45, 19*66, 11, 9*66, 45, 11, 7, 3, 3*2, 27, 5, 2*3, 2*5, 7*2/
+      DATA P( 6),(C( 6,I),I = 1,99)/   263, 111, 42, 54, 118, 20,
+     & 2*31, 72, 17, 94, 2*14, 11, 3*14, 94, 4*10, 7*14, 3*11, 7*8,
+     & 5*18, 113, 2*62, 2*45, 17*113, 2*63, 53, 63, 15*67, 5*51, 12,
+     & 51, 12, 51, 5, 2*3, 2*2, 5/
+      DATA P( 7),(C( 7,I),I = 1,99)/   397, 163, 154, 83, 43, 82,
+     & 92, 150, 59, 2*76, 47, 2*11, 100, 131, 6*116, 9*138, 21*101,
+     & 6*116, 5*100, 5*138, 19*101, 8*38, 5*3/
+      DATA P( 8),(C( 8,I),I = 1,99)/   593, 246, 189, 242, 102,
+     & 2*250, 102, 250, 280, 118, 196, 118, 191, 215, 2*121,
+     & 12*49, 34*171, 8*161, 17*14, 6*10, 103, 4*10, 5/
+      DATA P( 9),(C( 9,I),I = 1,99)/   907, 347, 402, 322, 418,
+     & 215, 220, 3*339, 337, 218, 4*315, 4*167, 361, 201, 11*124,
+     & 2*231, 14*90, 4*48, 23*90, 10*243, 9*283, 16, 283, 16, 2*283/
+      DATA P(10),(C(10,I),I = 1,99)/  1361, 505, 220, 601, 644,
+     & 612, 160, 3*206, 422, 134, 518, 2*134, 518, 652, 382,
+     & 206, 158, 441, 179, 441, 56, 2*559, 14*56, 2*101, 56,
+     & 8*101, 7*193, 21*101, 17*122, 4*101/
+      DATA P(11),(C(11,I),I = 1,99)/  2053, 794, 325, 960, 528,
+     & 2*247, 338, 366, 847, 2*753, 236, 2*334, 461, 711, 652,
+     & 3*381, 652, 7*381, 226, 7*326, 126, 10*326, 2*195, 19*55,
+     & 7*195, 11*132, 13*387/
+      DATA P(12),(C(12,I),I = 1,99)/  3079, 1189, 888, 259, 1082, 725,      
+     & 811, 636, 965, 2*497, 2*1490, 392, 1291, 2*508, 2*1291, 508,
+     & 1291, 2*508, 4*867, 934, 7*867, 9*1284, 4*563, 3*1010, 208,
+     & 838, 3*563, 2*759, 564, 2*759, 4*801, 5*759, 8*563, 22*226/
+      DATA P(13),(C(13,I),I = 1,99)/  4621, 1763, 1018, 1500, 432,
+     & 1332, 2203, 126, 2240, 1719, 1284, 878, 1983, 4*266,
+     & 2*747, 2*127, 2074, 127, 2074, 1400, 10*1383, 1400, 7*1383,
+     & 507, 4*1073, 5*1990, 9*507, 17*1073, 6*22, 1073, 6*452, 318,
+     & 4*301, 2*86, 15/
+      DATA P(14),(C(14,I),I = 1,99)/  6947, 2872, 3233, 1534, 2941,
+     & 2910, 393, 1796, 919, 446, 2*919, 1117, 7*103, 2311, 3117, 1101,
+     & 2*3117, 5*1101, 8*2503, 7*429, 3*1702, 5*184, 34*105, 13*784/
+      DATA P(15),(C(15,I),I = 1,99)/ 10427, 4309, 3758, 4034, 1963,
+     & 730, 642, 1502, 2246, 3834, 1511, 2*1102, 2*1522, 2*3427,
+     & 3928, 2*915, 4*3818, 3*4782, 3818, 4782, 2*3818, 7*1327, 9*1387,
+     & 13*2339, 18*3148, 3*1776, 3*3354, 925, 2*3354, 5*925, 8*2133/
+      DATA P(16),(C(16,I),I = 1,99)/ 15641, 6610, 6977, 1686, 3819,
+     & 2314, 5647, 3953, 3614, 5115, 2*423, 5408, 7426, 2*423,
+     & 487, 6227, 2660, 6227, 1221, 3811, 197, 4367, 351,
+     & 1281, 1221, 3*351, 7245, 1984, 6*2999, 3995, 4*2063, 1644,
+     & 2063, 2077, 3*2512, 4*2077, 19*754, 2*1097, 4*754, 248, 754,
+     & 4*1097, 4*222, 754,11*1982/
+      DATA P(17),(C(17,I),I = 1,99)/ 23473, 9861, 3647, 4073, 2535,
+     & 3430, 9865, 2830, 9328, 4320, 5913, 10365, 8272, 3706, 6186,
+     & 3*7806, 8610, 2563, 2*11558, 9421, 1181, 9421, 3*1181, 9421,
+     & 2*1181, 2*10574, 5*3534, 3*2898, 3450, 7*2141, 15*7055, 2831,
+     & 24*8204, 3*4688, 8*2831/
+      DATA P(18),(C(18,I),I = 1,99)/ 35221, 10327, 7582, 7124, 8214,
+     & 9600, 10271, 10193, 10800, 9086, 2365, 4409, 13812,
+     & 5661, 2*9344, 10362, 2*9344, 8585, 11114, 3*13080, 6949,
+     & 3*3436, 13213, 2*6130, 2*8159, 11595, 8159, 3436, 18*7096,
+     & 4377, 7096, 5*4377, 2*5410, 32*4377, 2*440, 3*1199/
+      DATA P(19),(C(19,I),I = 1,99)/ 52837, 19540, 19926, 11582,
+     & 11113, 24585, 8726, 17218, 419, 3*4918, 15701, 17710,
+     & 2*4037, 15808, 11401, 19398, 2*25950, 4454, 24987, 11719,
+     & 8697, 5*1452, 2*8697, 6436, 21475, 6436, 22913, 6434, 18497,
+     & 4*11089, 2*3036, 4*14208, 8*12906, 4*7614, 6*5021, 24*10145,
+     & 6*4544, 4*8394/    
+      DATA P(20),(C(20,I),I = 1,99)/ 79259, 34566, 9579, 12654,
+     & 26856, 37873, 38806, 29501, 17271, 3663, 10763, 18955,
+     & 1298, 26560, 2*17132, 2*4753, 8713, 18624, 13082, 6791,
+     & 1122, 19363, 34695, 4*18770, 15628, 4*18770, 33766, 6*20837,
+     & 5*6545, 14*12138, 5*30483, 19*12138, 9305, 13*11107, 2*9305/
+      DATA P(21),(C(21,I),I = 1,99)/118891, 31929, 49367, 10982, 3527,
+     & 27066, 13226, 56010, 18911, 40574, 2*20767, 9686, 2*47603, 
+     & 2*11736, 41601, 12888, 32948, 30801, 44243, 2*53351, 16016, 
+     & 2*35086, 32581, 2*2464, 49554, 2*2464, 2*49554, 2464, 81, 27260, 
+     & 10681, 7*2185, 5*18086, 2*17631, 3*18086, 37335, 3*37774, 
+     & 13*26401, 12982, 6*40398, 3*3518, 9*37799, 4*4721, 4*7067/
+      DATA P(22),(C(22,I),I = 1,99)/178349, 40701, 69087, 77576, 64590, 
+     & 39397, 33179, 10858, 38935, 43129, 2*35468, 5279, 2*61518, 27945,
+     & 2*70975, 2*86478, 2*20514, 2*73178, 2*43098, 4701,
+     & 2*59979, 58556, 69916, 2*15170, 2*4832, 43064, 71685, 4832,
+     & 3*15170, 3*27679, 2*60826, 2*6187, 5*4264, 45567, 4*32269,
+     & 9*62060, 13*1803, 12*51108, 2*55315, 5*54140, 13134/
+      DATA P(23),(C(23,I),I = 1,99)/267523, 103650, 125480, 59978,
+     & 46875, 77172, 83021, 126904, 14541, 56299, 43636, 11655,
+     & 52680, 88549, 29804, 101894, 113675, 48040, 113675,
+     & 34987, 48308, 97926, 5475, 49449, 6850, 2*62545, 9440,
+     & 33242, 9440, 33242, 9440, 33242, 9440, 62850, 3*9440,
+     & 3*90308, 9*47904, 7*41143, 5*36114, 24997, 14*65162, 7*47650,
+     & 7*40586, 4*38725, 5*88329/
+      DATA P(24),(C(24,I),I = 1,99)/401287, 165843, 90647, 59925,
+     & 189541, 67647, 74795, 68365, 167485, 143918, 74912,
+     & 167289, 75517, 8148, 172106, 126159,3*35867, 121694,
+     & 52171, 95354, 2*113969, 76304, 2*123709, 144615, 123709,
+     & 2*64958, 32377, 2*193002, 25023, 40017, 141605, 2*189165,
+     & 141605, 2*189165, 3*141605, 189165, 20*127047, 10*127785,
+     & 6*80822, 16*131661, 7114, 131661/
+      DATA P(25),(C(25,I),I = 1,99)/601942, 130365, 236711, 110235,
+     & 125699, 56483, 93735, 234469, 60549, 1291, 93937,
+     & 245291, 196061, 258647, 162489, 176631, 204895, 73353,
+     & 172319, 28881, 136787,2*122081, 275993, 64673, 3*211587,
+     & 2*282859, 211587, 242821, 3*256865, 122203, 291915, 122203,
+     & 2*291915, 122203, 2*25639, 291803, 245397, 284047,
+     & 7*245397, 94241, 2*66575, 19*217673, 10*210249, 15*94453/
+      DATA P(26),(C(26,I),I = 1,99)/902933, 333459, 375354, 102417,
+   
+     & 383544, 292630, 41147, 374614, 48032, 435453, 281493, 358168, 
+     & 114121, 346892, 238990, 317313, 164158, 35497, 2*70530, 434839,  
+     & 3*24754, 393656, 2*118711, 148227, 271087, 355831, 91034, 
+     & 2*417029, 2*91034, 417029, 91034, 2*299843, 2*413548, 308300,  
+     & 3*413548, 3*308300, 413548, 5*308300, 4*15311, 2*176255, 6*23613, 
+     & 172210, 4* 204328, 5*121626, 5*200187, 2*121551, 12*248492, 
+     & 5*13942/
+      DATA P(27), (C(27,I), I = 1,99)/ 1354471, 500884, 566009, 399251,
+     & 652979, 355008, 430235, 328722, 670680, 2*405585, 424646, 
+     & 2*670180, 641587, 215580, 59048, 633320, 81010, 20789, 2*389250,  
+     & 2*638764, 2*389250, 398094, 80846, 2*147776, 296177, 2*398094,  
+     & 2*147776, 396313, 3*578233, 19482, 620706, 187095, 620706, 
+     & 187095, 126467, 12*241663, 321632, 2*23210, 3*394484, 3*78101, 
+     & 19*542095, 3*277743, 12*457259/
+      DATA P(28), (C(28,I), I = 1, 99)/ 2031713, 858339, 918142, 501970, 
+     & 234813, 460565, 31996, 753018, 256150, 199809, 993599, 245149,      
+     & 794183, 121349, 150619, 376952, 2*809123, 804319, 67352, 969594, 
+     & 434796, 969594, 804319, 391368, 761041, 754049, 466264, 2*754049,
+     & 466264, 2*754049, 282852, 429907, 390017, 276645, 994856, 250142, 
+     & 144595, 907454, 689648, 4*687580, 978368, 687580, 552742, 105195, 
+     & 942843, 768249, 4*307142, 7*880619, 11*117185, 11*60731,  
+     & 4*178309, 8*74373, 3*214965/
 *
       END
 *
-      SUBROUTINE MVKSRC( NDIM, SUMKRO, PRIME, VK, FUNCTN, X )
-      EXTERNAL FUNCTN
-      INTEGER NDIM, PRIME, K, J, JP
-      DOUBLE PRECISION SUMKRO, VK(*), FUNCTN, X(*), ONE, XT, MVUNI, FT
-      PARAMETER ( ONE = 1 )
-      SUMKRO = 0
-      DO J = 1, NDIM-1
-         JP = J + MVUNI()*( NDIM + 1 - J ) 
-         XT = VK(J)
-         VK(J) = VK(JP)
-         VK(JP) = XT
+      SUBROUTINE MVKRSV( NDIM, VALUES, PRIME, VK, NF,FUNSUB, X,R,PR,FS )
+*
+*     For lattice rule sums
+*
+      INTEGER NDIM, NF, PRIME, K, J, JP, PR(*)
+      DOUBLE PRECISION VALUES(*), VK(*), FS(*), X(*), R(*), MVUNI
+      DO J = 1, NF
+         VALUES(J) = 0
       END DO
+*
+*     Determine random shifts for each variable; scramble lattice rule
+*
       DO J = 1, NDIM
-         X(NDIM+J) = MVUNI()
+         R(J) = MVUNI()
+         JP = 1 + J*R(J)
+         IF ( JP .LT. J ) PR(J) = PR(JP)
+         PR(JP) = J
       END DO
+*
+*     Compute latice rule sums
+*
       DO K = 1, PRIME
          DO J = 1, NDIM
-            X(J) = MOD( K*VK(J), ONE )
+            R(J) = R(J) + VK(PR(J))
+            IF ( R(J) .GT. 1 ) R(J) = R(J) - 1
+            X(J) = ABS( 2*R(J) - 1 )
          END DO
-         DO J = 1, NDIM
-            XT = X(J) + X(NDIM+J)
-            IF ( XT .GT. 1 ) XT = XT - 1
-            X(J) = ABS( 2*XT - 1 )
+         CALL FUNSUB( NDIM, X, NF, FS )
+         DO J = 1, NF
+            VALUES(J) = VALUES(J) + ( FS(J) - VALUES(J) )/( 2*K-1 )      
          END DO
-         FT =  FUNCTN(NDIM,X)
          DO J = 1, NDIM
             X(J) = 1 - X(J)
          END DO
-         FT = ( FT + FUNCTN(NDIM,X) )/2
-         SUMKRO = SUMKRO + ( FT - SUMKRO )/K
+         CALL FUNSUB( NDIM, X, NF, FS )
+         DO J = 1, NF
+            VALUES(J) = VALUES(J) + ( FS(J) - VALUES(J) )/( 2*K )      
+         END DO
       END DO
+*
       END
 *
       DOUBLE PRECISION FUNCTION MVUNI()
@@ -1209,10 +1439,11 @@
 *
 *     use R's random number generator directly
 *     the way `Writing R extentions' advertises.
-*   
+*
       DOUBLE PRECISION x
       CALL rndstart()
       x = unifrnd()
       CALL rndend()
       MVUNI = x
       END
+

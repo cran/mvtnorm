@@ -1,6 +1,6 @@
 Package: mvtnorm
 Title: Multivariate Normal and T Distribution 
-Version: 0.5-15
+Version: 0.6-0
 Date: $Date: 2003/06/16 07:42:32 $
 Author: Alan Genz <AlanGenz@wsu.edu>, 
   Frank Bretz <bretz@ifgb.uni-hannover.de>, 
