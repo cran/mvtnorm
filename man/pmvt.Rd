@@ -1,5 +1,6 @@
 \name{pmvt}
 \alias{pmvt}
+\alias{rmvt}
 \title{ Multivariate t Distribution }
 \description{
 
@@ -12,6 +13,7 @@ based on algorithms by Genz and Bretz.
 pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
      df=1, corr=NULL, sigma=NULL, maxpts = 25000, abseps = 0.001,
      releps = 0)
+rmvt(n, sigma=diag(2), df=1)
 }
 \arguments{
   \item{lower}{ the vector of lower limits of length n.}
@@ -27,6 +29,7 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
   \item{maxpts}{ maximum number of function values as integer. }
   \item{abseps}{ absolute error tolerance as double. }
   \item{releps}{ relative error tolerance as double. }
+  \item{n}{ number of observations.}
 }
 
 \details{
@@ -60,6 +63,9 @@ which can be downloaded (together with additional material
 and additional codes) from the websites 
 \url{http://www.bioinf.uni-hannover.de/~bretz/} 
 and \url{http://www.sci.wsu.edu/math/faculty/genz/homepage}.
+
+\code{rmvt} is a wrapper to \code{\link{rmvnorm}} for random number
+generation.
 
 }
 
@@ -153,6 +159,7 @@ attributes(a) <- NULL
 b <- pt(1, df=10) - pt(0, df=10)
 stopifnot(all.equal(round(a,10) , round(b, 10)))
 
+rmvt(10, sigma=diag(10))
 
 }
 

@@ -1,4 +1,4 @@
-# $Id: mvt.R,v 1.21 2002/07/03 08:19:54 hothorn Exp $ 
+# $Id: mvt.R,v 1.22 2002/10/07 06:29:13 hothorn Exp $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -170,3 +170,6 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
     return(RET)
 }
 
+rmvt <- function(n, sigma=diag(2), df=1) {
+  rmvnorm(n,sigma=sigma)/sqrt(rchisq(n,df)/df)
+}
