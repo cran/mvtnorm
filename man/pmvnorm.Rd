@@ -4,7 +4,7 @@
 \description{
 
 Computes the distribution function of the multivariate normal 
-distribution for arbitary limits and correlation matrices 
+distribution for arbitrary limits and correlation matrices 
 based on algorithms by Genz and Bretz.
 
 }
@@ -32,6 +32,8 @@ Note that both \code{-Inf} and \code{+Inf} may be specified in \code{lower} and
 \code{upper}. For more details see \code{\link{pmvt}}. 
 
 The mvn case is treated as a special case of \code{\link{pmvt}} with \code{df=0}. 
+
+Univariate problems are passed to \code{\link{pnorm}}.
 
 Multivariate normal density and random numbers are available using
 \code{\link[e1071]{dmvnorm}} and \code{\link[MASS]{mvrnorm}}.  
@@ -68,6 +70,8 @@ corr <- diag(5)
 corr[lower.tri(corr)] <- 0.5
 prob <- pmvnorm(mean, corr, lower, upper)
 print(prob)
+
+pmvnorm(0, 1, -Inf, 3)$value == pnorm(3)
 
 }
 

@@ -4,7 +4,7 @@
 \description{
 
 Computes the the distribution function of the multivariate t distribution 
-for arbitary limits, degrees of freedom and correlation matrices 
+for arbitrary limits, degrees of freedom and correlation matrices 
 based on algorithms by Genz and Bretz.
 
 }
@@ -45,6 +45,8 @@ integral of \eqn{I} goes from 0 to +Inf.
 
 Note that both \code{-Inf} and \code{+Inf} may be specified in the lower and upper integral
 limits. Randomized quasi-Monte Carlo methods are used for the computations.
+
+Univariate problems are passed to \code{\link{pt}}.
 
 Further information can be obtained from the quoted articles,
 which can be downloaded (together with additional material
@@ -89,6 +91,8 @@ corr[lower.tri(corr)] <- 0.5
 delta <- rep(0, 5)
 prob <- pmvt(lower, upper, df, corr , delta)
 print(prob)
+
+pmvt(-Inf, 3, df = 3, corr = 0)$value == pt(3, 3)
 
 }
 
