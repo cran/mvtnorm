@@ -2,3 +2,6 @@ useDynLib(mvtnorm)
 
 export(rmvnorm, dmvnorm, pmvnorm, pmvt, rmvt)
 
+# some package try to access low-level functionality: npmc in this case
+export(mvt)
+
