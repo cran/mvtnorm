@@ -1,6 +1,6 @@
 Package: mvtnorm
 Title: Multivariate Normal and T Distribution 
-Version: 0.7-0
+Version: 0.7-1
 Date: $Date: 2004/10/14 13:40:21 $
 Author: Alan Genz <AlanGenz@wsu.edu>, 
   Frank Bretz <frank.bretz@pharma.novartis.com>, 
@@ -9,4 +9,4 @@ Maintainer: Torsten Hothorn <Torsten.Hothorn@rzmail.uni-erlangen.de>
 Description: computes the multivariate normal and t distribution
 Depends: R(>= 1.9.0)
 License: GPL
-Packaged: Thu Oct 14 15:41:03 2004; hothorn
+Packaged: Thu Nov 18 13:36:44 2004; hothorn

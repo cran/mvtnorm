@@ -1,5 +1,9 @@
 # $Id: CHANGES,v 1.33 2004/10/14 13:40:21 hothorn Exp $
 
+	0.7-1 (18.11.2004)
+
+	use #!/bin/sh 
+
 	0.7-0 (14.10.2004)
 
 	a coding session with Frank produced `qmv{t,norm}'.
