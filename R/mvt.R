@@ -37,7 +37,7 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
     if (length(lower) != n) stop("wrong dimensions")
     if (length(upper) != n) stop("wrong dimensions")
 
-    if (n > 100) stop("only dimensions 1 <= n <= 100 allowed") 
+    if (n > 1000) stop("only dimensions 1 <= n <= 100 allowed") 
 
     infin <- rep(2, n)
     infin[upper == Inf] <- 1
