@@ -1,4 +1,9 @@
-# $Id: CHANGES,v 1.29 2004/05/27 09:46:57 hothorn Exp $
+# $Id: CHANGES,v 1.30 2004/06/03 07:04:03 hothorn Exp $
+
+	0.6-8 (03.06.2004)
+
+	EXIT statements are not supported by `f2c', Alan added GOTO
+        statements to `MVCHNC' 
 
 	0.6-7 (27.05.2004)
 
