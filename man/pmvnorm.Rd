@@ -78,6 +78,10 @@ a <- pmvnorm(lower=rep(-Inf,2),upper=c(.3,.5),mean=c(2,4),diag(2))$value
 
 stopifnot(round(a,16) == round(prod(pnorm(c(.3,.5),c(2,4))),16))
 
+a <- pmvnorm(lower=rep(-Inf,3),upper=c(.3,.5,1),mean=c(2,4,1),diag(3))$value
+
+stopifnot(round(a,16) == round(prod(pnorm(c(.3,.5,1),c(2,4,1))),16))
+
 # Example from R News paper (original by Genz, 1992):
 
 m <- 3

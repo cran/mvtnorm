@@ -14,11 +14,13 @@ pmvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
 pmvnorm <- function(lower, upper, mean, corr, maxpts = 25000,
                     abseps = 0.001, releps = 0)
 {
-    # delta <- mean # FIXME!
-    delta <- rep(0, length(mean))
+    if (length(mean) == 2) {
+      delta <- c(0,0)	# bug in the Fortran Sources FIXME!
+      lower <- lower - mean
+      upper <- upper - mean
+    } else
+      delta <- mean 
     if (length(mean) != length(lower)) stop("wrong dimensions")
-    lower <- lower - mean
-    upper <- upper - mean
     if (is.null(ncol(corr)) || length(mean) == 1)
         return(list(value = pnorm(upper, mean=mean, sd=corr) -
                             pnorm(lower, mean=mean, sd=corr),

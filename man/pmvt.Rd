@@ -120,6 +120,14 @@ myfct <- function(q, alpha) {
 
 round(uniroot(myfct, lower=1, upper=5, alpha=0.95)$root, 3)
 
+# compare pmvt and pmvnorm for large df:
+
+a <- pmvnorm(rep(-Inf, 5), rep(1, 5), mean=rep(0, 5), corr=diag(5))$value
+b <- pmvt(rep(-Inf, 5), rep(1, 5), df=rep(300,5), corr=diag(5), delta=rep(0, 5))$value
+a
+b
+
+stopifnot(round(a, 2) == round(b, 2))
 
 }
 

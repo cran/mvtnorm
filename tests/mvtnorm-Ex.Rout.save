@@ -53,6 +53,10 @@ $msg
 > 
 > stopifnot(round(a,16) == round(prod(pnorm(c(.3,.5),c(2,4))),16))
 > 
+> a <- pmvnorm(lower=rep(-Inf,3),upper=c(.3,.5,1),mean=c(2,4,1),diag(3))$value
+> 
+> stopifnot(round(a,16) == round(prod(pnorm(c(.3,.5,1),c(2,4,1))),16))
+> 
 > # Example from R News paper (original by Genz, 1992):
 > 
 > m <- 3
@@ -65,7 +69,7 @@ $value
 [1] 0.8279847
 
 $error
-[1] 5.684033e-07
+[1] 2.802714e-07
 
 $msg
 [1] "Normal Completion"
@@ -93,10 +97,10 @@ $msg
 > prob <- pmvt(lower, upper, df, corr , delta)
 > print(prob)
 $value
-[1] 0.5066346
+[1] 0.5063744
 
 $error
-[1] 0.0007850673
+[1] 0.0009431169
 
 $msg
 [1] "Normal Completion"
@@ -128,14 +132,25 @@ $msg
 + }
 > 
 > round(uniroot(myfct, lower=1, upper=5, alpha=0.95)$root, 3)
-[1] 2.561
+[1] 2.559
+> 
+> # compare pmvt and pmvnorm for large df:
+> 
+> a <- pmvnorm(rep(-Inf, 5), rep(1, 5), mean=rep(0, 5), corr=diag(5))$value
+> b <- pmvt(rep(-Inf, 5), rep(1, 5), df=rep(300,5), corr=diag(5), delta=rep(0, 5))$value
+> a
+[1] 0.4215702
+> b
+[1] 0.4211376
+> 
+> stopifnot(round(a, 2) == round(b, 2))
 > 
 > 
 > ## Keywords: 'distribution'.
 > 
 > 
 > cat("Time elapsed: ", proc.time() - get("ptime", env = .CheckExEnv),"\n")
-Time elapsed:  7.69 0.01 7.85 0 0 
+Time elapsed:  5.3 0.02 5.38 0 0 
 > dev.off(); quit('no')
 null device 
           1 

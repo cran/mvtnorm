@@ -29,6 +29,10 @@ a <- pmvnorm(lower=rep(-Inf,2),upper=c(.3,.5),mean=c(2,4),diag(2))$value
 
 stopifnot(round(a,16) == round(prod(pnorm(c(.3,.5),c(2,4))),16))
 
+a <- pmvnorm(lower=rep(-Inf,3),upper=c(.3,.5,1),mean=c(2,4,1),diag(3))$value
+
+stopifnot(round(a,16) == round(prod(pnorm(c(.3,.5,1),c(2,4,1))),16))
+
 # Example from R News paper (original by Genz, 1992):
 
 m <- 3
@@ -85,6 +89,15 @@ myfct <- function(q, alpha) {
 }
 
 round(uniroot(myfct, lower=1, upper=5, alpha=0.95)$root, 3)
+
+# compare pmvt and pmvnorm for large df:
+
+a <- pmvnorm(rep(-Inf, 5), rep(1, 5), mean=rep(0, 5), corr=diag(5))$value
+b <- pmvt(rep(-Inf, 5), rep(1, 5), df=rep(300,5), corr=diag(5), delta=rep(0, 5))$value
+a
+b
+
+stopifnot(round(a, 2) == round(b, 2))
 
 
 ## Keywords: 'distribution'.
