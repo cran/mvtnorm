@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f,v 1.6 2003/06/17 07:58:51 hothorn Exp $
+*    $Id: mvt.f,v 1.7 2003/06/25 07:09:53 hothorn Exp $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
@@ -131,7 +131,6 @@
             VL = 1
             IF ( INFI(1) .NE. 1 ) VL = MVSTDT( NU, B(1) - DL(1) ) 
             IF ( INFI(1) .NE. 0 ) VL = VL - MVSTDT( NU, A(1) - DL(1) ) 
-            IF ( VL .LT. 0 ) VL = 0
             ER = 2D-16
             ND = 0
          ELSE IF ( ND .EQ. 2 .AND. 
@@ -171,7 +170,6 @@
                VL = 1
                IF ( INFI(1) .NE. 1 ) VL = MVSTDT( NU, B(1)-DL(1) ) 
                IF ( INFI(1) .NE. 0 ) VL = VL - MVSTDT( NU, A(1)-DL(1) )
-               IF ( VL .LT. 0 ) VL = 0
                ER = 2D-16
             END IF
             ND = 0
@@ -351,11 +349,8 @@
 *              Expected Y = -( density(b) - density(a) )/( b - a )
 * 
                IF ( DEMIN .GT. EPSI ) THEN
-                  Y(I) = 0
-                  IF ( INFI(I) .NE. 0 ) Y(I) =        MVTDNS( 0, AMIN )
-   
-                  IF ( INFI(I) .NE. 1 ) Y(I) = Y(I) - MVTDNS( 0, BMIN )
-   
+                  IF ( INFI(I) .NE. 0 ) Y(I) =        MVTDNS( 0, AMIN )        
+                  IF ( INFI(I) .NE. 1 ) Y(I) = Y(I) - MVTDNS( 0, BMIN )        
                   Y(I) = Y(I)/DEMIN
                ELSE
                   IF ( INFI(I) .EQ. 0 ) Y(I) = BMIN
@@ -708,6 +703,8 @@
          MVBVN =  MVBVU ( LOWER(1), LOWER(2), CORREL )
       ELSE IF ( INFIN(1) .EQ. 0  .AND. INFIN(2) .EQ. 0 ) THEN
          MVBVN =  MVBVU ( -UPPER(1), -UPPER(2), CORREL )
+      ELSE
+         MVBVN = 1
       END IF
       END 
       DOUBLE PRECISION FUNCTION MVBVU( SH, SK, R )
@@ -739,6 +736,7 @@
       PARAMETER ( ZERO = 0, TWOPI = 6.283185307179586D0 ) 
       DOUBLE PRECISION X(10,3), W(10,3), AS, A, B, C, D, RS, XS
       DOUBLE PRECISION MVPHI, SN, ASR, H, K, BS, HS, HK
+      SAVE X, W
 *     Gauss Legendre Points and Weights, N =  6
       DATA ( W(I,1), X(I,1), I = 1,3) /
      *  0.1713244923791705D+00,-0.9324695142031522D+00,
@@ -764,7 +762,6 @@
      *  0.1420961093183821D+00,-0.3737060887154196D+00,
      *  0.1491729864726037D+00,-0.2277858511416451D+00,
      *  0.1527533871307259D+00,-0.7652652113349733D-01/
-      SAVE X, W
       IF ( ABS(R) .LT. 0.3 ) THEN
          NG = 1
          LG = 3
@@ -909,6 +906,8 @@
             MVBVT =  MVBVTL ( NU, -LOWER(1), -LOWER(2), CORREL )
          ELSE IF ( INFIN(1) .EQ. 0  .AND. INFIN(2) .EQ. 0 ) THEN
             MVBVT =  MVBVTL ( NU, UPPER(1), UPPER(2), CORREL )
+         ELSE
+            MVBVT = 1
          END IF
       END IF
       END
@@ -1005,8 +1004,8 @@
          xnhk = hrk**2/( hrk**2 + ors*( nu + dk**2 ) ) 
          xnkh = krh**2/( krh**2 + ors*( nu + dh**2 ) ) 
       else
-         xnhk = 0
-         xnkh = 0  
+         xnhk = 1  
+         xnkh = 1  
       end if
       hs = sign( one, dh - r*dk )  
       ks = sign( one, dk - r*dh ) 
@@ -1196,6 +1195,7 @@
       SAVE P, C, SAMPLS, NP, VAREST
       INFORM = 1
       INTVLS = 0
+      VARPRD = 0
       IF ( MINVLS .GE. 0 ) THEN
          DO K = 1, NF
             FINEST(K) = 0
@@ -1364,8 +1364,7 @@
      & 2*282859, 211587, 242821, 3*256865, 122203, 291915, 122203,
      & 2*291915, 122203, 2*25639, 291803, 245397, 284047,
      & 7*245397, 94241, 2*66575, 19*217673, 10*210249, 15*94453/
-      DATA P(26),(C(26,I),I = 1,99)/902933, 333459, 375354, 102417,
-   
+      DATA P(26),(C(26,I),I = 1,99)/902933, 333459, 375354, 102417,            
      & 383544, 292630, 41147, 374614, 48032, 435453, 281493, 358168, 
      & 114121, 346892, 238990, 317313, 164158, 35497, 2*70530, 434839,  
      & 3*24754, 393656, 2*118711, 148227, 271087, 355831, 91034, 
@@ -1446,4 +1445,3 @@
       CALL rndend()
       MVUNI = x
       END
-

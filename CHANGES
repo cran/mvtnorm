@@ -1,4 +1,9 @@
-# $Id: CHANGES,v 1.22 2003/06/18 07:21:39 hothorn Exp $
+# $Id: CHANGES,v 1.23 2003/06/25 07:09:52 hothorn Exp $
+
+	0.6-2 (25.06.2003)
+
+	Alan's recent changes to `mvt.f' make `g77 -pedantic -Wall'
+	happy
 
 	0.6-1 (18.06.2003)
 
