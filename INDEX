@@ -1,3 +1,4 @@
+Mvnorm                   The Multivariate Normal Distribution
 mvtnorm-internal         Internal mvtnorm function
 pmvnorm                  Multivariate Normal Distribution
 pmvt                     Multivariate t Distribution

@@ -9,14 +9,21 @@ based on algorithms by Genz and Bretz.
 
 }
 \usage{
-pmvt(lower, upper, df, corr, delta, maxpts=25000, abseps=0.001, releps=0)
+pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
+     df=1, corr=NULL, sigma=NULL, maxpts = 25000, abseps = 0.001,
+     releps = 0)
 }
 \arguments{
   \item{lower}{ the vector of lower limits of length n.}
   \item{upper}{ the vector of upper limits of length n.}
+  \item{delta}{ the vector of noncentrality parameters of length n.}
   \item{df}{ degree of freedom as integer.}
   \item{corr}{ the correlation matrix of dimension n.}
-  \item{delta}{ the vector of noncentrality parameters of length n.}
+  \item{sigma}{ the covariance matrix of dimension n. Either \code{corr} or
+                \code{sigma} can be specified. If \code{sigma} is given, the  
+                problem is standardized. If neither \code{corr} nor
+                \code{sigma} is given, the identity matrix is used 
+                for \code{sigma}. }
   \item{maxpts}{ maximum number of function values as integer. }
   \item{abseps}{ absolute error tolerance as double. }
   \item{releps}{ relative error tolerance as double. }
@@ -57,9 +64,8 @@ and \url{http://www.sci.wsu.edu/math/faculty/genz/homepage}.
 }
 
 \value{
-A list with the following components:
-  \item{value}{estimated integral value.}
-  \item{error}{estimated absolute error.}
+The distribution function is returned with attributes
+  \item{error}{estimated absolute error and}
   \item{msg}{status messages.}
 }
 
@@ -85,16 +91,16 @@ multiple comparisons. \emph{Biometrics}, \bold{43}, 913--928
 \examples{
 
 n <- 5
-lower <- rep(-1, 5)
-upper <- rep(3, 5)
+lower <- -1
+upper <- 3
 df <- 4
 corr <- diag(5)
 corr[lower.tri(corr)] <- 0.5
 delta <- rep(0, 5)
-prob <- pmvt(lower, upper, df, corr , delta)
+prob <- pmvt(lower=lower, upper=upper, delta=delta, df=df, corr=corr)
 print(prob)
 
-pmvt(-Inf, 3, df = 3, corr = 0)$value == pt(3, 3)
+pmvt(lower=-Inf, upper=3, df = 3, sigma = 1) == pt(3, 3)
 
 # Example from R News paper (original by Edwards and Berry, 1987)
 
@@ -115,19 +121,34 @@ delta <- rep(0,5)
 myfct <- function(q, alpha) {
   lower <- rep(-q, ncol(cv))
   upper <- rep(q, ncol(cv))
-  pmvt(lower, upper, df, cr, delta, abseps=0.0001)$value - alpha
+  pmvt(lower=lower, upper=upper, delta=delta, df=df, corr=cr, abseps=0.0001) - alpha
 }
 
 round(uniroot(myfct, lower=1, upper=5, alpha=0.95)$root, 3)
 
 # compare pmvt and pmvnorm for large df:
 
-a <- pmvnorm(rep(-Inf, 5), rep(1, 5), mean=rep(0, 5), corr=diag(5))$value
-b <- pmvt(rep(-Inf, 5), rep(1, 5), df=rep(300,5), corr=diag(5), delta=rep(0, 5))$value
+a <- pmvnorm(lower=-Inf, upper=1, mean=rep(0, 5), corr=diag(5))
+b <- pmvt(lower=-Inf, upper=1, delta=rep(0, 5), df=rep(300,5),
+          corr=diag(5))
 a
 b
 
 stopifnot(round(a, 2) == round(b, 2))
+
+# correlation and covariance matrix
+
+a <- pmvt(lower=-Inf, upper=2, delta=rep(0,5), df=3,
+          sigma = diag(5)*2)
+b <- pmvt(lower=-Inf, upper=2/sqrt(2), delta=rep(0,5),
+          df=3, corr=diag(5))  
+attributes(a) <- NULL
+attributes(b) <- NULL
+a
+b
+stopifnot(all.equal(round(a,3) , round(b, 3)))
+
+
 
 }
 

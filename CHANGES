@@ -1,0 +1,25 @@
+# $Id: CHANGES,v 1.5 2001/12/10 13:59:27 hothorn Exp $
+
+	0.5-0 (10.12.2001)
+
+	release for R-1.4.0
+
+	0.4-4 (06.12.2001)
+
+	bugfix
+
+	0.4-3 (05.12.2001)
+
+	the length of lower, upper and mean (delta) is now recycled to the
+	length of the largest, i.e. it is possible to say
+	pmvnorm(lower=-Inf, upper=1, mean=rep(1,10), corr=diag(10))
+
+	0.4-2 (04.12.2001)
+
+	several typos, man-pages improved
+
+	0.4-1 (04.12.2001)
+
+	interface changed: sigma (covariance matrix) can be specified as
+                           well
+	{rd}mvnorm added from package e1071 (thanks to Fritz!)
