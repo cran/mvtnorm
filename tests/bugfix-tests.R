@@ -45,6 +45,7 @@ dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE)
 stopifnot(all.equal(dmvnorm(x=0, mean=30,log=TRUE), 
                     dnorm(0,30,log=TRUE)))
 
+# large df
 pnorm(2)^2
 pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=25, corr=diag(2))
 pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=250, corr=diag(2))
@@ -52,3 +53,7 @@ pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=1340, corr=diag(2))
 pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=2500, corr=diag(2))
 pmvt(lower=c(-100,-100), upper=c(2,2), delta=c(0, 0), df=2500, corr=diag(2))
 
+# df = 0
+pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=0, corr=diag(2))
+pmvt(lower=-Inf, upper = 2, delta=0, df=0, corr=1)
+pnorm(2)

@@ -68,6 +68,7 @@ attr(,"msg")
 > stopifnot(all.equal(dmvnorm(x=0, mean=30,log=TRUE), 
 +                     dnorm(0,30,log=TRUE)))
 > 
+> # large df
 > pnorm(2)^2
 [1] 0.9550173
 > pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=25, corr=diag(2))
@@ -101,4 +102,19 @@ attr(,"error")
 attr(,"msg")
 [1] "Normal Completion"
 > 
+> # df = 0
+> pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=0, corr=diag(2))
+[1] 0.9550173
+attr(,"error")
+[1] 1e-15
+attr(,"msg")
+[1] "Normal Completion"
+> pmvt(lower=-Inf, upper = 2, delta=0, df=0, corr=1)
+[1] 0.9772499
+attr(,"error")
+[1] 0
+attr(,"msg")
+[1] "univariate: using pnorm"
+> pnorm(2)
+[1] 0.9772499
 > 

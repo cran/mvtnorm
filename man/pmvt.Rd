@@ -69,6 +69,8 @@ and \url{http://www.sci.wsu.edu/math/faculty/genz/homepage}.
 \code{rmvt} is a wrapper to \code{\link{rmvnorm}} for random number
 generation.
 
+If \code{df = 0}, normal probabilities are returned. 
+
 }
 
 \value{
