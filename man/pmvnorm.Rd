@@ -36,7 +36,8 @@ The mvn case is treated as a special case of \code{\link{pmvt}} with \code{df=0}
 Univariate problems are passed to \code{\link{pnorm}}.
 
 Multivariate normal density and random numbers are available using
-\code{\link[e1071]{dmvnorm}} and \code{\link[MASS]{mvrnorm}}.  
+\code{dmvnorm} (available in \code{\link[e1071]{Mvnorm}}) 
+and \code{\link[MASS]{mvrnorm}}.  
  
 }
 \value{
