@@ -3,19 +3,23 @@
 rmvnorm <- function(n, mean=rep(0, nrow(sigma)),
                       sigma=diag(length(mean))){
 
-  if(nrow(sigma) != ncol(sigma)){
-    stop("sigma meanst be a square matrix")
-  }
+    if(nrow(sigma) != ncol(sigma)){
+        stop("sigma must be a square matrix")
+    }
 
-  if(length(mean) != nrow(sigma)){
-    stop("mean and sigma have non-conforming size")
-  }
-  
-  sigsvd <- svd(sigma)
-  retval <- t(sigsvd$v %*% (t(sigsvd$u) * sqrt(sigsvd$d)))
-  retval <- matrix(rnorm(n * ncol(sigma)), nrow = n) %*% retval
-  retval <- sweep(retval, 2, mean, "+")
-  retval
+    if(length(mean) != nrow(sigma)){
+        stop("mean and sigma have non-conforming size")
+    }
+
+    ev <- eigen(sigma, sym = TRUE)$values
+    if (!all(ev >= -sqrt(.Machine$double.eps) * abs(ev[1])))   
+        warning("sigma is numerically not positive definite")
+
+    sigsvd <- svd(sigma)
+    retval <- t(sigsvd$v %*% (t(sigsvd$u) * sqrt(sigsvd$d)))
+    retval <- matrix(rnorm(n * ncol(sigma)), nrow = n) %*% retval
+    retval <- sweep(retval, 2, mean, "+")
+    retval
 }
 
 

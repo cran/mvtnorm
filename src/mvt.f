@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f,v 1.6 2003/06/17 07:58:51 hothorn Exp $
+*    $Id: mvt.f,v 1.8 2003/07/21 16:59:27 hothorn Exp $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &           MAXPTS, ABSEPS, RELEPS, TOL, ERROR, VALUE, INFORM )       

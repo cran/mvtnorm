@@ -1,4 +1,4 @@
-# $Id: mvt.R,v 1.26 2003/06/18 07:21:17 hothorn Exp $ 
+# $Id: mvt.R,v 1.28 2003/10/06 16:04:45 hothorn Exp $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -86,7 +86,7 @@ pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL
           lower <- (carg$lower - carg$mean)/sqrt(diag(carg$sigma))
           upper <- (carg$upper - carg$mean)/sqrt(diag(carg$sigma))
           mean <- rep(0, length(lower))
-          corr <- sig2corr(carg$sigma)
+          corr <- cov2cor(carg$sigma)
           RET <- mvt(lower=lower, upper=upper, df=0, corr=corr, delta=mean,
                      maxpts=maxpts, abseps=abseps,releps=releps)
       }
@@ -123,7 +123,7 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
         } else {
             lower <- carg$lower/sqrt(diag(carg$sigma))
             upper <- carg$upper/sqrt(diag(carg$sigma))
-            corr <- sig2corr(carg$sigma)
+            corr <- cov2cor(carg$sigma)
             RET <- mvt(lower=lower, upper=upper, df=df, corr=corr,
                        delta=carg$mean, maxpts=maxpts,
                        abseps=abseps,releps=releps)

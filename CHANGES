@@ -1,9 +1,17 @@
-# $Id: CHANGES,v 1.23 2003/06/25 07:09:52 hothorn Exp $
+# $Id: CHANGES,v 1.26 2003/10/06 16:04:51 hothorn Exp $
+
+	0.6-5 (14.11.2003)
+
+	check if covariance matrix is pd in rmvnorm (by Fritz Leisch)
+
+	0.6-4 (06.10.2003)
+
+	use new base function `cov2cor'
 
 	0.6-3 (21.07.2003)
 
 	Alans changes were restricted to N <= 100, now N <= 1000
-    are possible again
+        are possible again
 
 	0.6-2 (25.06.2003)
 
