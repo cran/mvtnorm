@@ -4,7 +4,7 @@ for f in ./src/*.*o; do
     rm -f $f
 done
 
-for f in ./src/*.c; do
+for f in ./src/mvt*.c; do
     rm -f $f
 done
 

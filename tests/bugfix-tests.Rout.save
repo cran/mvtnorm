@@ -1,6 +1,6 @@
 
 R : Copyright 2002, The R Development Core Team
-Version 1.5.0 Under development (unstable) (2002-04-08)
+Version 1.7.0 Under development (unstable) (2002-11-21)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -15,6 +15,7 @@ Type `q()' to quit R.
 
 > invisible(options(echo = TRUE))
 > library(mvtnorm)
+> set.seed(290875)
 > 
 > # correlation matrices for unequal variances were wrong
 > # from Pamela Ohman-Strickland <ohmanpa@UMDNJ.EDU>
@@ -30,4 +31,19 @@ attr(,"error")
 [1] 1e-15
 attr(,"msg")
 [1] "Normal Completion"
+> 
+> # check if set.seed works (starting from 0.5-7)
+> n <- 5
+> lower <- -1
+> upper <- 3
+> df <- 4
+> corr <- diag(5)
+> corr[lower.tri(corr)] <- 0.5
+> delta <- rep(0, 5)
+> set.seed(290875)
+> prob1 <- pmvt(lower=lower, upper=upper, delta=delta, df=df, corr=corr)
+> set.seed(290875)
+> prob2 <- pmvt(lower=lower, upper=upper, delta=delta, df=df, corr=corr)
+> stopifnot(all.equal(prob1, prob2))
+> 
 > 

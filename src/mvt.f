@@ -1,3 +1,6 @@
+*
+*    $Id: mvt.f,v 1.5 2002/11/22 13:25:28 hothorn Exp $
+*
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
 *
@@ -1204,56 +1207,12 @@
 *
 *     Uniform (0,1) random number generator
 *
-*     Reference:
-*     L'Ecuyer, Pierre (1996), 
-*     "Combined Multiple Recursive Random Number Generators"
-*     Operations Research 44, pp. 816-822.
-*
-*
-      INTEGER A12, A13, A21, A23, P12, P13, P21, P23
-      INTEGER Q12, Q13, Q21, Q23, R12, R13, R21, R23
-      INTEGER X10, X11, X12, X20, X21, X22, Z, M1, M2, H 
-      DOUBLE PRECISION INVMP1
-      PARAMETER ( M1 = 2147483647, M2 = 2145483479 )
-      PARAMETER ( A12 =   63308, Q12 = 33921, R12 = 12979 )
-      PARAMETER ( A13 = -183326, Q13 = 11714, R13 =  2883 )
-      PARAMETER ( A21 =   86098, Q21 = 24919, R21 =  7417 )
-      PARAMETER ( A23 = -539608, Q23 =  3976, R23 =  2071 )
-      PARAMETER ( INVMP1 = 4.656612873077392578125D-10 ) 
-*                 INVMP1 = 1/( M1 + 1 )
-      SAVE X10, X11, X12, X20, X21, X22
-      DATA       X10,      X11,      X12,      X20,      X21,      X22  
-     &    / 15485857, 17329489, 36312197, 55911127, 75906931, 96210113 /      
-*
-*     Component 1
-*
-      H = X10/Q13
-      P13 = -A13*( X10 - H*Q13 ) - H*R13
-      H = X11/Q12
-      P12 =  A12*( X11 - H*Q12 ) - H*R12
-      IF ( P13 .LT. 0 ) P13 = P13 + M1
-      IF ( P12 .LT. 0 ) P12 = P12 + M1
-      X10 = X11 
-      X11 = X12
-      X12 = P12 - P13
-      IF ( X12 .LT. 0 ) X12 = X12 + M1
-*
-*     Component 2
-*
-      H = X20/Q23
-      P23 = -A23*( X20 - H*Q23 ) - H*R23
-      H = X22/Q21
-      P21 =  A21*( X22 - H*Q21 ) - H*R21
-      IF ( P23 .LT. 0 ) P23 = P23 + M2
-      IF ( P21 .LT. 0 ) P21 = P21 + M2
-      X20 = X21 
-      X21 = X22
-      X22 = P21 - P23
-      IF ( X22 .LT. 0 ) X22 = X22 + M2
-*
-*     Combination
-*
-      Z = X12 - X22
-      IF ( Z .LE. 0 ) Z = Z + M1
-      MVUNI = Z*INVMP1
+*     use R's random number generator directly
+*     the way `Writing R extentions' advertises.
+*   
+      DOUBLE PRECISION x
+      CALL rndstart()
+      x = unifrnd()
+      CALL rndend()
+      MVUNI = x
       END

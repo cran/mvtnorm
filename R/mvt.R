@@ -1,4 +1,4 @@
-# $Id: mvt.R,v 1.22 2002/10/07 06:29:13 hothorn Exp $ 
+# $Id: mvt.R,v 1.23 2002/11/22 13:52:47 hothorn Exp $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -134,7 +134,7 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
     if (length(lower) != n) stop("wrong dimensions")
     if (length(upper) != n) stop("wrong dimensions")
 
-    if (n > 1000) stop("only dimensions 1 <= n <= 100 allowed") 
+    if (n > 1000) stop("only dimensions 1 <= n <= 1000 allowed") 
 
     infin <- rep(2, n)
     infin[upper == Inf] <- 1
