@@ -20,6 +20,10 @@ for f in ./man/*~; do
     rm -f $f
 done
 
+for f in ./inst/doc/*~; do
+    rm -f $f
+done
+
 for f in *~; do
     rm -f $f
 done

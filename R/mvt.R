@@ -1,4 +1,4 @@
-# $Id: mvt.R,v 1.24 2003/01/21 08:03:12 hothorn Exp $ 
+# $Id: mvt.R,v 1.25 2003/05/30 10:53:36 hothorn Exp $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
