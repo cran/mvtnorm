@@ -38,7 +38,7 @@ This program involves the computation of central and noncentral
 multivariate t-probabilities with arbitrary correlation matrices.
 It involves both the computation of singular and nonsingular
 probabilities. The methodology is described in
-Genz and Bretz (1999, 2001).
+Genz and Bretz (1999, 2002).
 
 For a given correlation matrix \code{corr}, for short \eqn{A}, say, 
 (which has to be  positive semi-definite) and 
@@ -74,7 +74,7 @@ If \code{df = 0}, normal probabilities are returned.
 }
 
 \value{
-The distribution function is returned with attributes
+The evaluated distribution function is returned with attributes
   \item{error}{estimated absolute error and}
   \item{msg}{status messages.}
 }
@@ -86,17 +86,20 @@ t-probabilities with application to power calculation of multiple
 contrasts. \emph{Journal of Statistical Computation and Simulation},
 \bold{63}, 361--378.
 
-Genz, A. and Bretz, F. (2001), Methods for the computation of multivariate
-t-probabilities. \emph{(submitted)}
+Genz, A. and Bretz, F. (2002), Methods for the computation of multivariate
+t-probabilities. \emph{Journal of Computational and Graphical Statistics},
+\bold{11}, 950--971.
 
 Edwards D. and Berry, Jack J. (1987), The efficiency of simulation-based 
-multiple comparisons. \emph{Biometrics}, \bold{43}, 913--928
+multiple comparisons. \emph{Biometrics}, \bold{43}, 913--928.
 
 }
 
 \author{ Fortran Code by Alan Genz <AlanGenz@wsu.edu> and Frank Bretz
-<bretz@ifgb.uni-hannover.de>, \R port by Torsten Hothorn
+<frank.bretz@pharma.novartis.com>, \R port by Torsten Hothorn
 <Torsten.Hothorn@rzmail.uni-erlangen.de> }
+
+\seealso{\code{\link{qmvt}}}
 
 \examples{
 

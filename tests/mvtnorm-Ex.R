@@ -160,6 +160,26 @@ stopifnot(all.equal(round(a,3) , round(b, 3)))
 
 ## Keywords: 'distribution'.
 
+### quantile functions
+
+q1 <- qmvnorm(0.9025, sigma = diag(2))$quantile
+stopifnot(identical(round(q1, 3), round(qnorm(0.95), 3)))
+
+q1 <- qmvnorm(0.9025, sigma = diag(2), tail = "upper")$quantile
+stopifnot(identical(round(q1, 3), round(qnorm(1 - 0.95), 3)))
+
+q1 <- qmvnorm(0.9025, sigma = diag(2), tail = "both")$quantile 
+stopifnot(identical(round(q1, 3), round(qnorm(0.975), 3)))
+
+q2 <- qmvt(0.9025, df = 500, corr = diag(2))$quantile
+stopifnot(identical(round(q2, 3), round(qt(0.95, df = 500), 3)))
+
+q2 <- qmvt(0.9025, df = 500, corr = diag(2), tail = "upper")$quantile
+stopifnot(identical(round(q2, 3), round(qt(1 - 0.95, df = 500), 3)))
+
+q2 <- qmvt(0.9025, df = 500, corr = diag(2), tail = "both")$quantile
+stopifnot(identical(round(q2, 2), round(qt(0.975, df = 500), 2)))
+
 
 cat("Time elapsed: ", proc.time() - get("ptime", env = .CheckExEnv),"\n")
 dev.off(); quit('no')

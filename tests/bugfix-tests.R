@@ -77,3 +77,13 @@ b
 attributes(a) <- NULL
 attributes(b) <- NULL
 stopifnot(all.equal(round(a, 3), round(b, 3)))
+
+# cases where the support is the empty set tried to compute something.
+# spotted by Peter Thomson <peter@statsresearch.co.nz>
+stopifnot(pmvnorm(upper=c(-Inf,1)) == 0)
+stopifnot(pmvnorm(lower=c(Inf,1)) == 0)
+stopifnot(pmvnorm(lower=c(-2,0),upper=c(-1,1),corr=matrix(rep(1,4),2,2)) == 0)
+
+# bugged Fritz (long time ago)
+stopifnot(all.equal(pmvnorm(-Inf, c(Inf, 0), 0, diag(2)), pmvnorm(-Inf,
+                    c(Inf, 0), 0)))

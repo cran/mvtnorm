@@ -1,4 +1,13 @@
-# $Id: CHANGES,v 1.30 2004/06/03 07:04:03 hothorn Exp $
+# $Id: CHANGES,v 1.33 2004/10/14 13:40:21 hothorn Exp $
+
+	0.7-0 (14.10.2004)
+
+	a coding session with Frank produced `qmv{t,norm}'.
+        try to check if the support specified by `lower' and `upper' is
+        empty (problem spotted by Peter Thomson <peter@statsresearch.co.nz>)
+	Alan's fix prevents negative values to be returned.
+
+	some cosmetics
 
 	0.6-8 (03.06.2004)
 

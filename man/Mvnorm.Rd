@@ -21,7 +21,7 @@ rmvnorm(n, mean, sigma)
  \item{log}{Logical; if \code{TRUE}, densities d are given as log(d).}
 }
 \author{Friedrich Leisch <Friedrich.Leisch@ci.tuwien.ac.at> }
-\seealso{\link{pmvnorm},\link{rnorm}}
+\seealso{\code{\link{pmvnorm}}, \code{\link{rnorm}}, \code{\link{qmvnorm}}}
 \examples{
 dmvnorm(x=c(0,0))
 dmvnorm(x=c(0,0), mean=c(1,1))

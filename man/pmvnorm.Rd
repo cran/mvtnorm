@@ -30,7 +30,7 @@ pmvnorm(lower=-Inf, upper=Inf, mean=rep(0, length(lower)),
 \details{
 
 This program involves the computation of 
-multivariate normal-probabilities with arbitrary correlation matrices.
+multivariate normal probabilities with arbitrary correlation matrices.
 It involves both the computation of singular and nonsingular 
 probabilities. The methodology is described in
 Genz (1992, 1993).
@@ -38,16 +38,16 @@ Genz (1992, 1993).
 Note that both \code{-Inf} and \code{+Inf} may be specified in \code{lower} and
 \code{upper}. For more details see \code{\link{pmvt}}. 
 
-The mvn case is treated as a special case of \code{\link{pmvt}} with \code{df=0}. 
-
-Univariate problems are passed to \code{\link{pnorm}}.
+The multivariate normal 
+case is treated as a special case of \code{\link{pmvt}} with \code{df=0} and 
+univariate problems are passed to \code{\link{pnorm}}.
 
 Multivariate normal density and random numbers are available using
 \code{\link{dmvnorm}} and \code{\link{rmvnorm}}.
  
 }
 \value{
-The distribution function is returned with attributes
+The evaluated distribution function is returned with attributes
   \item{error}{estimated absolute error and}
   \item{msg}{status messages.}
 }
@@ -63,8 +63,10 @@ normal probabilities. \emph{Computing Science and Statistics}, \bold{25},
 }
 
 \author{ Fortran Code by Alan Genz <AlanGenz@wsu.edu> and Frank Bretz
-<bretz@ifgb.uni-hannover.de>, \R port by Torsten Hothorn
+<frank.bretz@pharma.novartis.com>, \R port by Torsten Hothorn
 <Torsten.Hothorn@rzmail.uni-erlangen.de> }
+
+\seealso{\code{\link{qmvnorm}}}
 
 \examples{
 
@@ -103,13 +105,5 @@ a <- pmvnorm(lower=-Inf, upper=c(2,2), sigma = diag(2)*2)
 b <- pmvnorm(lower=-Inf, upper=c(2,2)/sqrt(2), corr=diag(2))
 stopifnot(all.equal(round(a,5) , round(b, 5)))
 
-\testonly{
-  # bugged Fritz
-  stopifnot(all.equal(pmvnorm(-Inf, c(Inf, 0), 0, diag(2)), pmvnorm(-Inf,
-                      c(Inf, 0), 0)))
 }
-
-
-}
-
 \keyword{distribution}

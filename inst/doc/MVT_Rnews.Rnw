@@ -218,23 +218,16 @@ cv <- C %*% V %*% t(C)
 dv <- t(1/sqrt(diag(cv)))
 cr <- cv * (t(dv) %*% dv)
 delta <- rep(0,5)
-myfct <- function(q, alpha) {
-  lower <- rep(-q, ncol(cv))
-  upper <- rep(q, ncol(cv))
-  pmvt(lower = lower, upper = upper, delta = delta, df = df,
-       corr = cr, abseps=0.0001, maxpts = 100000) - alpha
-}
-uniroot(myfct, lower=1, upper=5, alpha=0.95)
+qmvt(0.95, df = df, delta = delta, corr = cr, abseps = 0.0001, 
+     maxpts = 100000, tail = "both")
 @
 {\ttfamily n} is the sample size vector of each level of the
 factor, {\ttfamily V} is the covariance matrix of $ \beta $. With
 the contrasts $ \C $ we can compute the correlation matrix
 {\ttfamily cr} of $ \C\beta $. Finally, we are interested in the
-$ 95\%$ quantile of $ W $. A wrapper function {\ttfamily myfct}
-computes the difference of the multivariate $ t $ probability for
-quantile {\ttfamily q} and {\ttfamily alpha}. The {\ttfamily
+$ 95\%$ quantile of $ W $. The {\ttfamily
 alpha} quantile can now be computed easily using {\ttfamily
-uniroot}. The $95\%$ quantile of $ W $ in this example is $ 2.56 $
+pmvt}. The $95\%$ quantile of $ W $ in this example is $ 2.56 $
 , \cite{the-effici:1987} obtained the same result using $ 80.000
 $ simulation runs. The computation needs $ 8.06 $ seconds total
 time on a Pentium III $450$ MHz with $256$ MB memory.

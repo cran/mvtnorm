@@ -116,9 +116,9 @@ This is computed as follows:
 +     4, 2))
 \end{Sinput}
 \begin{Soutput}
-[1] 0.8279855
+[1] 0.8279847
 attr(,"error")
-[1] 2.168699e-06
+[1] 4.712612e-07
 attr(,"msg")
 [1] "Normal Completion"
 \end{Soutput}
@@ -224,27 +224,22 @@ compute the quantile for the example cited above.
 > dv <- t(1/sqrt(diag(cv)))
 > cr <- cv * (t(dv) %*% dv)
 > delta <- rep(0, 5)
-> myfct <- function(q, alpha) {
-+     lower <- rep(-q, ncol(cv))
-+     upper <- rep(q, ncol(cv))
-+     pmvt(lower = lower, upper = upper, delta = delta, df = df, 
-+         corr = cr, abseps = 1e-04, maxpts = 1e+05) - alpha
-+ }
-> uniroot(myfct, lower = 1, upper = 5, alpha = 0.95)
+> qmvt(0.95, df = df, delta = delta, corr = cr, abseps = 1e-04, 
++     maxpts = 1e+05, tail = "both")
 \end{Sinput}
 \begin{Soutput}
-$root
-[1] 2.560929
+$quantile
+[1] 2.560774
 
-$f.root
-[1] -1.932693e-05
+$f.quantile
+[1] -5.698734e-05
 attr(,"error")
-[1] 9.274334e-05
+[1] 7.958454e-05
 attr(,"msg")
 [1] "Normal Completion"
 
 $iter
-[1] 10
+[1] 11
 
 $estim.prec
 [1] 6.103516e-05
@@ -254,11 +249,9 @@ $estim.prec
 factor, {\ttfamily V} is the covariance matrix of $ \beta $. With
 the contrasts $ \C $ we can compute the correlation matrix
 {\ttfamily cr} of $ \C\beta $. Finally, we are interested in the
-$ 95\%$ quantile of $ W $. A wrapper function {\ttfamily myfct}
-computes the difference of the multivariate $ t $ probability for
-quantile {\ttfamily q} and {\ttfamily alpha}. The {\ttfamily
+$ 95\%$ quantile of $ W $. The {\ttfamily
 alpha} quantile can now be computed easily using {\ttfamily
-uniroot}. The $95\%$ quantile of $ W $ in this example is $ 2.56 $
+pmvt}. The $95\%$ quantile of $ W $ in this example is $ 2.56 $
 , \cite{the-effici:1987} obtained the same result using $ 80.000
 $ simulation runs. The computation needs $ 8.06 $ seconds total
 time on a Pentium III $450$ MHz with $256$ MB memory.

@@ -1,13 +1,14 @@
 *
-*    $Id: mvt.f,v 1.10 2004/06/03 07:04:03 hothorn Exp $
+*    $Id: mvt.f,v 1.11 2004/10/14 13:39:01 hothorn Exp $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &           MAXPTS, ABSEPS, RELEPS, TOL, ERROR, VALUE, INFORM )       
 *
 *     A subroutine for computing non-central multivariate t probabilities.
 *     This subroutine uses an algorithm (QRSVN) described in the paper
-*     "Methods for the  Computation of Multivariate t-Probabilities",
-*        by Alan Genz and Frank Bretz
+*     "Comparison of Methods for the Computation of Multivariate
+*         t-Probabilities", by Alan Genz and Frank Bretz
+*         J. Comp. Graph. Stat. 11 (2002), pp. 950-971.
 *
 *          Alan Genz 
 *          Department of Mathematics
@@ -131,8 +132,9 @@
 *           1-d case for normal or central t
 *
             VL = 1
-            IF ( INFI(1) .NE. 1 ) VL = MVSTDT( NU, B(1) - DL(1) ) 
-            IF ( INFI(1) .NE. 0 ) VL = VL - MVSTDT( NU, A(1) - DL(1) ) 
+            IF ( INFI(1) .NE. 1 ) VL = MVSTDT( NU, B(1) - DL(1) )
+            IF ( INFI(1) .NE. 0 ) VL = VL - MVSTDT( NU, A(1) - DL(1) )
+            IF ( VL .LT. 0 ) VL = 0 
             ER = 2D-16
             ND = 0
          ELSE IF ( ND .EQ. 2 .AND. 
@@ -172,6 +174,7 @@
                VL = 1
                IF ( INFI(1) .NE. 1 ) VL = MVSTDT( NU, B(1)-DL(1) ) 
                IF ( INFI(1) .NE. 0 ) VL = VL - MVSTDT( NU, A(1)-DL(1) )
+               IF ( VL .LT. 0 ) VL = 0
                ER = 2D-16
             END IF
             ND = 0
@@ -353,6 +356,7 @@
 *              Expected Y = -( density(b) - density(a) )/( b - a )
 * 
                IF ( DEMIN .GT. EPSI ) THEN
+                  Y(I) = 0
                   IF ( INFI(I) .NE. 0 ) Y(I) =        MVTDNS( 0, AMIN )        
                   IF ( INFI(I) .NE. 1 ) Y(I) = Y(I) - MVTDNS( 0, BMIN )        
                   Y(I) = Y(I)/DEMIN
@@ -1008,8 +1012,8 @@
          xnhk = hrk**2/( hrk**2 + ors*( nu + dk**2 ) ) 
          xnkh = krh**2/( krh**2 + ors*( nu + dh**2 ) ) 
       else
-         xnhk = 1  
-         xnkh = 1  
+         xnhk = 0
+         xnkh = 0  
       end if
       hs = sign( one, dh - r*dk )  
       ks = sign( one, dk - r*dh ) 
@@ -1251,7 +1255,7 @@
             VAREST(K) = 0
          END DO
          SAMPLS = MINSMP 
-         DO I = 1, PLIM
+         DO I = MIN( NDIM, 10 ), PLIM
             NP = I
             IF ( MINVLS .LT. 2*SAMPLS*P(I) ) GO TO 10
          END DO
