@@ -1,6 +1,6 @@
 
-R : Copyright 2004, The R Foundation for Statistical Computing
-Version 2.0.0  (2004-10-04), ISBN 3-900051-07-0
+R : Copyright 2005, The R Foundation for Statistical Computing
+Version 2.1.1  (2005-06-20), ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -181,9 +181,9 @@ attr(,"error")
 attr(,"msg")
 [1] "Normal Completion"
 > b
-[1] 0.4211411
+[1] 0.4211421
 attr(,"error")
-[1] 1.874813e-06
+[1] 2.788776e-06
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -198,9 +198,9 @@ attr(,"msg")
 > attributes(a) <- NULL
 > attributes(b) <- NULL
 > a
-[1] 0.5653985
+[1] 0.5654019
 > b
-[1] 0.5653997
+[1] 0.5654054
 > stopifnot(all.equal(round(a,3) , round(b, 3)))
 > 
 > 
@@ -229,7 +229,7 @@ attr(,"msg")
 > 
 > 
 > cat("Time elapsed: ", proc.time() - get("ptime", env = .CheckExEnv),"\n")
-Time elapsed:  2.53 0 2.53 0 0 
+Time elapsed:  1.63 0.38 2.04 0 0 
 > dev.off(); quit('no')
 null device 
           1 

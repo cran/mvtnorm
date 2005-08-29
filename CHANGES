@@ -1,4 +1,8 @@
-# $Id: CHANGES,v 1.33 2004/10/14 13:40:21 hothorn Exp $
+# $Id: CHANGES,v 1.35 2005/08/29 11:06:08 hothorn Exp $
+
+	0.7-2 (29.08.2005)
+
+        make gfortran happy (a warning about unused variable NF remains)
 
 	0.7-1 (18.11.2004)
 
