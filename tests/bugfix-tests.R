@@ -87,3 +87,6 @@ stopifnot(pmvnorm(lower=c(-2,0),upper=c(-1,1),corr=matrix(rep(1,4),2,2)) == 0)
 # bugged Fritz (long time ago)
 stopifnot(all.equal(pmvnorm(-Inf, c(Inf, 0), 0, diag(2)), pmvnorm(-Inf,
                     c(Inf, 0), 0)))
+
+# this is a bug in `mvtdst' nobody was able to fix yet :-(
+stopifnot(pmvnorm(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0) == 0)
