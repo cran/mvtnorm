@@ -1,4 +1,4 @@
-# $Id: mvnorm.R,v 1.4 2004/01/22 14:30:50 hothorn Exp $
+# $Id: mvnorm.R 2917 2006-09-06 15:04:05Z hothorn $
 
 rmvnorm <- function(n, mean=rep(0, nrow(sigma)),
                       sigma=diag(length(mean))){
@@ -34,13 +34,13 @@ dmvnorm <- function (x, mean, sigma, log=FALSE)
     if (missing(sigma)) {
         sigma <- diag(ncol(x))
     }
-    if (ncol(x) != ncol(sigma)) {
+    if (NCOL(x) != NCOL(sigma)) {
         stop("x and sigma have non-conforming size")
     }
-    if (nrow(sigma) != ncol(sigma)) {
+    if (NROW(sigma) != NCOL(sigma)) {
         stop("sigma meanst be a square matrix")
     }
-    if (length(mean) != nrow(sigma)) {
+    if (length(mean) != NROW(sigma)) {
         stop("mean and sigma have non-conforming size")
     }
     distval <- mahalanobis(x, center = mean, cov = sigma)

@@ -20,7 +20,7 @@ rmvnorm(n, mean, sigma)
  \item{sigma}{Covariance matrix, default is \code{diag(ncol(x))}.}
  \item{log}{Logical; if \code{TRUE}, densities d are given as log(d).}
 }
-\author{Friedrich Leisch <Friedrich.Leisch@ci.tuwien.ac.at> }
+\author{Friedrich Leisch <Friedrich.Leisch@R-project.org> }
 \seealso{\code{\link{pmvnorm}}, \code{\link{rnorm}}, \code{\link{qmvnorm}}}
 \examples{
 dmvnorm(x=c(0,0))

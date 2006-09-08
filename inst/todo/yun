@@ -1,0 +1,33 @@
+
+Date: Wed, 13 Jul 2005 15:58:42 -0500 (CDT)
+From: Jun Yan <jyan@stat.uiowa.edu>
+To: Torsten Hothorn <Torsten.Hothorn@rzmail.uni-erlangen.de>
+Subject: pmvnorm 
+
+Dear Torsten,
+
+I have been using your package mvtnorm and found it very useful. However, 
+I'd like to request for a functionality of pmvnorm (and pmvt): Could you 
+make it available to compute the cdf given a matrix, each row of which is 
+an observation? For example, let u be such a matrix of dim n by p, then
+
+pmvnorm(lower = matrix(Inf, n, p), upper = u, sigma=sigma)
+
+returns a vector of length n.
+
+This way, the cdf function behaves more like the univariate cdf functions. 
+I could have used apply function to do such batch jobs, but I think it is 
+cleaner if pmvnorm can handle this in the compiled code for the sake of 
+speed and elegancy.
+
+Thanks!
+
+Jun
+-------
+Jun Yan
+Assistant Professor
+Department of Statistics and               
+ Actuarial Science                             Voice: 319-335-0824
+University of Iowa                               Fax: 319-335-3017
+219 Schaeffer Hall                          Email: j-yan@uiowa.edu
+Iowa City, IA 52242           Web: http://www.stat.uiowa.edu/~jyan

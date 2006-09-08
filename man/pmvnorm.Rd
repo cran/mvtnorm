@@ -62,10 +62,6 @@ normal probabilities. \emph{Computing Science and Statistics}, \bold{25},
 
 }
 
-\author{ Fortran Code by Alan Genz <AlanGenz@wsu.edu> and Frank Bretz
-<frank.bretz@pharma.novartis.com>, \R port by Torsten Hothorn
-<Torsten.Hothorn@rzmail.uni-erlangen.de> }
-
 \seealso{\code{\link{qmvnorm}}}
 
 \examples{

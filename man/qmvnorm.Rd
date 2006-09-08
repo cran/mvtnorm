@@ -1,6 +1,6 @@
 \name{qmvnorm}
 \alias{qmvnorm}
-\title{ Quantiles of the Multvariate Normal Distribution }
+\title{ Quantiles of the Multivariate Normal Distribution }
 \description{
 
 Computes the equicoordinate quantile function of the multivariate normal

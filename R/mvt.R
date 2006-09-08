@@ -1,4 +1,4 @@
-# $Id: mvt.R,v 1.31 2006/08/23 08:48:24 hothorn Exp $ 
+# $Id: mvt.R 2936 2006-09-08 11:30:57Z hothorn $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -219,6 +219,45 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
 
 rmvt <- function(n, sigma=diag(2), df=1) {
   rmvnorm(n,sigma=sigma)/sqrt(rchisq(n,df)/df)
+}
+
+dmvt <- function(x, delta, sigma, df = 1, log = TRUE)
+{
+    if (df == 0)
+        return(dmvnorm(x, mean = delta, sigma = sigma, log = log))
+
+    if (is.vector(x)) {
+        x <- matrix(x, ncol = length(x))
+    }
+    if (missing(delta)) {
+        delta <- rep(0, length = ncol(x))
+    }
+    if (missing(sigma)) {
+        sigma <- diag(ncol(x))
+    }
+    if (NCOL(x) != NCOL(sigma)) {
+        stop("x and sigma have non-conforming size")
+    }
+    if (NROW(sigma) != NCOL(sigma)) {
+        stop("sigma meanst be a square matrix")
+    }
+    if (length(delta) != NROW(sigma)) {
+        stop("mean and sigma have non-conforming size")
+    }
+
+    m <- NCOL(sigma)
+
+    distval <- mahalanobis(x, center = delta, cov = sigma)
+
+    logdet <- sum(log(eigen(sigma, symmetric = TRUE,
+                            only.values = TRUE)$values))
+
+    logretval <- lgamma((m + df)/2) - 
+                 (lgamma(df / 2) + 0.5 * (logdet + m * logb(pi * df))) -
+                 0.5 * (df + m) * logb(1 + distval / df)
+    if (log)
+        return(logretval) 
+    return(exp(logretval))
 }
 
 qmvnorm <- function(p, interval = c(-10, 10), 

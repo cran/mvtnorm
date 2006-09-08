@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f,v 1.12 2005/08/29 11:02:59 hothorn Exp $
+*    $Id: mvt.f 2935 2006-09-08 10:37:47Z hothorn $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &           MAXPTS, ABSEPS, RELEPS, TOL, ERROR, VALUE, INFORM )
@@ -58,6 +58,9 @@
      &                 ABSEPS, TOL, ERROR, VALUE, E(1), V(1)
       COMMON /PTBLCK/IVLS
       IVLS = 0
+      
+      CALL rndstart()
+      
       IF ( N .GT. 1000 .OR. N .LT. 1 ) THEN
          VALUE = 0
          ERROR = 1
@@ -75,6 +78,9 @@
             VALUE = V(1)
          ENDIF
       ENDIF
+      
+      CALL rndend()
+      
       END
 *
       SUBROUTINE MVSUBR( N, W, NF, F )
@@ -1492,9 +1498,8 @@
 *     use R's random number generator directly
 *     the way `Writing R extentions' advertises.
 *
-      DOUBLE PRECISION x
-      CALL rndstart()
+      DOUBLE PRECISION unifrnd, x
+
       x = unifrnd()
-      CALL rndend()
       MVUNI = x
       END

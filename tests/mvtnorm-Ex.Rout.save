@@ -1,6 +1,6 @@
 
-R : Copyright 2006, The R Foundation for Statistical Computing
-Version 2.3.1 (2006-06-01)
+R version 2.4.0 alpha (2006-09-06 r39158)
+Copyright (C) 2006 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -76,7 +76,7 @@ Type 'q()' to quit R.
 > print(prob)
 [1] 0.5801684
 attr(,"error")
-[1] 0.0002864827
+[1] 0.000286482
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -100,7 +100,7 @@ attr(,"msg")
 > pmvnorm(lower=rep(-Inf, m), upper=c(1,4,2), mean=rep(0, m), corr=sigma)
 [1] 0.8279847
 attr(,"error")
-[1] 5.845659e-07
+[1] 5.845616e-07
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -139,14 +139,12 @@ attr(,"msg")
 > print(prob)
 [1] 0.5061948
 attr(,"error")
-[1] 0.0003715254
+[1] 0.0003715248
 attr(,"msg")
 [1] "Normal Completion"
 > 
 > pmvt(lower=-Inf, upper=3, df = 3, sigma = 1) == pt(3, 3)
 [1] TRUE
-Warning message:
-full precision was not achieved in 'pnt' 
 > 
 > # Example from R News paper (original by Edwards and Berry, 1987)
 > 
@@ -186,7 +184,7 @@ attr(,"msg")
 > b
 [1] 0.4211421
 attr(,"error")
-[1] 2.788776e-06
+[1] 2.788829e-06
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -230,9 +228,12 @@ attr(,"msg")
 > q2 <- qmvt(0.9025, df = 500, corr = diag(2), tail = "both")$quantile
 > stopifnot(identical(round(q2, 2), round(qt(0.975, df = 500), 2)))
 > 
+> ### check t density function
+> di <- dmvt(0.5, sigma = 1, df = 5, log = TRUE) - dt(0.5, df = 5, log = TRUE)
+> stopifnot(max(abs(di)) < sqrt(.Machine$double.eps))
 > 
 > cat("Time elapsed: ", proc.time() - get("ptime", env = .CheckExEnv),"\n")
-Time elapsed:  2.132 0.006 2.143 0 0 
+Time elapsed:  2.068 0.004 2.085 0 0 
 > dev.off(); quit('no')
 null device 
           1 

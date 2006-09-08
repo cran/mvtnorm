@@ -1,19 +1,17 @@
 \name{pmvt}
 \alias{pmvt}
-\alias{rmvt}
 \title{ Multivariate t Distribution }
 \description{
 
-Computes the the distribution function of the multivariate t distribution 
-for arbitrary limits, degrees of freedom and correlation matrices 
-based on algorithms by Genz and Bretz.
+  Computes the the distribution function of the multivariate t distribution 
+  for arbitrary limits, degrees of freedom and correlation matrices 
+  based on algorithms by Genz and Bretz.
 
 }
 \usage{
 pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
      df=1, corr=NULL, sigma=NULL, maxpts = 25000, abseps = 0.001,
      releps = 0)
-rmvt(n, sigma=diag(2), df=1)
 }
 \arguments{
   \item{lower}{ the vector of lower limits of length n.}
@@ -29,7 +27,6 @@ rmvt(n, sigma=diag(2), df=1)
   \item{maxpts}{ maximum number of function values as integer. }
   \item{abseps}{ absolute error tolerance as double. }
   \item{releps}{ relative error tolerance as double. }
-  \item{n}{ number of observations.}
 }
 
 \details{
@@ -66,9 +63,6 @@ and additional codes) from the websites
 \url{http://www.bioinf.uni-hannover.de/~bretz/} 
 and \url{http://www.sci.wsu.edu/math/faculty/genz/homepage}.
 
-\code{rmvt} is a wrapper to \code{\link{rmvnorm}} for random number
-generation.
-
 If \code{df = 0}, normal probabilities are returned. 
 
 }
@@ -94,10 +88,6 @@ Edwards D. and Berry, Jack J. (1987), The efficiency of simulation-based
 multiple comparisons. \emph{Biometrics}, \bold{43}, 913--928.
 
 }
-
-\author{ Fortran Code by Alan Genz <AlanGenz@wsu.edu> and Frank Bretz
-<frank.bretz@pharma.novartis.com>, \R port by Torsten Hothorn
-<Torsten.Hothorn@rzmail.uni-erlangen.de> }
 
 \seealso{\code{\link{qmvt}}}
 
@@ -164,8 +154,6 @@ a <- pmvt(0, 1,df=10)
 attributes(a) <- NULL
 b <- pt(1, df=10) - pt(0, df=10)
 stopifnot(all.equal(round(a,10) , round(b, 10)))
-
-rmvt(10, sigma=diag(10))
 
 }
 

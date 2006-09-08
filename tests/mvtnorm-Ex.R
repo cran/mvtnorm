@@ -180,6 +180,9 @@ stopifnot(identical(round(q2, 3), round(qt(1 - 0.95, df = 500), 3)))
 q2 <- qmvt(0.9025, df = 500, corr = diag(2), tail = "both")$quantile
 stopifnot(identical(round(q2, 2), round(qt(0.975, df = 500), 2)))
 
+### check t density function
+di <- dmvt(0.5, sigma = 1, df = 5, log = TRUE) - dt(0.5, df = 5, log = TRUE)
+stopifnot(max(abs(di)) < sqrt(.Machine$double.eps))
 
 cat("Time elapsed: ", proc.time() - get("ptime", env = .CheckExEnv),"\n")
 dev.off(); quit('no')
