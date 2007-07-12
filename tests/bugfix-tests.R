@@ -89,4 +89,37 @@ stopifnot(all.equal(pmvnorm(-Inf, c(Inf, 0), 0, diag(2)), pmvnorm(-Inf,
                     c(Inf, 0), 0)))
 
 # this is a bug in `mvtdst' nobody was able to fix yet :-(
-stopifnot(pmvnorm(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0) == 0)
+stopifnot(pmvnorm(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0)) == 1)
+
+### check for correct random seed initialization
+### problem reported by Karen Conneely <conneely@umich.edu>
+dm <- 250000
+iters <- 2
+corr <- .7
+dim <- 100
+abserr <- .0000035
+cutoff <- -5.199338
+mn <- rep(0,dim)
+mat <- diag(dim)
+for (i in 1:dim) {
+    for (j in 1:(i-1)) {
+        mat[i,j]=mat[j,i]=corr^(i-j)
+    }
+}
+ll <- rep(cutoff, dim)
+mn <- rep(0, dim)
+p <- matrix(0, iters,1)
+
+set.seed(290875)
+for (i in 1:iters) {
+   pp <- pmvnorm(lower=ll, sigma=mat, maxpts=dm, abseps=abserr)
+   p[i] <- 1-pp
+}
+stopifnot((abs(p[1]/p[2]) > 1+1e-5))#
+ptmp <- p
+set.seed(290875)
+for (i in 1:iters) {
+   pp <- pmvnorm(lower=ll, sigma=mat, maxpts=dm, abseps=abserr)
+   p[i] <- 1-pp
+}
+stopifnot(all.equal(p, ptmp))

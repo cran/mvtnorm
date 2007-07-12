@@ -1,4 +1,4 @@
-# $Id: mvt.R 2936 2006-09-08 11:30:57Z hothorn $ 
+# $Id: mvt.R 3637 2007-07-12 16:21:51Z hothorn $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -184,11 +184,6 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
 
     error <- 0; value <- 0; inform <- 0
 
-    ### TOL argument re-added in version 0.6-3
-    ### not yet exported
-
-    tol <- 1e-10
-
     ret <- .Fortran("mvtdst", N = as.integer(n), 
                               NU = as.integer(df),
                               LOWER = as.double(lower), 
@@ -199,7 +194,6 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
                               MAXPTS = as.integer(maxpts),
                               ABSEPS = as.double(abseps), 
                               RELEPS = as.double(releps),  
-                              TOL = as.double(tol),
                               error = as.double(error), 
                               value = as.double(value),
                               inform = as.integer(inform), PACKAGE="mvtnorm")
@@ -239,7 +233,7 @@ dmvt <- function(x, delta, sigma, df = 1, log = TRUE)
         stop("x and sigma have non-conforming size")
     }
     if (NROW(sigma) != NCOL(sigma)) {
-        stop("sigma meanst be a square matrix")
+        stop("sigma must be a square matrix")
     }
     if (length(delta) != NROW(sigma)) {
         stop("mean and sigma have non-conforming size")
@@ -312,9 +306,9 @@ qmvt <- function(p, interval = c(-10, 10),
         stop(sQuote("p"), " is not a double between zero and one")
 
     tail <- match.arg(tail)
-    dim <- length(mean)
-    if (is.matrix(corr)) dim <- nrow(corr)
-    if (is.matrix(sigma)) dim <- nrow(sigma)
+    dim <- 1
+    if (!is.null(corr)) dim <- NROW(corr)
+    if (!is.null(sigma)) dim <- NROW(sigma)
     lower <- rep(0, dim)
     upper <- rep(0, dim)
     args <- checkmvArgs(lower, upper, delta, corr, sigma)

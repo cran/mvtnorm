@@ -1,4 +1,14 @@
-# $Id: CHANGES 2936 2006-09-08 11:30:57Z hothorn $
+# $Id: CHANGES 3654 2007-07-23 07:29:20Z hothorn $
+
+	0.8-0 (23.07.2007)
+
+	upgrade to 7/7 version of MVTDST (includes better support for
+        dimensions > 100). Thanks to Karen Conneely <conneely@umich.edu>
+        for motivating the update and for checking the new version.
+
+	rmvnorm() now can also use a Cholesky decomposition to compute
+        the root of sigma (thanks to Fabian Scheipl)
+
 
 	0.7-5 (15.09.2006)
 

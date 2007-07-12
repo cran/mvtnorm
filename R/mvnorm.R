@@ -1,27 +1,40 @@
-# $Id: mvnorm.R 2917 2006-09-06 15:04:05Z hothorn $
+# $Id: mvnorm.R 3649 2007-07-20 09:29:48Z leisch $
 
-rmvnorm <- function(n, mean=rep(0, nrow(sigma)),
-                      sigma=diag(length(mean))){
-
-    if(nrow(sigma) != ncol(sigma)){
+rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
+                   method=c("svd", "chol"))
+{    
+    if (nrow(sigma) != ncol(sigma)) {
         stop("sigma must be a square matrix")
     }
-
-    if(length(mean) != nrow(sigma)){
+    if (length(mean) != nrow(sigma)) {
         stop("mean and sigma have non-conforming size")
     }
 
-    ev <- eigen(sigma, sym = TRUE)$values
-    if (!all(ev >= -sqrt(.Machine$double.eps) * abs(ev[1])))   
-        warning("sigma is numerically not positive definite")
-
-    sigsvd <- svd(sigma)
-    retval <- t(sigsvd$v %*% (t(sigsvd$u) * sqrt(sigsvd$d)))
-    retval <- matrix(rnorm(n * ncol(sigma)), nrow = n) %*% retval
+    method <- match.arg(method)
+    
+    if(method == "svd"){
+        ev <- eigen(sigma, sym = TRUE)$values
+        
+        if (!all(ev >= -sqrt(.Machine$double.eps) * abs(ev[1]))){
+            warning("sigma is numerically not positive definite")
+        }    
+      
+        sigsvd <- svd(sigma)
+        retval <- t(sigsvd$v %*% (t(sigsvd$u) * sqrt(sigsvd$d)))
+     
+    }
+    
+    if(method == "chol")
+    {
+        retval <- chol(sigma, pivot = T)
+        o <- order(attr(retval, "pivot"))
+        retval <- retval[,o]
+    }
+    
+    retval <- matrix(rnorm(n * ncol(sigma)), nrow = n) %*%  retval
     retval <- sweep(retval, 2, mean, "+")
     retval
 }
-
 
 dmvnorm <- function (x, mean, sigma, log=FALSE)
 {
@@ -38,7 +51,7 @@ dmvnorm <- function (x, mean, sigma, log=FALSE)
         stop("x and sigma have non-conforming size")
     }
     if (NROW(sigma) != NCOL(sigma)) {
-        stop("sigma meanst be a square matrix")
+        stop("sigma must be a square matrix")
     }
     if (length(mean) != NROW(sigma)) {
         stop("mean and sigma have non-conforming size")

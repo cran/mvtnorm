@@ -34,7 +34,7 @@ qmvnorm(p, interval = c(-10, 10), tail = c("lower.tail", "upper.tail", "both.tai
   \item{maxpts}{ maximum number of function values as integer. }
   \item{abseps}{ absolute integration error tolerance as double. }
   \item{releps}{ relative integration error tolerance as double. }
-  \item{...}{ additional paramters to be passed to
+  \item{...}{ additional parameters to be passed to
               \code{\link{uniroot}}.}
 }
 \details{
