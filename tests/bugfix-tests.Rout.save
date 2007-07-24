@@ -205,7 +205,7 @@ attr(,"msg")
 +    pp <- pmvnorm(lower=ll, sigma=mat, maxpts=dm, abseps=abserr)
 +    p[i] <- 1-pp
 + }
-> stopifnot((abs(p[1]/p[2]) > 1+1e-5))#
+> stopifnot(abs(p[1] - p[2]) < 2 * abserr)
 > ptmp <- p
 > set.seed(290875)
 > for (i in 1:iters) {
