@@ -1,5 +1,11 @@
 # $Id: CHANGES 3863 2008-02-10 16:41:41Z hothorn $
 
+	0.8-3
+
+        make sure rmvnorm(1, sigma = matrix(0.5, 1, 1)) works
+        (reported by Kurt Hornik)
+
+
 	0.8-2
 
 	rmvnorm() now issues a warning for non-symmetric sigma and uses 

@@ -1,4 +1,4 @@
-# $Id: mvnorm.R 3830 2008-01-11 14:18:41Z leisch $
+# $Id: mvnorm.R 3890 2008-02-19 19:05:07Z hothorn $
 
 rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
                    method=c("eigen", "svd", "chol"))
@@ -22,7 +22,8 @@ rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
         if (!all(ev$values >= -sqrt(.Machine$double.eps) * abs(ev$values[1]))){
             warning("sigma is numerically not positive definite")
         }    
-        retval <- ev$vectors %*%  diag(sqrt(ev$values)) %*% t(ev$vectors)
+        retval <- ev$vectors %*%  diag(sqrt(ev$values), 
+                      length(ev$values)) %*% t(ev$vectors)
     }
     else if(method == "svd"){
         sigsvd <- svd(sigma)
@@ -32,7 +33,7 @@ rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
         retval <- t(sigsvd$v %*% (t(sigsvd$u) * sqrt(sigsvd$d)))
     }    
     else if(method == "chol"){
-        retval <- chol(sigma, pivot = T)
+        retval <- chol(sigma, pivot = TRUE)
         o <- order(attr(retval, "pivot"))
         retval <- retval[,o]
     }
