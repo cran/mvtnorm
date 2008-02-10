@@ -1,7 +1,7 @@
 Package: mvtnorm
 Title: Multivariate Normal and T Distribution 
-Version: 0.8-1
-Date: $Date: 2007-07-24 10:13:00 +0200 (Tue, 24 Jul 2007) $
+Version: 0.8-2
+Date: $Date: 2008-02-10 17:41:41 +0100 (Sun, 10 Feb 2008) $
 Author: Alan Genz <AlanGenz@wsu.edu>, 
   Frank Bretz <frank.bretz@pharma.novartis.com>, 
   R port by Torsten Hothorn <Torsten.Hothorn@R-project.org>
@@ -11,4 +11,4 @@ Description: Computes multivariate normal and t probabilities, quantiles and
 Imports: stats
 Depends: R(>= 1.9.0)
 License: GPL-2
-Packaged: Tue Jul 24 18:31:51 2007; hothorn
+Packaged: Sun Feb 10 17:41:54 2008; hothorn

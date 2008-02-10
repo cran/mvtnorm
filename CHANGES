@@ -1,4 +1,12 @@
-# $Id: CHANGES 3669 2007-07-24 08:13:00Z hothorn $
+# $Id: CHANGES 3863 2008-02-10 16:41:41Z hothorn $
+
+	0.8-2
+
+	rmvnorm() now issues a warning for non-symmetric sigma and uses 
+        the eigenvalue decomposition as default. 
+
+        make gfortran 4.3 happy
+
 
 	0.8-1 (24.07.2007)
 

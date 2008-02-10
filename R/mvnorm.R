@@ -1,7 +1,7 @@
-# $Id: mvnorm.R 3649 2007-07-20 09:29:48Z leisch $
+# $Id: mvnorm.R 3830 2008-01-11 14:18:41Z leisch $
 
 rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
-                   method=c("svd", "chol"))
+                   method=c("eigen", "svd", "chol"))
 {    
     if (nrow(sigma) != ncol(sigma)) {
         stop("sigma must be a square matrix")
@@ -9,23 +9,29 @@ rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
     if (length(mean) != nrow(sigma)) {
         stop("mean and sigma have non-conforming size")
     }
+    sigma1 <- sigma
+    dimnames(sigma1) <- NULL
+    if(!isTRUE(all.equal(sigma1, t(sigma1)))){
+        warning("sigma is numerically not symmetric")
+    }
 
     method <- match.arg(method)
     
-    if(method == "svd"){
-        ev <- eigen(sigma, sym = TRUE)$values
-        
-        if (!all(ev >= -sqrt(.Machine$double.eps) * abs(ev[1]))){
+    if(method == "eigen"){
+        ev <- eigen(sigma, symmetric = TRUE)
+        if (!all(ev$values >= -sqrt(.Machine$double.eps) * abs(ev$values[1]))){
             warning("sigma is numerically not positive definite")
         }    
-      
-        sigsvd <- svd(sigma)
-        retval <- t(sigsvd$v %*% (t(sigsvd$u) * sqrt(sigsvd$d)))
-     
+        retval <- ev$vectors %*%  diag(sqrt(ev$values)) %*% t(ev$vectors)
     }
-    
-    if(method == "chol")
-    {
+    else if(method == "svd"){
+        sigsvd <- svd(sigma)
+        if (!all(sigsvd$d >= -sqrt(.Machine$double.eps) * abs(sigsvd$d[1]))){
+            warning("sigma is numerically not positive definite")
+        }    
+        retval <- t(sigsvd$v %*% (t(sigsvd$u) * sqrt(sigsvd$d)))
+    }    
+    else if(method == "chol"){
         retval <- chol(sigma, pivot = T)
         o <- order(attr(retval, "pivot"))
         retval <- retval[,o]

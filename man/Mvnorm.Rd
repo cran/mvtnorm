@@ -10,7 +10,9 @@
 }
 \usage{
 dmvnorm(x, mean, sigma, log=FALSE)
-rmvnorm(n, mean, sigma, method=c("svd", "chol"))
+rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
+        method=c("eigen", "svd", "chol"))
+
 }
 \arguments{
  \item{x}{Vector or matrix of quantiles. If \code{x} is a matrix, each
@@ -20,19 +22,10 @@ rmvnorm(n, mean, sigma, method=c("svd", "chol"))
  \item{sigma}{Covariance matrix, default is \code{diag(ncol(x))}.}
  \item{log}{Logical; if \code{TRUE}, densities d are given as log(d).}
  \item{method}{Matrix decomposition used to determine the matrix root of
-  \code{sigma}, possible methods are singular value decomposition
-	(\code{"svd"}, default) and Cholesky decomposition (\code{"chol"}).}
+  \code{sigma}, possible methods are eigenvalue decomposition
+	(\code{"eigen"}, default), singular value decomposition
+	(\code{"svd"}), and Cholesky decomposition (\code{"chol"}).}
 } 
-\details{
-  SVD will work even for numerically negative definite \code{sigma}
-  (with a warning), while the Cholesky decomposition is possible only
-  for non-negative 
-  definite \code{sigma} and issues a warning for positive
-  semi-definiteness.
-  Using \code{method = "chol"} may be faster and more stable for higher
-  dimensional \code{sigma}.
-}
-
 \author{Friedrich Leisch <Friedrich.Leisch@R-project.org>, Fabian Scheipl}
 \seealso{\code{\link{pmvnorm}}, \code{\link{rnorm}}, \code{\link{qmvnorm}}}
 \examples{

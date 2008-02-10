@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f 3637 2007-07-12 16:21:51Z hothorn $
+*    $Id: mvt.f 3863 2008-02-10 16:41:41Z hothorn $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
@@ -299,7 +299,8 @@
                   ENDIF
                END DO
             ENDIF
- 10      END DO
+         END DO
+ 10   CONTINUE
 *
 *     Sort remaining limits and determine Cholesky factor.
 *
