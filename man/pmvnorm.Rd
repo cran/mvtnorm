@@ -10,8 +10,7 @@ based on algorithms by Genz and Bretz.
 }
 \usage{
 pmvnorm(lower=-Inf, upper=Inf, mean=rep(0, length(lower)),
-        corr=NULL, sigma=NULL, maxpts = 25000, abseps = 0.001,
-        releps = 0)
+        corr=NULL, sigma=NULL, algorithm = GenzBretz(), ...)
 }
 \arguments{
   \item{lower}{ the vector of lower limits of length n.}
@@ -23,9 +22,11 @@ pmvnorm(lower=-Inf, upper=Inf, mean=rep(0, length(lower)),
                 problem is standardized. If neither \code{corr} nor
                 \code{sigma} is given, the identity matrix is used 
                 for \code{sigma}. }
-  \item{maxpts}{ maximum number of function values as integer. }
-  \item{abseps}{ absolute error tolerance as double. }
-  \item{releps}{ relative error tolerance as double. }
+  \item{algorithm}{ an object of class \code{\link{GenzBretz}} or \code{\link{Miwa}}
+                    specifying both the algorithm to be used as well as 
+                    the associated hyper parameters.}
+  \item{...}{ additional parameters (currently given to \code{GenzBretz} for 
+              backward compatibility issues). }
 }
 \details{
 
@@ -42,7 +43,7 @@ The multivariate normal
 case is treated as a special case of \code{\link{pmvt}} with \code{df=0} and 
 univariate problems are passed to \code{\link{pnorm}}.
 
-Multivariate normal density and random numbers are available using
+The multivariate normal density and random deviates are available using
 \code{\link{dmvnorm}} and \code{\link{rmvnorm}}.
  
 }
@@ -54,12 +55,20 @@ The evaluated distribution function is returned with attributes
 \references{ 
 
 Genz, A. (1992). Numerical computation of multivariate normal probabilities.
-\emph{Journal of Computational and Graphical Statistics}, \bold{1}, 141--150 
+\emph{Journal of Computational and Graphical Statistics}, \bold{1}, 141--150.
 
 Genz, A. (1993). Comparison of methods for the computation of multivariate
 normal probabilities. \emph{Computing Science and Statistics}, \bold{25},
-400--405
+400--405.
 
+Miwa, A., Hayter J. and Kuriki, S. (2003).
+The evaluation of general non-centred orthant probabilities.
+\emph{Journal of the Royal Statistical Society}, Ser. B, 65, 223--234.
+
+}
+
+\source{
+  \url{http://www.sci.wsu.edu/math/faculty/genz/homepage}
 }
 
 \seealso{\code{\link{qmvnorm}}}

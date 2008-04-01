@@ -9,9 +9,9 @@ based on an inversion of the algorithms by Genz and Bretz.
 
 }
 \usage{
-qmvt(p, interval = c(-10, 10), tail = c("lower.tail", "upper.tail", "both.tails"), 
-     df = 1, delta = 0, corr = NULL, sigma = NULL, maxpts = 25000, 
-     abseps = 0.001, releps = 0, ...)
+qmvt(p, interval = c(-10, 10), tail = c("lower.tail", 
+     "upper.tail", "both.tails"), df = 1, delta = 0, corr = NULL, 
+     sigma = NULL, algorithm = GenzBretz(), ...)
 }
 \arguments{
   \item{p}{ probability.}
@@ -31,9 +31,8 @@ qmvt(p, interval = c(-10, 10), tail = c("lower.tail", "upper.tail", "both.tails"
                 problem is standardized. If neither \code{corr} nor
                 \code{sigma} is given, the identity matrix is used
                 for \code{sigma}. }
-  \item{maxpts}{ maximum number of function values as integer. }
-  \item{abseps}{ absolute integration error tolerance as double. }
-  \item{releps}{ relative integration error tolerance as double. }
+  \item{algorithm}{ an object of class \code{\link{GenzBretz}} defining the
+                    hyper parameters of this algorithm.}
   \item{...}{ additional parameters to be passed to                                            
               \code{\link{uniroot}}.}
 }

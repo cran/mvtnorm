@@ -1,4 +1,4 @@
-# $Id: mvt.R 3637 2007-07-12 16:21:51Z hothorn $ 
+# $Id: mvt.R 3955 2008-04-01 15:05:26Z hothorn $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -73,10 +73,10 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
 
 
 pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL, sigma=NULL,
-                    maxpts = 25000, abseps = 0.001, releps = 0)
+                    algorithm = GenzBretz(), ...)
 {
     carg <- checkmvArgs(lower=lower, upper=upper, mean=mean, corr=corr,
-                      sigma=sigma)
+                        sigma=sigma)
     if (!is.null(carg$corr)) {
       corr <- carg$corr
       if (carg$uni) {
@@ -86,7 +86,7 @@ pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL
           upper <- carg$upper - carg$mean
           mean <- rep(0, length(lower))
           RET <- mvt(lower=lower, upper=upper, df=0, corr=corr, delta=mean,
-                     maxpts=maxpts, abseps=abseps,releps=releps)
+                     algorithm = algorithm, ...)
       }
     } else {
       if (carg$uni) {
@@ -99,7 +99,7 @@ pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL
           mean <- rep(0, length(lower))
           corr <- cov2cor(carg$sigma)
           RET <- mvt(lower=lower, upper=upper, df=0, corr=corr, delta=mean,
-                     maxpts=maxpts, abseps=abseps,releps=releps)
+                     algorithm = algorithm, ...)
       }
     }
     attr(RET$value, "error") <- RET$error
@@ -108,8 +108,8 @@ pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL
 }
 
 pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
-                 df=1, corr=NULL, sigma=NULL, maxpts = 25000, abseps = 0.001,
-                 releps = 0)
+                 df=1, corr=NULL, sigma=NULL, 
+                 algorithm = GenzBretz(), ...)
 {
     carg <- checkmvArgs(lower=lower, upper=upper, mean=delta, corr=corr,
                        sigma=sigma)
@@ -130,15 +130,13 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
     } else {
         if (!is.null(carg$corr)) {
             RET <- mvt(lower=carg$lower, upper=carg$upper, df=df, corr=carg$corr,
-                       delta=carg$mean,  maxpts=maxpts,
-                       abseps=abseps,releps=releps)
+                       delta=carg$mean,  algorithm = algorithm, ...)
         } else {
             lower <- carg$lower/sqrt(diag(carg$sigma))
             upper <- carg$upper/sqrt(diag(carg$sigma))
             corr <- cov2cor(carg$sigma)
             RET <- mvt(lower=lower, upper=upper, df=df, corr=corr,
-                       delta=carg$mean, maxpts=maxpts,
-                       abseps=abseps,releps=releps)
+                       delta=carg$mean, algorithm = algorithm, ...)
         }
     }
     attr(RET$value, "error") <- RET$error
@@ -147,11 +145,18 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
 }
 
 
-mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
-                abseps = 0.001, releps = 0)
+mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
 {
+
+    ### only for compatibility with older versions
+    addargs <- list(...)
+    if (length(addargs) > 0)
+        algorithm <- GenzBretz(...)
+    if (is.function(algorithm) || is.character(algorithm))
+        algorithm <- do.call(algorithm, list())
+
     ### handle cases where the support is the empty set
-    if (any(abs(lower - upper)) < sqrt(.Machine$double.eps) || 
+    if (any(abs(lower - upper) < sqrt(.Machine$double.eps)) || 
         any(is.na(lower - upper))) {
         RET <- list(value = 0, error = 0, msg = "lower == upper")
         return(RET)
@@ -165,7 +170,7 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
 
     if (n > 1000) stop("only dimensions 1 <= n <= 1000 allowed") 
 
-    infin <- rep(2, n)
+    infin <- rep(2, n)   
     infin[upper == Inf] <- 1
     infin[lower == -Inf] <- 0
     infin[lower == -Inf & upper == Inf] <- -1
@@ -179,25 +184,8 @@ mvt <- function(lower, upper, df, corr, delta, maxpts = 25000,
         corrF <- corrF[upper.tri(corrF)]
     } else corrF <- corr 
 
-    lower[lower == -Inf] <- 0
-    upper[upper == Inf] <- 0
 
-    error <- 0; value <- 0; inform <- 0
-
-    ret <- .Fortran("mvtdst", N = as.integer(n), 
-                              NU = as.integer(df),
-                              LOWER = as.double(lower), 
-                              UPPER = as.double(upper), 
-                              INFIN = as.integer(infin),
-                              CORREL = as.double(corrF), 
-                              DELTA = as.double(delta), 
-                              MAXPTS = as.integer(maxpts),
-                              ABSEPS = as.double(abseps), 
-                              RELEPS = as.double(releps),  
-                              error = as.double(error), 
-                              value = as.double(value),
-                              inform = as.integer(inform), PACKAGE="mvtnorm")
-    
+    ret <- probval(algorithm, n, df, lower, upper, infin, corr, corrF, delta)
     error <- ret$error; value <- ret$value; inform <- ret$inform
 
     msg <- NULL
@@ -256,11 +244,15 @@ dmvt <- function(x, delta, sigma, df = 1, log = TRUE)
 
 qmvnorm <- function(p, interval = c(-10, 10), 
                     tail = c("lower.tail", "upper.tail", "both.tails"), 
-                    mean = 0, corr = NULL, sigma = NULL,
-                    maxpts = 25000, abseps = 0.001, releps = 0, ...) {
-
+                    mean = 0, corr = NULL, sigma = NULL, algorithm = 
+                    GenzBretz(), ...)
+{
     if (length(p) != 1 || (p <= 0 || p >= 1)) 
         stop(sQuote("p"), " is not a double between zero and one")
+
+    dots <- dots2GenzBretz(...)
+    if (!is.null(dots$algorithm) && !is.null(algorithm)) 
+        algorithm <- dots$algorithm
 
     tail <- match.arg(tail)
     dim <- length(mean)
@@ -283,8 +275,8 @@ qmvnorm <- function(p, interval = c(-10, 10),
                   upp <- rep(      q, dim)
            },)
            pmvnorm(lower = low, upper = upp, mean = args$mean,
-                   corr = args$corr, sigma = args$sigma,
-                   abseps = abseps, maxpts = maxpts, releps = releps) - p
+                   corr = args$corr, sigma = args$sigma, 
+                   algorithm = algorithm) - p
     }
 
     if (tail == "both.tails") {
@@ -292,7 +284,11 @@ qmvnorm <- function(p, interval = c(-10, 10),
         interval <- abs(interval)
     }
 
-    qroot <- uniroot(pfct, interval = interval, ...)
+    if (is.null(dots$uniroot)) {
+        qroot <- uniroot(pfct, interval = interval)
+    } else {
+        qroot <- do.call("uniroot", list(pfct, interval = interval, dots$uniroot))
+    }
     names(qroot)[1:2] <- c("quantile", "f.quantile")
     qroot
 }
@@ -300,10 +296,14 @@ qmvnorm <- function(p, interval = c(-10, 10),
 qmvt <- function(p, interval = c(-10, 10), 
                  tail = c("lower.tail", "upper.tail", "both.tails"), 
                  df = 1, delta = 0, corr = NULL, sigma = NULL,
-                 maxpts = 25000, abseps = 0.001, releps = 0, ...) {
+                 algorithm = GenzBretz(), ...) {
 
     if (length(p) != 1 || (p <= 0 || p >= 1)) 
         stop(sQuote("p"), " is not a double between zero and one")
+
+    dots <- dots2GenzBretz(...)
+    if (!is.null(dots$algorithm)  && !is.null(algorithm)) 
+        algorithm <- dots$algorithm
 
     tail <- match.arg(tail)
     dim <- 1
@@ -327,7 +327,7 @@ qmvt <- function(p, interval = c(-10, 10),
            },)
            pmvt(lower = low, upper = upp, df = df, delta = args$mean,
                 corr = args$corr, sigma = args$sigma,
-                abseps = abseps, maxpts = maxpts, releps = releps) - p
+                algorithm = algorithm) - p
     }
 
     if (tail == "both.tails") {
@@ -335,7 +335,82 @@ qmvt <- function(p, interval = c(-10, 10),
         interval <- abs(interval)
     }
 
-    qroot <- uniroot(pfct, interval = interval, ...)
+    if (is.null(dots$uniroot)) {
+        qroot <- uniroot(pfct, interval = interval)
+    } else {
+        qroot <- do.call("uniroot", list(pfct, interval = interval, dots$uniroot))
+    }
     names(qroot)[1:2] <- c("quantile", "f.quantile")
     qroot
+}
+
+GenzBretz <- function(maxpts = 25000, abseps = 0.001, releps = 0) {
+    ret <- list(maxpts = maxpts, abseps = abseps, releps = releps)
+    class(ret) <- "GenzBretz"
+    ret
+}
+
+Miwa <- function(steps = 128) {
+    ret <- list(steps = steps)
+    class(ret) <- "Miwa"
+    ret
+}
+
+probval <- function(x, ...)
+    UseMethod("probval")
+
+probval.GenzBretz <- function(x, n, df, lower, upper, infin, corr, corrF, delta) {
+
+    lower[lower == -Inf] <- 0
+    upper[upper == Inf] <- 0
+
+    error <- 0; value <- 0; inform <- 0
+    ret <- .Fortran("mvtdst", N = as.integer(n),
+                              NU = as.integer(df),
+                              LOWER = as.double(lower), 
+                              UPPER = as.double(upper),
+                              INFIN = as.integer(infin),
+                              CORREL = as.double(corrF),
+                              DELTA = as.double(delta),
+                              MAXPTS = as.integer(x$maxpts),
+                              ABSEPS = as.double(x$abseps),
+                              RELEPS = as.double(x$releps),
+                              error = as.double(error),
+                              value = as.double(value),
+                              inform = as.integer(inform), PACKAGE="mvtnorm")
+    ret
+}
+
+probval.Miwa <- function(x, n, df, lower, upper, infin, corr, corrF, delta) {
+
+    if (df != 0)
+        stop("Miwa algorithm cannot compute t-probabilities")
+
+    if (n > 20) 
+        stop("Miwa algorithm cannot compute exact probabilities for n > 20")
+
+    sc <- try(solve(corr))
+    if (inherits(sc, "try-error")) 
+        stop("Miwa algorithm cannot compute probabilities for singular problems")
+
+    p <- .Call("C_miwa", steps = as.integer(x$steps),
+                         corr = as.double(corr),
+                         upper = as.double(upper),
+                         lower = as.double(lower),
+                         infin = as.integer(infin))
+    ret <- list(value = p, inform = 0, error = NA)
+    ret
+}
+
+dots2GenzBretz <- function(...) {
+    addargs <- list(...)
+    fm1 <- sapply(names(addargs), function(x) length(grep(x, names(formals(GenzBretz)))) == 1)
+    fm2 <- sapply(names(addargs), function(x) length(grep(x, names(formals(uniroot)))) == 1)
+    algorithm <- NULL
+    uniroot <- NULL
+    if (any(fm1))
+        algorithm <- do.call("GenzBretz", addargs[fm1])
+    if (any(fm2))
+        uniroot <- addargs[fm2]
+    list(algorithm = algorithm, uniroot = uniroot)
 }

@@ -10,8 +10,7 @@
 }
 \usage{
 pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
-     df=1, corr=NULL, sigma=NULL, maxpts = 25000, abseps = 0.001,
-     releps = 0)
+     df=1, corr=NULL, sigma=NULL, algorithm = GenzBretz(), ...)
 }
 \arguments{
   \item{lower}{ the vector of lower limits of length n.}
@@ -24,9 +23,9 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
                 problem is standardized. If neither \code{corr} nor
                 \code{sigma} is given, the identity matrix is used 
                 for \code{sigma}. }
-  \item{maxpts}{ maximum number of function values as integer. }
-  \item{abseps}{ absolute error tolerance as double. }
-  \item{releps}{ relative error tolerance as double. }
+  \item{algorithm}{ an object of class \code{\link{GenzBretz}} defining the
+                    hyper parameters of this algorithm.}
+  \item{...}{}
 }
 
 \details{
@@ -39,30 +38,24 @@ Genz and Bretz (1999, 2002).
 
 For a given correlation matrix \code{corr}, for short \eqn{A}, say, 
 (which has to be  positive semi-definite) and 
-degrees of freedom \code{df} the following 
+degrees of freedom \eqn{\nu} the following 
 values are numerically evaluated
 
-\deqn{I = K \int s^{df-1} \exp(-s^2/2) \Phi(s \cdot lower/\sqrt{df}-delta,
-s \cdot upper/\sqrt{df}-delta) ds }
+\deqn{I = 2^{1-\nu/2} / \Gamma(\nu/2) \int_0^\infty s^{\nu-1} \exp(-s^2/2) \Phi(s \cdot lower/\sqrt{\nu} - \delta,
+s \cdot upper/\sqrt{\nu} - \delta) \, ds }
 
-where \eqn{\Phi(a,b) = K^\prime \int_a^b \exp(-x^\prime Ax/2) dx} is the
-multivariate normal distribution, \eqn{K^\prime = 1/\sqrt{det(A)(2\pi)^m}}
-and \eqn{K = 2^{1-df/2} / Gamma(df/2)} are constants and the (single)
-integral of \eqn{I} goes from 0 to +Inf.
+where 
+
+\deqn{\Phi(a,b) = (det(A)(2\pi)^m)^{-1/2} \int_a^b \exp(-x^\prime Ax/2) \, dx} 
+
+is the multivariate normal distribution and $m$ is the number of rows of \eqn{A}.
 
 Note that both \code{-Inf} and \code{+Inf} may be specified in 
 the lower and upper integral limits in order to compute one-sided
 probabilities. Randomized quasi-Monte Carlo methods are used for the 
 computations.
 
-Univariate problems are passed to \code{\link{pt}}.
-
-Further information can be obtained from the quoted articles,
-which can be downloaded (together with additional material
-and additional codes) from the websites 
-\url{http://www.bioinf.uni-hannover.de/~bretz/} 
-and \url{http://www.sci.wsu.edu/math/faculty/genz/homepage}.
-
+Univariate problems are passed to \code{\link{pt}}. 
 If \code{df = 0}, normal probabilities are returned. 
 
 }
@@ -87,6 +80,10 @@ t-probabilities. \emph{Journal of Computational and Graphical Statistics},
 Edwards D. and Berry, Jack J. (1987), The efficiency of simulation-based 
 multiple comparisons. \emph{Biometrics}, \bold{43}, 913--928.
 
+}
+
+\source{
+  \url{http://www.sci.wsu.edu/math/faculty/genz/homepage}
 }
 
 \seealso{\code{\link{qmvt}}}

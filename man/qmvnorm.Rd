@@ -9,9 +9,9 @@ based on an inversion of the algorithms by Genz and Bretz.
 
 }
 \usage{
-qmvnorm(p, interval = c(-10, 10), tail = c("lower.tail", "upper.tail", "both.tails"), 
-        mean = 0, corr = NULL, sigma = NULL, maxpts = 25000, abseps = 0.001, 
-        releps = 0, ...)
+qmvnorm(p, interval = c(-10, 10), tail = c("lower.tail", 
+        "upper.tail", "both.tails"), mean = 0, corr = NULL, 
+        sigma = NULL, algorithm = GenzBretz(), ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -31,9 +31,9 @@ qmvnorm(p, interval = c(-10, 10), tail = c("lower.tail", "upper.tail", "both.tai
                 problem is standardized. If neither \code{corr} nor
                 \code{sigma} is given, the identity matrix is used
                 for \code{sigma}. }
-  \item{maxpts}{ maximum number of function values as integer. }
-  \item{abseps}{ absolute integration error tolerance as double. }
-  \item{releps}{ relative integration error tolerance as double. }
+  \item{algorithm}{ an object of class \code{\link{GenzBretz}} or \code{\link{Miwa}}
+                    specifying both the algorithm to be used as well as
+                    the associated hyper parameters.}
   \item{...}{ additional parameters to be passed to
               \code{\link{uniroot}}.}
 }

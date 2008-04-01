@@ -1,7 +1,7 @@
 \name{Mvnorm}
 \alias{dmvnorm}
 \alias{rmvnorm}
-\title{Multivariate Normal Density and Random Numbers}
+\title{Multivariate Normal Density and Random Deviates}
 \description{
   These functions provide the density function and a random number
   generator for the multivariate normal
@@ -26,7 +26,7 @@ rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
 	(\code{"eigen"}, default), singular value decomposition
 	(\code{"svd"}), and Cholesky decomposition (\code{"chol"}).}
 } 
-\author{Friedrich Leisch <Friedrich.Leisch@R-project.org>, Fabian Scheipl}
+\author{Friedrich Leisch and Fabian Scheipl}
 \seealso{\code{\link{pmvnorm}}, \code{\link{rnorm}}, \code{\link{qmvnorm}}}
 \examples{
 dmvnorm(x=c(0,0))

@@ -1,12 +1,23 @@
-# $Id: CHANGES 3863 2008-02-10 16:41:41Z hothorn $
+# $Id: CHANGES 3955 2008-04-01 15:05:26Z hothorn $
+
+	0.9-0 (1.04.2008)
+
+	add support for the multivariate normal distributions in small
+        dimensions by Miwa's method thanks to Tetsuhisa Miwa and Xuefei Mi;
+        both have been added as `authors'.
+
+        new argument `algorithm' defaulting to `GenzBretz()' with 
+        `Miwa()' being the alternative. Those two functions are now used
+        to specify hyper parameters such as `abseps'.
+
+        internal function `mvt' is no longer exported.
 
 	0.8-3
 
         make sure rmvnorm(1, sigma = matrix(0.5, 1, 1)) works
         (reported by Kurt Hornik)
 
-
-	0.8-2
+	0.8-2 (10.02.2008)
 
 	rmvnorm() now issues a warning for non-symmetric sigma and uses 
         the eigenvalue decomposition as default. 

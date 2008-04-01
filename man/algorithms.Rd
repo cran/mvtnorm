@@ -1,0 +1,52 @@
+\name{algorithms}
+\alias{GenzBretz}
+\alias{Miwa}
+\title{ Choice of Algorithm and Hyper Parameters }
+\description{
+  Choose between two algorithms for evaluating normal distributions
+  and define hyper parameters.
+}
+\usage{
+GenzBretz(maxpts = 25000, abseps = 0.001, releps = 0)
+Miwa(steps = 128)
+}
+\arguments{
+  \item{maxpts}{ maximum number of function values as integer. }
+  \item{abseps}{ absolute error tolerance as double. }
+  \item{releps}{ relative error tolerance as double. }
+  \item{steps}{ number of grid points to be evaluated. }
+}
+\details{
+
+There are two algorithms available for evaluating normal
+probabilities: The default is the randomized Quasi-Monte-Carlo procedure
+by Genz (1992, 1993) and Genz and Bretz (2002) applicable to
+arbitrary covariance structures and dimensions up to 1000.
+
+For smaller dimensions (up to 20) and non-singular covariance matrices,
+the algorithm by Miwa et al. (2003) can be used as well.
+
+}
+\value{
+    An object of class \code{GenzBretz} or \code{Miwa} 
+    defining hyper parameters.
+}
+\references{ 
+
+Genz, A. (1992). Numerical computation of multivariate normal probabilities.
+\emph{Journal of Computational and Graphical Statistics}, \bold{1}, 141--150.
+
+Genz, A. (1993). Comparison of methods for the computation of multivariate
+normal probabilities. \emph{Computing Science and Statistics}, \bold{25},
+400--405.
+
+Genz, A. and Bretz, F. (2002), Methods for the computation of multivariate
+t-probabilities. \emph{Journal of Computational and Graphical Statistics},
+\bold{11}, 950--971.
+
+Miwa, A., Hayter J. and Kuriki, S. (2003).
+The evaluation of general non-centred orthant probabilities.
+\emph{Journal of the Royal Statistical Society}, Ser. B, 65, 223--234.
+
+}
+\keyword{distribution}

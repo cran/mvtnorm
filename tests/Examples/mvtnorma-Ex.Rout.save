@@ -1,0 +1,379 @@
+
+R version 2.6.2 (2008-02-08)
+Copyright (C) 2008 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ### * <HEADER>
+> ###
+> attach(NULL, name = "CheckExEnv")
+> assign("nameEx", 
++        local({
++ 	   s <- "__{must remake R-ex/*.R}__"
++            function(new) {
++                if(!missing(new)) s <<- new else s
++            }
++        }),
++        pos = "CheckExEnv")
+> ## Add some hooks to label plot pages for base and grid graphics
+> assign("base_plot_hook",
++        function() {
++            pp <- par(c("mfg","mfcol","oma","mar"))
++            if(all(pp$mfg[1:2] == c(1, pp$mfcol[2]))) {
++                outer <- (oma4 <- pp$oma[4]) > 0; mar4 <- pp$mar[4]
++                mtext(sprintf("help(\"%s\")", nameEx()), side = 4,
++                      line = if(outer)max(1, oma4 - 1) else min(1, mar4 - 1),
++               outer = outer, adj = 1, cex = .8, col = "orchid", las=3)
++            }
++        },
++        pos = "CheckExEnv")
+> assign("grid_plot_hook",
++        function() {
++            pushViewport(viewport(width=unit(1, "npc") - unit(1, "lines"),
++                                  x=0, just="left"))
++            grid.text(sprintf("help(\"%s\")", nameEx()),
++                      x=unit(1, "npc") + unit(0.5, "lines"),
++                      y=unit(0.8, "npc"), rot=90,
++                      gp=gpar(col="orchid"))
++        },
++        pos = "CheckExEnv")
+> setHook("plot.new",     get("base_plot_hook", pos = "CheckExEnv"))
+> setHook("persp",        get("base_plot_hook", pos = "CheckExEnv"))
+> setHook("grid.newpage", get("grid_plot_hook", pos = "CheckExEnv"))
+> assign("cleanEx",
++        function(env = .GlobalEnv) {
++ 	   rm(list = ls(envir = env, all.names = TRUE), envir = env)
++            RNGkind("default", "default")
++ 	   set.seed(1)
++    	   options(warn = 1)
++ 	   .CheckExEnv <- as.environment("CheckExEnv")
++ 	   delayedAssign("T", stop("T used instead of TRUE"),
++ 		  assign.env = .CheckExEnv)
++ 	   delayedAssign("F", stop("F used instead of FALSE"),
++ 		  assign.env = .CheckExEnv)
++ 	   sch <- search()
++ 	   newitems <- sch[! sch %in% .oldSearch]
++ 	   for(item in rev(newitems))
++                eval(substitute(detach(item), list(item=item)))
++ 	   missitems <- .oldSearch[! .oldSearch %in% sch]
++ 	   if(length(missitems))
++ 	       warning("items ", paste(missitems, collapse=", "),
++ 		       " have been removed from the search path")
++        },
++        pos = "CheckExEnv")
+> assign("ptime", proc.time(), pos = "CheckExEnv")
+> grDevices::postscript("mvtnorm-Ex.ps")
+> assign("par.postscript", graphics::par(no.readonly = TRUE), pos = "CheckExEnv")
+> options(contrasts = c(unordered = "contr.treatment", ordered = "contr.poly"))
+> options(warn = 1)    
+> library('mvtnorm')
+> 
+> assign(".oldSearch", search(), pos = 'CheckExEnv')
+> assign(".oldNS", loadedNamespaces(), pos = 'CheckExEnv')
+> cleanEx(); nameEx("Mvnorm")
+> ### * Mvnorm
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: Mvnorm
+> ### Title: Multivariate Normal Density and Random Deviates
+> ### Aliases: dmvnorm rmvnorm
+> ### Keywords: distribution multivariate
+> 
+> ### ** Examples
+> 
+> dmvnorm(x=c(0,0))
+[1] 0.1591549
+> dmvnorm(x=c(0,0), mean=c(1,1))
+[1] 0.05854983
+> 
+> sigma <- matrix(c(4,2,2,3), ncol=2)
+> x <- rmvnorm(n=500, mean=c(1,2), sigma=sigma)
+> colMeans(x)
+[1] 1.017636 1.937467
+> var(x)
+         [,1]     [,2]
+[1,] 4.030475 1.981823
+[2,] 1.981823 3.242750
+> 
+> x <- rmvnorm(n=500, mean=c(1,2), sigma=sigma, method="chol")
+> colMeans(x)
+[1] 0.994023 1.955242
+> var(x)
+         [,1]     [,2]
+[1,] 4.077508 2.018602
+[2,] 2.018602 3.290346
+> 
+> plot(x)
+> 
+> 
+> 
+> cleanEx(); nameEx("Mvt")
+> ### * Mvt
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: Mvt
+> ### Title: The Multivariate t Distribution
+> ### Aliases: dmvt rmvt
+> ### Keywords: distribution multivariate
+> 
+> ### ** Examples
+> 
+> 
+>   dmvt(x=c(0,0), sigma = diag(2))
+[1] -1.837877
+>   x <- rmvt(n=100, sigma = diag(2), df = 3)
+>   plot(x)
+> 
+> 
+> 
+> 
+> cleanEx(); nameEx("pmvnorm")
+> ### * pmvnorm
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: pmvnorm
+> ### Title: Multivariate Normal Distribution
+> ### Aliases: pmvnorm
+> ### Keywords: distribution
+> 
+> ### ** Examples
+> 
+> 
+> n <- 5
+> mean <- rep(0, 5)
+> lower <- rep(-1, 5)
+> upper <- rep(3, 5)
+> corr <- diag(5)
+> corr[lower.tri(corr)] <- 0.5
+> corr[upper.tri(corr)] <- 0.5
+> prob <- pmvnorm(lower, upper, mean, corr)
+> print(prob)
+[1] 0.580005
+attr(,"error")
+[1] 0.0002696831
+attr(,"msg")
+[1] "Normal Completion"
+> 
+> stopifnot(pmvnorm(lower=-Inf, upper=3, mean=0, sigma=1) == pnorm(3))
+> 
+> a <- pmvnorm(lower=-Inf,upper=c(.3,.5),mean=c(2,4),diag(2))
+> 
+> stopifnot(round(a,16) == round(prod(pnorm(c(.3,.5),c(2,4))),16))
+> 
+> a <- pmvnorm(lower=-Inf,upper=c(.3,.5,1),mean=c(2,4,1),diag(3))
+> 
+> stopifnot(round(a,16) == round(prod(pnorm(c(.3,.5,1),c(2,4,1))),16))
+> 
+> # Example from R News paper (original by Genz, 1992):
+> 
+> m <- 3
+> sigma <- diag(3)
+> sigma[2,1] <- 3/5
+> sigma[3,1] <- 1/3
+> sigma[3,2] <- 11/15
+> pmvnorm(lower=rep(-Inf, m), upper=c(1,4,2), mean=rep(0, m), corr=sigma)
+[1] 0.8279847
+attr(,"error")
+[1] 2.658133e-07
+attr(,"msg")
+[1] "Normal Completion"
+> 
+> # Correlation and Covariance
+> 
+> a <- pmvnorm(lower=-Inf, upper=c(2,2), sigma = diag(2)*2)
+> b <- pmvnorm(lower=-Inf, upper=c(2,2)/sqrt(2), corr=diag(2))
+> stopifnot(all.equal(round(a,5) , round(b, 5)))
+> 
+> 
+> 
+> 
+> cleanEx(); nameEx("pmvt")
+> ### * pmvt
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: pmvt
+> ### Title: Multivariate t Distribution
+> ### Aliases: pmvt
+> ### Keywords: distribution
+> 
+> ### ** Examples
+> 
+> 
+> n <- 5
+> lower <- -1
+> upper <- 3
+> df <- 4
+> corr <- diag(5)
+> corr[lower.tri(corr)] <- 0.5
+> delta <- rep(0, 5)
+> prob <- pmvt(lower=lower, upper=upper, delta=delta, df=df, corr=corr)
+> print(prob)
+[1] 0.5063832
+attr(,"error")
+[1] 0.0002426557
+attr(,"msg")
+[1] "Normal Completion"
+> 
+> pmvt(lower=-Inf, upper=3, df = 3, sigma = 1) == pt(3, 3)
+[1] TRUE
+> 
+> # Example from R News paper (original by Edwards and Berry, 1987)
+> 
+> n <- c(26, 24, 20, 33, 32)
+> V <- diag(1/n)
+> df <- 130
+> C <- c(1,1,1,0,0,-1,0,0,1,0,0,-1,0,0,1,0,0,0,-1,-1,0,0,-1,0,0)
+> C <- matrix(C, ncol=5)
+> ### covariance matrix
+> cv <- C %*% V %*% t(C)
+> ### correlation matrix
+> dv <- t(1/sqrt(diag(cv)))
+> cr <- cv * (t(dv) %*% dv)
+> delta <- rep(0,5)
+> 
+> myfct <- function(q, alpha) {
++   lower <- rep(-q, ncol(cv))
++   upper <- rep(q, ncol(cv))
++   pmvt(lower=lower, upper=upper, delta=delta, df=df, 
++        corr=cr, abseps=0.0001) - alpha
++ }
+> 
+> round(uniroot(myfct, lower=1, upper=5, alpha=0.95)$root, 3)
+[1] 2.561
+> 
+> # compare pmvt and pmvnorm for large df:
+> 
+> a <- pmvnorm(lower=-Inf, upper=1, mean=rep(0, 5), corr=diag(5))
+> b <- pmvt(lower=-Inf, upper=1, delta=rep(0, 5), df=rep(300,5),
++           corr=diag(5))
+> a
+[1] 0.4215702
+attr(,"error")
+[1] 0
+attr(,"msg")
+[1] "Normal Completion"
+> b
+[1] 0.4211428
+attr(,"error")
+[1] 7.078415e-06
+attr(,"msg")
+[1] "Normal Completion"
+> 
+> stopifnot(round(a, 2) == round(b, 2))
+> 
+> # correlation and covariance matrix
+> 
+> a <- pmvt(lower=-Inf, upper=2, delta=rep(0,5), df=3,
++           sigma = diag(5)*2)
+> b <- pmvt(lower=-Inf, upper=2/sqrt(2), delta=rep(0,5),
++           df=3, corr=diag(5))  
+> attributes(a) <- NULL
+> attributes(b) <- NULL
+> a
+[1] 0.565397
+> b
+[1] 0.5653944
+> stopifnot(all.equal(round(a,3) , round(b, 3)))
+> 
+> a <- pmvt(0, 1,df=10)
+> attributes(a) <- NULL
+> b <- pt(1, df=10) - pt(0, df=10)
+> stopifnot(all.equal(round(a,10) , round(b, 10)))
+> 
+> 
+> 
+> 
+> cleanEx(); nameEx("qmvnorm")
+> ### * qmvnorm
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: qmvnorm
+> ### Title: Quantiles of the Multivariate Normal Distribution
+> ### Aliases: qmvnorm
+> ### Keywords: distribution
+> 
+> ### ** Examples
+> 
+> qmvnorm(0.95, sigma = diag(2), tail = "both")
+$quantile
+[1] 2.236497
+
+$f.quantile
+[1] 2.5831e-06
+attr(,"error")
+[1] 1e-15
+attr(,"msg")
+[1] "Normal Completion"
+
+$iter
+[1] 11
+
+$estim.prec
+[1] 6.103516e-05
+
+> 
+> 
+> 
+> cleanEx(); nameEx("qmvt")
+> ### * qmvt
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: qmvt
+> ### Title: Quantiles of the Multivariate t Distribution
+> ### Aliases: qmvt
+> ### Keywords: distribution
+> 
+> ### ** Examples
+> 
+> qmvt(0.95, df = 16, tail = "both")
+$quantile
+[1] 2.119906
+
+$f.quantile
+[1] 2.467696e-08
+attr(,"error")
+[1] 0
+attr(,"msg")
+[1] "univariate: using pt"
+
+$iter
+[1] 11
+
+$estim.prec
+[1] 6.103516e-05
+
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> cat("Time elapsed: ", proc.time() - get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  3.296 0.028 3.497 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

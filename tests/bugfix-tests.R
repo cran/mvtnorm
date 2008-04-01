@@ -1,5 +1,5 @@
 invisible(options(echo = TRUE))
-library(mvtnorm)
+library("mvtnorm")
 set.seed(290875)
 
 # correlation matrices for unequal variances were wrong
@@ -120,6 +120,89 @@ ptmp <- p
 set.seed(290875)
 for (i in 1:iters) {
    pp <- pmvnorm(lower=ll, sigma=mat, maxpts=dm, abseps=abserr)
+   p[i] <- 1-pp
+}
+stopifnot(all.equal(p, ptmp))
+
+### same for algoritm = Miwa
+
+pmvnormM <- function(...) pmvnorm(..., algorithm = Miwa())
+
+a <- 4.048
+shi <- -9
+slo <- -10
+mu <- -5
+sig <- matrix(c(1,1,1,2),ncol=2) 
+pmvnormM(lower=c(-a,slo),upper=c(a,shi),mean=c(mu,2*mu),sigma=sig)
+
+# check if set.seed works (starting from 0.5-7)
+n <- 5
+lower <- -1
+upper <- 3
+df <- 4
+corr <- diag(5)
+corr[lower.tri(corr)] <- 0.5
+delta <- rep(0, 5)
+set.seed(290875)
+prob1 <- pmvnormM(lower=lower, upper=upper, mean = delta, corr=corr)
+set.seed(290875)
+prob2 <- pmvnormM(lower=lower, upper=upper, mean = delta, corr=corr)
+stopifnot(all.equal(prob1, prob2))
+
+# confusion for univariate probabilities when sigma is a matrix
+# by Jerome Asselin <jerome@hivnet.ubc.ca>
+a <- pmvnormM(lower=-Inf,upper=2,mean=0,sigma=matrix(1.5))
+attributes(a) <- NULL
+stopifnot(all.equal(a, pnorm(2, sd=sqrt(1.5))))
+a <- pmvnormM(lower=-Inf,upper=2,mean=0,sigma=matrix(.5))
+attributes(a) <- NULL
+stopifnot(all.equal(a, pnorm(2, sd=sqrt(.5))))
+a <- pmvnormM(lower=-Inf,upper=2,mean=0,sigma=.5)
+attributes(a) <- NULL
+stopifnot(all.equal(a, pnorm(2, sd=sqrt(.5))))
+
+
+# cases where the support is the empty set tried to compute something.
+# spotted by Peter Thomson <peter@statsresearch.co.nz>
+stopifnot(pmvnormM(upper=c(-Inf,1)) == 0)
+stopifnot(pmvnormM(lower=c(Inf,1)) == 0)
+
+# bugged Fritz (long time ago)
+stopifnot(all.equal(pmvnormM(-Inf, c(Inf, 0), 0, diag(2)), pmvnormM(-Inf,
+                    c(Inf, 0), 0)))
+
+# this is a bug in `mvtdst' nobody was able to fix yet :-(
+stopifnot(pmvnormM(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0)) == 1)
+
+### check for correct random seed initialization
+### problem reported by Karen Conneely <conneely@umich.edu>
+dm <- 250000
+iters <- 2
+corr <- .7
+dim <- 10
+abserr <- .0000035
+cutoff <- -5.199338
+mn <- rep(0,dim)
+mat <- diag(dim)
+for (i in 1:dim) {
+    for (j in 1:(i-1)) {
+        mat[i,j]=mat[j,i]=corr^(i-j)
+    }
+}
+ll <- rep(cutoff, dim)
+mn <- rep(0, dim)
+p <- matrix(0, iters,1)
+
+set.seed(290875)
+for (i in 1:iters) {
+   pp <- pmvnormM(lower=ll, sigma=mat, maxpts=dm, abseps=abserr)
+   p[i] <- 1-pp
+}
+stopifnot(abs(p[1] - p[2]) < 2 * abserr)
+ptmp <- p
+set.seed(290875)
+for (i in 1:iters) {
+   pp <- pmvnormM(lower=ll, sigma=mat, maxpts=dm, abseps=abserr)
    p[i] <- 1-pp
 }
 stopifnot(all.equal(p, ptmp))
