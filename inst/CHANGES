@@ -1,6 +1,13 @@
-# $Id: CHANGES 187 2008-07-02 12:02:34Z thothorn $
+# $Id: CHANGES 188 2008-07-08 07:33:41Z thothorn $
 
-	0.9-1 (xx.07.2008)
+	0.9-2 (08.07.2008)
+
+        be a little more liberal (tol = sqrt(.Machine$double.eps))
+        when testing for symmetry of covariance matrices
+        (and make R CMD CHECK monomvn happy again)
+
+
+	0.9-1 (02.07.2008)
 
         better check for covariance matrices, suggested by 
         James Rogers  <James.A.Rogers@pfizer.com>
