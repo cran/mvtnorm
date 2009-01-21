@@ -3,6 +3,12 @@
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
     UNI <- FALSE
+    if (!is.numeric(lower) || !is.vector(lower))
+        stop(sQuote("lower"), " is not a numeric vector")
+    if (!is.numeric(upper) || !is.vector(upper))
+        stop(sQuote("upper"), " is not a numeric vector")
+    if (!is.numeric(mean) || !is.vector(mean))
+        stop(sQuote("mean"), " is not a numeric vector")
     if (is.null(lower) || any(is.na(lower)))
         stop(sQuote("lower"), " not specified or contains NA")
     if (is.null(upper) || any(is.na(upper)))
@@ -27,6 +33,8 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
                 " specified: ignoring ", sQuote("sigma"))
     }
     if (!is.null(corr)) {
+         if (!is.numeric(corr))
+             stop(sQuote("corr"), " is not numeric")
          if (!is.matrix(corr)) {
              if (length(corr) == 1)
                 UNI <- TRUE
@@ -48,6 +56,8 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
          }
     }
     if (!is.null(sigma)) {
+         if (!is.numeric(sigma))
+             stop(sQuote("sigma"), " is not numeric")
          if (!is.matrix(sigma)) {
             if (length(sigma) == 1)
                 UNI <- TRUE
