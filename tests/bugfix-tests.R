@@ -206,3 +206,6 @@ for (i in 1:iters) {
    p[i] <- 1-pp
 }
 stopifnot(all.equal(p, ptmp))
+
+### was == 1; spotted by Alex Lenkoski <lenkoski@stat.washington.edu>
+stopifnot(pmvnorm(c(-Inf, -Inf, 0, 0)) == 0.25)

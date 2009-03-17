@@ -1,4 +1,9 @@
-# $Id: CHANGES 192 2008-12-22 13:37:11Z thothorn $
+# $Id: CHANGES 194 2009-03-17 10:28:54Z thothorn $
+
+        0.9-5 (17.03.2009)
+
+        fix FORTRAN bug spotted by Alex Lenkoski
+        <lenkoski@stat.washington.edu>
 
 	0.9-3 (22.12.2008)
 

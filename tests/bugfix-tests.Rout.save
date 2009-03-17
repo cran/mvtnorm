@@ -1,5 +1,5 @@
 
-R version 2.6.2 (2008-02-08)
+R version 2.8.1 (2008-12-22)
 Copyright (C) 2008 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -112,7 +112,8 @@ attr(,"error")
 attr(,"msg")
 [1] "Normal Completion"
 > pmvt(lower=-Inf, upper = 2, delta=0, df=0, corr=1)
-[1] 0.9772499
+    upper 
+0.9772499 
 attr(,"error")
 [1] 0
 attr(,"msg")
@@ -301,4 +302,7 @@ attr(,"msg")
 +    p[i] <- 1-pp
 + }
 > stopifnot(all.equal(p, ptmp))
+> 
+> ### was == 1; spotted by Alex Lenkoski <lenkoski@stat.washington.edu>
+> stopifnot(pmvnorm(c(-Inf, -Inf, 0, 0)) == 0.25)
 > 
