@@ -77,6 +77,10 @@ Genz, A. and Bretz, F. (2002), Methods for the computation of multivariate
 t-probabilities. \emph{Journal of Computational and Graphical Statistics},
 \bold{11}, 950--971.
 
+Genz, A. and Bretz, F. (2009), \emph{Computation of Multivariate Normal and
+t Probabilities}. Lecture Notes in Statistics, Vol. 195. Springer-Verlag,  
+Heidelberg.
+
 Edwards D. and Berry, Jack J. (1987), The efficiency of simulation-based 
 multiple comparisons. \emph{Biometrics}, \bold{43}, 913--928.
 

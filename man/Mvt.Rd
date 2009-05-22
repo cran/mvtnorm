@@ -4,7 +4,7 @@
 \title{The Multivariate t Distribution}
 \description{
   These functions provide information about the multivariate t
-  distribution with non-centrality parameter \code{delta}, covariance matrix
+  distribution with non-centrality parameter \code{delta}, correlation matrix
   \code{sigma} and degrees of freedom \code{df}. 
   \code{dmvt} gives the density and \code{rmvt}
   generates random deviates.
@@ -18,7 +18,7 @@ dmvt(x, delta, sigma, df = 1, log = TRUE)
    row is taken to be a quantile.}
  \item{n}{Number of observations.}
  \item{delta}{ the vector of noncentrality parameters of length n.}
- \item{sigma}{Covariance matrix, default is \code{diag(ncol(x))}.}
+ \item{sigma}{Correlation matrix, default is \code{diag(ncol(x))}.}
  \item{df}{ degree of freedom as integer.}
  \item{log}{Logical; if \code{TRUE}, densities d are given as log(d).}
 }

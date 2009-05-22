@@ -44,6 +44,10 @@ Genz, A. and Bretz, F. (2002), Methods for the computation of multivariate
 t-probabilities. \emph{Journal of Computational and Graphical Statistics},
 \bold{11}, 950--971.
 
+Genz, A. and Bretz, F. (2009), \emph{Computation of Multivariate Normal and
+t Probabilities}. Lecture Notes in Statistics, Vol. 195. Springer-Verlag,
+Heidelberg.
+
 Miwa, A., Hayter J. and Kuriki, S. (2003).
 The evaluation of general non-centred orthant probabilities.
 \emph{Journal of the Royal Statistical Society}, Ser. B, 65, 223--234.

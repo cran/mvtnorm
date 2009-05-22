@@ -1,6 +1,6 @@
 
-R version 2.8.1 (2008-12-22)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.10.0 (2009-10-26)
+Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -227,7 +227,7 @@ attr(,"msg")
 > pmvnormM(lower=c(-a,slo),upper=c(a,shi),mean=c(mu,2*mu),sigma=sig)
 [1] 0.04210555
 attr(,"error")
-[1] NA
+[1] 1
 attr(,"msg")
 [1] "Normal Completion"
 > 
