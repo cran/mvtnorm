@@ -1,4 +1,4 @@
-# $Id: mvt.R 193 2009-01-21 14:42:35Z thothorn $ 
+# $Id: mvt.R 197 2009-05-22 09:46:33Z thothorn $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -112,7 +112,7 @@ pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL
                      algorithm = algorithm, ...)
       }
     }
-    attr(RET$value, "error") <- RET$error
+    attr(RET$value, "error") <- ifelse(is.na(RET$error), 1, RET$error)
     attr(RET$value, "msg") <- RET$msg
     return(RET$value)
 }
@@ -149,7 +149,7 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
                        delta=carg$mean, algorithm = algorithm, ...)
         }
     }
-    attr(RET$value, "error") <- RET$error
+    attr(RET$value, "error") <- ifelse(is.na(RET$error), 1, RET$error)
     attr(RET$value, "msg") <- RET$msg
     return(RET$value)
 }

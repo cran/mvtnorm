@@ -1,4 +1,12 @@
-# $Id: CHANGES 194 2009-03-17 10:28:54Z thothorn $
+# $Id: CHANGES 196 2009-05-22 09:43:58Z thothorn $
+
+        0.9-7 (22.05.2009)
+
+        make sure `error' is not NA
+
+        0.9-6 (25.03.2009)
+
+        update Alan's FORTRAN code
 
         0.9-5 (17.03.2009)
 
