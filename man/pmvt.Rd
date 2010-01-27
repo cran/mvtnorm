@@ -25,7 +25,8 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
                 for \code{sigma}. }
   \item{algorithm}{ an object of class \code{\link{GenzBretz}} defining the
                     hyper parameters of this algorithm.}
-  \item{...}{}
+  \item{...}{additional parameters (currently given to \code{GenzBretz} for
+              backward compatibility issues). }
 }
 
 \details{

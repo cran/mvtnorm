@@ -37,7 +37,8 @@ probabilities. The methodology is described in
 Genz (1992, 1993).
 
 Note that both \code{-Inf} and \code{+Inf} may be specified in \code{lower} and
-\code{upper}. For more details see \code{\link{pmvt}}. 
+\code{upper}. Randomized quasi-Monte Carlo methods are used for the
+computations. For more details see \code{\link{pmvt}}. 
 
 The multivariate normal 
 case is treated as a special case of \code{\link{pmvt}} with \code{df=0} and 

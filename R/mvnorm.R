@@ -1,4 +1,4 @@
-# $Id: mvnorm.R 188 2008-07-08 07:33:41Z thothorn $
+# $Id: mvnorm.R 203 2010-01-07 13:21:43Z thothorn $
 
 rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
                    method=c("eigen", "svd", "chol"))
@@ -40,6 +40,7 @@ rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
     
     retval <- matrix(rnorm(n * ncol(sigma)), nrow = n) %*%  retval
     retval <- sweep(retval, 2, mean, "+")
+    colnames(retval) <- names(mean)
     retval
 }
 

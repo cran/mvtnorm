@@ -1,5 +1,9 @@
 # $Id: CHANGES 200 2009-10-27 08:40:10Z thothorn $
 
+        0.9-9 (27.01.2010)
+
+        document ... in pmvt.Rd
+
         0.9-8 (27.10.2009)
 
         add citation entry
