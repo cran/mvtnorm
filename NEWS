@@ -1,4 +1,15 @@
-# $Id: CHANGES 200 2009-10-27 08:40:10Z thothorn $
+# $Id: CHANGES 208 2010-07-06 14:24:11Z thothorn $
+
+        0.9-92 (06.07.2010)
+
+        update to new mvtdstpack.f (7/10) by Alan. Fixes
+        potential bias problem in higher dimension.
+
+        0.9-91 (13.04.2010)
+
+        better search interval for uniroot in qmv{t,norm} speeds up
+        quantile estimation; suggestion by Björn Bornkamp 
+        <bornkamp@statistik.tu-dortmund.de>
 
         0.9-9 (27.01.2010)
 

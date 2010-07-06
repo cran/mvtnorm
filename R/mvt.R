@@ -1,4 +1,4 @@
-# $Id: mvt.R 197 2009-05-22 09:46:33Z thothorn $ 
+# $Id: mvt.R 207 2010-04-16 11:44:20Z thothorn $ 
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -252,7 +252,31 @@ dmvt <- function(x, delta, sigma, df = 1, log = TRUE)
     return(exp(logretval))
 }
 
-qmvnorm <- function(p, interval = c(-10, 10), 
+### find suitable interval to search for quantile
+approx_interval <- function(p, tail, corr, df = 0) {
+
+    qfun <- function(p) {
+        if (df == 0) return(qnorm(p))
+        return(qt(p, df = df))
+    }
+
+    if (tail == "both.tails")
+        p <- p + (1 - p) / 2
+
+             ### univariate quantile (corr == 1, perfect correlation)
+    ret <- c(qfun(p),
+             ### multivariate quantile (corr == 0, independence)
+             qfun(p^(1 / NCOL(corr))))
+
+    ### just to please uniroot
+    ret <- ret * c(0.9, 1.1)
+
+    if (tail == "upper.tail")
+        ret <- rev(-ret)
+    ret
+}
+
+qmvnorm <- function(p, interval = NULL, 
                     tail = c("lower.tail", "upper.tail", "both.tails"), 
                     mean = 0, corr = NULL, sigma = NULL, algorithm = 
                     GenzBretz(), ...)
@@ -265,6 +289,8 @@ qmvnorm <- function(p, interval = c(-10, 10),
         algorithm <- dots$algorithm
 
     tail <- match.arg(tail)
+    if (tail == "both.tails" && p < 0.5)
+        stop("cannot compute two-sided quantile for p < 0.5")
     dim <- length(mean)
     if (is.matrix(corr)) dim <- nrow(corr)
     if (is.matrix(sigma)) dim <- nrow(sigma)
@@ -289,9 +315,15 @@ qmvnorm <- function(p, interval = c(-10, 10),
                    algorithm = algorithm) - p
     }
 
-    if (tail == "both.tails") {
-        interval[1] <- 0
-        interval <- abs(interval)
+    if (is.null(interval) || length(interval) != 2) {
+        if (mean == 0) {
+            cr <- args$corr
+            if (!is.null(args$sigma)) cr <- cov2cor(args$sigma)
+            interval <- approx_interval(p = p, tail = tail, 
+                                        corr = cr, df = 0)
+        } else {
+            interval <- c(ifelse(tail == "both.tails", 0, -10), 10)
+        }
     }
 
     if (is.null(dots$uniroot)) {
@@ -303,7 +335,7 @@ qmvnorm <- function(p, interval = c(-10, 10),
     qroot
 }
 
-qmvt <- function(p, interval = c(-10, 10), 
+qmvt <- function(p, interval = NULL, 
                  tail = c("lower.tail", "upper.tail", "both.tails"), 
                  df = 1, delta = 0, corr = NULL, sigma = NULL,
                  algorithm = GenzBretz(), ...) {
@@ -316,6 +348,8 @@ qmvt <- function(p, interval = c(-10, 10),
         algorithm <- dots$algorithm
 
     tail <- match.arg(tail)
+    if (tail == "both.tails" && p < 0.5)
+        stop("cannot compute two-sided quantile for p < 0.5")
     dim <- 1
     if (!is.null(corr)) dim <- NROW(corr)
     if (!is.null(sigma)) dim <- NROW(sigma)
@@ -340,9 +374,15 @@ qmvt <- function(p, interval = c(-10, 10),
                 algorithm = algorithm) - p
     }
 
-    if (tail == "both.tails") {
-        interval[1] <- 0
-        interval <- abs(interval)
+    if (is.null(interval) || length(interval) != 2) {
+        if (delta == 0) {
+            cr <- args$corr
+            if (!is.null(args$sigma)) cr <- cov2cor(args$sigma)
+            interval <- approx_interval(p = p, tail = tail, 
+                                        corr = cr, df = df)
+        } else {
+            interval <- c(ifelse(tail == "both.tails", 0, -10), 10)
+        } 
     }
 
     if (is.null(dots$uniroot)) {

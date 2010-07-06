@@ -9,14 +9,14 @@ based on an inversion of the algorithms by Genz and Bretz.
 
 }
 \usage{
-qmvnorm(p, interval = c(-10, 10), tail = c("lower.tail", 
+qmvnorm(p, interval = NULL, tail = c("lower.tail", 
         "upper.tail", "both.tails"), mean = 0, corr = NULL, 
         sigma = NULL, algorithm = GenzBretz(), ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{p}{ probability.}
-  \item{interval}{ a vector containing the end-points of the interval to be
+  \item{interval}{ optional, a vector containing the end-points of the interval to be
           searched by \code{\link{uniroot}}.}
   \item{tail}{ specifies which quantiles should be computed.
                \code{lower.tail} gives the quantile \eqn{x} for which 

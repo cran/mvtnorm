@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f 195 2009-03-25 11:39:37Z thothorn $
+*    $Id: mvt.f 208 2010-07-06 14:24:11Z thothorn $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
@@ -19,7 +19,7 @@
 *	Original source available from
 *	http://www.math.wsu.edu/faculty/genz/software/fort77/mvtdstpack.f
 *
-*	This is version 7/7 with better support for 100 < dimension < 1000
+*	This is version 7/10 with better support for 100 < dimension < 1000
 *
 *  Parameters
 *
@@ -265,7 +265,7 @@
       INTEGER I, J, K, L, M, II, IJ, IL, JL, JMIN
       DOUBLE PRECISION SUMSQ, AJ, BJ, SUM, EPS, EPSI, D, E
       DOUBLE PRECISION CVDIAG, AMIN, BMIN, DEMIN, MVTDNS
-      PARAMETER ( EPS = 1D-6 )
+      PARAMETER ( EPS = 1D-10 )
       INFORM = 0
       IJ = 0
       II = 0
@@ -303,7 +303,7 @@
                   ENDIF
                END DO
             ENDIF
- 10      CONTINUE
+ 10         CONTINUE
          END DO
 *
 *     Sort remaining limits and determine Cholesky factor.
@@ -319,7 +319,7 @@
             JMIN = I
             CVDIAG = 0
             IJ = II
-            EPSI = EPS*I*I
+            EPSI = EPS*I
             IF ( .NOT. PIVOT ) JL = I
             DO J = I, JL
                IF ( COV(IJ+J) .GT. EPSI ) THEN
