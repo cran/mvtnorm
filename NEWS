@@ -1,4 +1,20 @@
-# $Id: CHANGES 208 2010-07-06 14:24:11Z thothorn $
+# $Id: CHANGES 219 2010-11-16 17:18:01Z thothorn $
+
+        0.9-94 (16.11.2010)
+
+        allow for two different noncentral t distributions (via type
+        argument)
+
+        add support for one-dimensional quantiles (requested by Jerry Lewis
+        <jerry.lewis@biogenidec.com>)
+
+        documentation fixes for problems spotted by
+        Jerry Lewis <jerry.lewis@biogenidec.com>
+
+        0.9-93 (30.08.2010, not published)
+
+        interface to Alan's TVPACK algorithms for 2- and 3-d 
+        probabilities by Bjoern Bornkamp added.
 
         0.9-92 (06.07.2010)
 

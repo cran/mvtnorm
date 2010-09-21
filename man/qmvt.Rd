@@ -5,13 +5,14 @@
 
 Computes the equicoordinate quantile function of the multivariate t
 distribution for arbitrary correlation matrices
-based on an inversion of the algorithms by Genz and Bretz.
+based on inversion of qmvt.
 
 }
 \usage{
 qmvt(p, interval = NULL, tail = c("lower.tail", 
      "upper.tail", "both.tails"), df = 1, delta = 0, corr = NULL, 
-     sigma = NULL, algorithm = GenzBretz(), ...)
+     sigma = NULL, algorithm = GenzBretz(), 
+     type = c("Kshirsagar", "shifted"), ...)
 }
 \arguments{
   \item{p}{ probability.}
@@ -23,18 +24,27 @@ qmvt(p, interval = NULL, tail = c("lower.tail",
                \eqn{P[X > x] = p} and 
                \code{both.tails} leads to \eqn{x} 
                with \eqn{P[-x \le X \le x] = p}.}
-  \item{delta}{ the vector of noncentrality parameters of length n.}
-  \item{df}{ degree of freedom as integer.}
+  \item{delta}{ the vector of noncentrality parameters of length n, for
+   \code{type = "shifted"} delta specifies the mode.}
+  \item{df}{ degree of freedom as integer. Normal quantiles are computed for \code{df = 0}.}
   \item{corr}{ the correlation matrix of dimension n.}
   \item{sigma}{ the covariance matrix of dimension n. Either \code{corr} or
                 \code{sigma} can be specified. If \code{sigma} is given, the
                 problem is standardized. If neither \code{corr} nor
                 \code{sigma} is given, the identity matrix is used
                 for \code{sigma}. }
-  \item{algorithm}{ an object of class \code{\link{GenzBretz}} defining the
+  \item{algorithm}{ an object of class \code{\link{GenzBretz}} or
+                    \code{\link{TVPACK}} defining the
                     hyper parameters of this algorithm.}
+  \item{type}{ type of the noncentral multivariate t distribution
+              to be computed. \code{type = "Kshirsagar"} corresponds
+              to formula (1.4) in Genz and Bretz (2009) (see also
+	      Chapter 5.1 in Kotz and Nadarajah (2004)) and
+	      \code{type = "shifted"} corresponds to the formula before
+	      formula (1.4) in Genz and Bretz (2009)
+	      (see also formula (1.1) in Kotz and Nadarajah (2004)). }
   \item{...}{ additional parameters to be passed to                                            
-              \code{\link{uniroot}}.}
+              \code{\link{GenzBretz}}.}
 }
 \details{
 
@@ -51,7 +61,7 @@ qmvt(p, interval = NULL, tail = c("lower.tail",
   of iterations used and an approximate estimated precision from
   \code{\link{uniroot}}.
 }
-\seealso{\code{\link{pmvnorm}}, \code{\link{qmvt}}}
+\seealso{\code{\link{pmvnorm}}, \code{\link{qmvnorm}}}
 \examples{
 qmvt(0.95, df = 16, tail = "both")
 }

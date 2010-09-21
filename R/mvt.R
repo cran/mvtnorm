@@ -1,4 +1,16 @@
-# $Id: mvt.R 207 2010-04-16 11:44:20Z thothorn $ 
+# $Id: mvt.R 219 2010-11-16 17:18:01Z thothorn $ 
+
+chkcorr <- function(x) {
+
+    if (!is.matrix(x)) return(TRUE)
+    rownames(x) <- colnames(x) <- NULL
+    storage.mode(x) <- "numeric"
+    ONE <- 1 + .Machine$double.eps
+
+    ret <- (min(x) < -ONE || max(x) > ONE) ||
+           !isTRUE(all.equal(diag(x), rep(1, nrow(x))))
+    !ret
+}
 
 checkmvArgs <- function(lower, upper, mean, corr, sigma) 
 {
@@ -52,6 +64,8 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
                  if (length(diag(corr)) != length(lower))        
                      stop(sQuote("diag(corr)"), " and ", sQuote("lower"), 
                           " are of different length")
+                 if (!chkcorr(corr))
+                     stop(sQuote("corr"), " is not a correlation matrix")
              }
          }
     }
@@ -75,6 +89,8 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
               if (length(diag(sigma)) != length(lower))                     
                  stop(sQuote("diag(sigma)"), " and ", sQuote("lower"), 
                       " are of different length")
+              if (!isTRUE(all.equal(sigma, t(sigma))) || any(diag(sigma) < 0))
+                 stop(sQuote("sigma"), " is not a covariance matrix")
             }
          }
     }
@@ -112,17 +128,33 @@ pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL
                      algorithm = algorithm, ...)
       }
     }
-    attr(RET$value, "error") <- ifelse(is.na(RET$error), 1, RET$error)
+    attr(RET$value, "error") <- RET$error
     attr(RET$value, "msg") <- RET$msg
     return(RET$value)
 }
 
 pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
                  df=1, corr=NULL, sigma=NULL, 
-                 algorithm = GenzBretz(), ...)
+                 algorithm = GenzBretz(), 
+                 type = c("Kshirsagar", "shifted"), ...)
 {
+    type <- match.arg(type)
     carg <- checkmvArgs(lower=lower, upper=upper, mean=delta, corr=corr,
-                       sigma=sigma)
+                        sigma=sigma)
+    if (type == "shifted") { # can be handled by integrating over central t
+      if(!is.null(carg$corr)){ # using transformed integration bounds
+        d <- 1
+      } else {
+        if(!is.null(carg$sigma)){
+          d <- sqrt(diag(carg$sigma))
+          carg$corr <- cov2cor(carg$sigma)
+        }
+      }
+      carg$lower <- (carg$lower - carg$mean)/d
+      carg$upper <- (carg$upper - carg$mean)/d
+      carg$mean <- rep(0, length(carg$mean))
+    }
+
     if (is.null(df))
         stop(sQuote("df"), " not specified")
     if (any(df < 0))
@@ -141,15 +173,16 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
         if (!is.null(carg$corr)) {
             RET <- mvt(lower=carg$lower, upper=carg$upper, df=df, corr=carg$corr,
                        delta=carg$mean,  algorithm = algorithm, ...)
-        } else {
-            lower <- carg$lower/sqrt(diag(carg$sigma))
-            upper <- carg$upper/sqrt(diag(carg$sigma))
+        } else { # need to transform integration bounds and delta
+            d <- sqrt(diag(carg$sigma))
+            lower <- carg$lower/d
+            upper <- carg$upper/d
             corr <- cov2cor(carg$sigma)
             RET <- mvt(lower=lower, upper=upper, df=df, corr=corr,
-                       delta=carg$mean, algorithm = algorithm, ...)
+                       delta=carg$mean/d, algorithm = algorithm, ...)
         }
     }
-    attr(RET$value, "error") <- ifelse(is.na(RET$error), 1, RET$error)
+    attr(RET$value, "error") <- RET$error
     attr(RET$value, "msg") <- RET$msg
     return(RET$value)
 }
@@ -209,11 +242,30 @@ mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
     return(RET)
 }
 
-rmvt <- function(n, sigma=diag(2), df=1) {
-  rmvnorm(n,sigma=sigma)/sqrt(rchisq(n,df)/df)
+rmvt <- function(n, sigma = diag(2), df = 1, 
+     delta = rep(0, nrow(sigma)),
+     type = c("shifted", "Kshirsagar")) {
+
+    if (length(delta) != nrow(sigma))
+      stop("delta and sigma have non-conforming size")
+
+    if (df == 0)
+        return(rmvnorm(n, mean = delta, sigma = sigma))
+    type <- match.arg(type)
+
+    if (type == "Kshirsagar")
+        return(rmvnorm(n, mean = delta, sigma = sigma)/
+               sqrt(rchisq(n, df)/df))
+
+    if (type == "shifted"){
+        sims <- rmvnorm(n, sigma = sigma)/sqrt(rchisq(n, df)/df)
+        return(sweep(sims, 2, delta, "+"))
+    }
+    ### was: rmvnorm(n,sigma=sigma)/sqrt(rchisq(n,df)/df)
 }
 
-dmvt <- function(x, delta, sigma, df = 1, log = TRUE)
+dmvt <- function(x, delta, sigma, df = 1, 
+                 log = TRUE, type = "shifted")
 {
     if (df == 0)
         return(dmvnorm(x, mean = delta, sigma = sigma, log = log))
@@ -297,6 +349,15 @@ qmvnorm <- function(p, interval = NULL,
     lower <- rep(0, dim)
     upper <- rep(0, dim)
     args <- checkmvArgs(lower, upper, mean, corr, sigma)
+    if (args$uni) {
+        if (is.null(args$sigma))
+          stop(sQuote("sigma"), " not specified: cannot compute qnorm")
+        if (tail == "both.tails") p <- ifelse(p < 0.5, p / 2, 1 - (1 - p)/2)
+        q <- qnorm(p, mean = args$mean, sd = args$sigma, 
+                   lower.tail = (tail != "upper.tail"))
+        qroot <- c(quantile = q, f.quantile = 0)
+        return(qroot)
+    }
     dim <- length(args$mean)
 
     pfct <- function(q) {
@@ -338,7 +399,8 @@ qmvnorm <- function(p, interval = NULL,
 qmvt <- function(p, interval = NULL, 
                  tail = c("lower.tail", "upper.tail", "both.tails"), 
                  df = 1, delta = 0, corr = NULL, sigma = NULL,
-                 algorithm = GenzBretz(), ...) {
+                 algorithm = GenzBretz(), 
+                 type = c("Kshirsagar", "shifted"), ...) {
 
     if (length(p) != 1 || (p <= 0 || p >= 1)) 
         stop(sQuote("p"), " is not a double between zero and one")
@@ -346,6 +408,7 @@ qmvt <- function(p, interval = NULL,
     dots <- dots2GenzBretz(...)
     if (!is.null(dots$algorithm)  && !is.null(algorithm)) 
         algorithm <- dots$algorithm
+    type <- match.arg(type)
 
     tail <- match.arg(tail)
     if (tail == "both.tails" && p < 0.5)
@@ -356,6 +419,13 @@ qmvt <- function(p, interval = NULL,
     lower <- rep(0, dim)
     upper <- rep(0, dim)
     args <- checkmvArgs(lower, upper, delta, corr, sigma)
+    if (args$uni) {
+        if (tail == "both.tails") p <- ifelse(p < 0.5, p / 2, 1 - (1 - p)/2)
+        q <- qt(p, df = df, ncp = args$mean, lower.tail = (tail != "upper.tail"))
+        qroot <- c(quantile = q, f.quantile = 0)
+        return(qroot)
+    }
+
     dim <- length(args$mean)
 
     pfct <- function(q) {
@@ -371,7 +441,7 @@ qmvt <- function(p, interval = NULL,
            },)
            pmvt(lower = low, upper = upp, df = df, delta = args$mean,
                 corr = args$corr, sigma = args$sigma,
-                algorithm = algorithm) - p
+                algorithm = algorithm, type = type) - p
     }
 
     if (is.null(interval) || length(interval) != 2) {

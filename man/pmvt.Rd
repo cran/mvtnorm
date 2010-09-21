@@ -10,21 +10,38 @@
 }
 \usage{
 pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
-     df=1, corr=NULL, sigma=NULL, algorithm = GenzBretz(), ...)
+     df=1, corr=NULL, sigma=NULL, algorithm = GenzBretz(), 
+     type = c("Kshirsagar", "shifted"), ...)
 }
 \arguments{
   \item{lower}{ the vector of lower limits of length n.}
   \item{upper}{ the vector of upper limits of length n.}
-  \item{delta}{ the vector of noncentrality parameters of length n.}
-  \item{df}{ degree of freedom as integer.}
+  \item{delta}{ the vector of noncentrality parameters of length n, for
+   \code{type = "shifted"} delta specifies the mode.}
+  \item{df}{ degree of freedom as integer. Normal probabilities are computed for \code{df=0}.}
   \item{corr}{ the correlation matrix of dimension n.}
   \item{sigma}{ the covariance matrix of dimension n. Either \code{corr} or
                 \code{sigma} can be specified. If \code{sigma} is given, the  
                 problem is standardized. If neither \code{corr} nor
                 \code{sigma} is given, the identity matrix is used 
                 for \code{sigma}. }
-  \item{algorithm}{ an object of class \code{\link{GenzBretz}} defining the
+  \item{algorithm}{ an object of class \code{\link{GenzBretz}} or \code{\link{TVPACK}} defining the
                     hyper parameters of this algorithm.}
+ \item{type}{ type of the noncentral multivariate t distribution
+              to be computed. \code{type = "Kshirsagar"} corresponds
+              to formula (1.4) in Genz and Bretz (2009) (see also
+	      Chapter 5.1 in Kotz and Nadarajah (2004)). This is the
+	      noncentral t-distribution needed for calculating
+	      the power of multiple contrast tests under a normality
+	      assumption. \code{type = "shifted"} corresponds to the
+	       formula right before formula (1.4) in Genz and Bretz (2009)
+	      (see also formula (1.1) in Kotz and Nadarajah (2004)). It
+	      is a location shifted version of the central
+	      t-distribution. This noncentral multivariate t distribution appears for
+	      example as the Bayesian posterior distribution
+	      for the regression coefficients in a linear regression.
+ 	      In the central case both types coincide.
+	    }
   \item{...}{additional parameters (currently given to \code{GenzBretz} for
               backward compatibility issues). }
 }
@@ -34,13 +51,17 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
 This program involves the computation of central and noncentral
 multivariate t-probabilities with arbitrary correlation matrices.
 It involves both the computation of singular and nonsingular
-probabilities. The methodology is described in
-Genz and Bretz (1999, 2002).
+probabilities. The methodology is based on randomized quasi Monte Carlo
+methods and described in Genz and Bretz (1999, 2002).
 
-For a given correlation matrix \code{corr}, for short \eqn{A}, say, 
-(which has to be  positive semi-definite) and 
-degrees of freedom \eqn{\nu} the following 
-values are numerically evaluated
+For 2- and 3-dimensional problems one can also use the TVPACK routines
+described by Genz (2004), which only handles semi-infinite integration
+regions (and for \code{type = "Kshirsagar"} only central problems).
+
+For \code{type = "Kshirsagar"} and a given correlation matrix
+\code{corr}, for short \eqn{A}, say, (which has to be positive
+semi-definite) and degrees of freedom \eqn{\nu} the following values are
+numerically evaluated
 
 \deqn{I = 2^{1-\nu/2} / \Gamma(\nu/2) \int_0^\infty s^{\nu-1} \exp(-s^2/2) \Phi(s \cdot lower/\sqrt{\nu} - \delta,
 s \cdot upper/\sqrt{\nu} - \delta) \, ds }
@@ -49,12 +70,27 @@ where
 
 \deqn{\Phi(a,b) = (det(A)(2\pi)^m)^{-1/2} \int_a^b \exp(-x^\prime Ax/2) \, dx} 
 
-is the multivariate normal distribution and $m$ is the number of rows of \eqn{A}.
+is the multivariate normal distribution and \eqn{m} is the number of rows of
+\eqn{A}.
+
+For \code{type = "shifted"}, a positive definite symmetric matrix
+\eqn{S} (which might be the correlation or the covariance matrix),
+non-centrality vector \eqn{\delta} and degrees of freedom \eqn{\nu} the
+following integral is evaluated:
+
+\deqn{c\int_{lower_1}^{upper_1}...\int_{lower_m}^{upper_m} 
+  (1+(x-\delta)'S^{-1}(x-\delta)/\nu)^{-(\nu+m)/2}\, dx_1 ... dx_m,
+}
+
+where
+
+\deqn{c = \Gamma((\nu+m)/2)/((\pi \nu)^{m/2}\Gamma(\nu/2)|S|^{1/2}),}
+
+and \eqn{m} is the number of rows of \eqn{S}.
 
 Note that both \code{-Inf} and \code{+Inf} may be specified in 
 the lower and upper integral limits in order to compute one-sided
-probabilities. Randomized quasi-Monte Carlo methods are used for the 
-computations.
+probabilities. 
 
 Univariate problems are passed to \code{\link{pt}}. 
 If \code{df = 0}, normal probabilities are returned. 
@@ -78,9 +114,16 @@ Genz, A. and Bretz, F. (2002), Methods for the computation of multivariate
 t-probabilities. \emph{Journal of Computational and Graphical Statistics},
 \bold{11}, 950--971.
 
+Genz, A. (2004), Numerical computation of rectangular bivariate and
+trivariate normal and t-probabilities, \emph{Statistics and
+Computing}, \bold{14}, 251--260.
+
 Genz, A. and Bretz, F. (2009), \emph{Computation of Multivariate Normal and
 t Probabilities}. Lecture Notes in Statistics, Vol. 195. Springer-Verlag,  
 Heidelberg.
+
+S. Kotz and S. Nadarajah (2004), \emph{Multivariate t Distributions and
+  Their Applications}. Cambridge University Press. Cambridge.
 
 Edwards D. and Berry, Jack J. (1987), The efficiency of simulation-based 
 multiple comparisons. \emph{Biometrics}, \bold{43}, 913--928.

@@ -5,7 +5,7 @@
 
 Computes the equicoordinate quantile function of the multivariate normal
 distribution for arbitrary correlation matrices
-based on an inversion of the algorithms by Genz and Bretz.
+based on inversion of pmvnorm.
 
 }
 \usage{
@@ -31,11 +31,12 @@ qmvnorm(p, interval = NULL, tail = c("lower.tail",
                 problem is standardized. If neither \code{corr} nor
                 \code{sigma} is given, the identity matrix is used
                 for \code{sigma}. }
-  \item{algorithm}{ an object of class \code{\link{GenzBretz}} or \code{\link{Miwa}}
-                    specifying both the algorithm to be used as well as
-                    the associated hyper parameters.}
-  \item{...}{ additional parameters to be passed to
-              \code{\link{uniroot}}.}
+  \item{algorithm}{ an object of class \code{\link{GenzBretz}},
+                  \code{\link{Miwa}} or \code{\link{TVPACK}}
+                  specifying both the algorithm to be used as well as
+                  the associated hyper parameters.}
+  \item{...}{ additional parameters to be passed to 
+              \code{\link{GenzBretz}}.}
 }
 \details{
 

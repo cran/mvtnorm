@@ -209,3 +209,47 @@ stopifnot(all.equal(p, ptmp))
 
 ### was == 1; spotted by Alex Lenkoski <lenkoski@stat.washington.edu>
 stopifnot(pmvnorm(c(-Inf, -Inf, 0, 0)) == 0.25)
+
+#############################
+## testing rmvt und pmvt
+#############################
+set.seed(290875)
+n <- 100000
+df <- rpois(1,1/rexp(1,1))+1
+dim <- rpois(1,runif(1,0,10))+2
+mn <- rnorm(dim,0,4) ##rep(0,dim)
+sigma <- matrix(runif(dim^2,-1,1), nrow = dim, ncol = dim)
+sigma <- crossprod(sigma)+diag(dim)
+d <- runif(dim, 0.3, 20)
+sigma <- diag(d)%*%sigma%*%diag(d)
+corrMat <- cov2cor(sigma)
+
+## sigma handed over
+sims1 <- rmvt(n, sigma = sigma, delta = mn, df=df, type = "shifted")
+sims2 <- rmvt(n, sigma = sigma, delta = mn, df=df, type = "Kshirsagar")
+lower <- mn-d*2
+upper <- mn+d*3
+comp <- function(x, lower, upper){
+  all(x>lower) & all(x<upper)
+}
+ind1 <- apply(sims1, 1, comp, lower=lower, upper=upper)
+mean(ind1) #Monte Carlo Integration
+pmvt(lower, upper, sigma = sigma, delta=mn, df=df, type = "shifted")
+ind2 <- apply(sims2, 1, comp, lower=lower, upper=upper)
+mean(ind2)
+pmvt(lower, upper, sigma = sigma, delta=mn, df=df, type = "Kshirsagar")
+
+## corrMat handed over
+sims1 <- rmvt(n, sigma = corrMat, delta = mn, df=df, type = "shifted")
+sims2 <- rmvt(n, sigma = corrMat, delta = mn, df=df, type = "Kshirsagar")
+lower <- mn-d*0.5
+upper <- mn+d
+comp <- function(x, lower, upper){
+  all(x>lower) & all(x<upper)
+}
+ind1 <- apply(sims1, 1, comp, lower=lower, upper=upper)
+mean(ind1) #Monte Carlo Integration
+pmvt(lower, upper, corr = corrMat, delta=mn, df=df, type = "shifted")
+ind2 <- apply(sims2, 1, comp, lower=lower, upper=upper)
+mean(ind2)
+pmvt(lower, upper, corr = corrMat, delta=mn, df=df, type = "Kshirsagar")

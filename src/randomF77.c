@@ -1,4 +1,4 @@
-/* $Id: randomF77.c 183 2008-04-04 09:49:28Z thothorn $
+/* $Id: randomF77.c 95 2002-11-22 13:24:41Z hothorn $
 *
 *  wrapper for calling R's random number generator from
 *  the original FORTRAN code

@@ -1,0 +1,11 @@
+      SUBROUTINE TVTLRCALL( NU, H, R, EPSI, VAL )
+      INTEGER NU
+      DOUBLE PRECISION EPSI, VAL, H(3), R(3)
+      VAL = TVTL(NU, H, R, EPSI)
+      END
+      
+      SUBROUTINE BVTLRCALL( NU, L1, L2, R, VAL )
+      INTEGER NU
+      DOUBLE PRECISION L1, L2, R, VAL
+      VAL = BVTL( NU, L1, L2, R )
+      END
