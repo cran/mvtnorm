@@ -1,11 +1,11 @@
-# $Id: mvt.R 219 2010-11-16 17:18:01Z thothorn $ 
+# $Id: mvt.R 220 2010-11-18 12:16:31Z thothorn $ 
 
 chkcorr <- function(x) {
 
-    if (!is.matrix(x)) return(TRUE)
+    if (!is.matrix(x)) return(FALSE)
     rownames(x) <- colnames(x) <- NULL
     storage.mode(x) <- "numeric"
-    ONE <- 1 + .Machine$double.eps
+    ONE <- 1 + sqrt(.Machine$double.eps)
 
     ret <- (min(x) < -ONE || max(x) > ONE) ||
            !isTRUE(all.equal(diag(x), rep(1, nrow(x))))
@@ -355,7 +355,7 @@ qmvnorm <- function(p, interval = NULL,
         if (tail == "both.tails") p <- ifelse(p < 0.5, p / 2, 1 - (1 - p)/2)
         q <- qnorm(p, mean = args$mean, sd = args$sigma, 
                    lower.tail = (tail != "upper.tail"))
-        qroot <- c(quantile = q, f.quantile = 0)
+        qroot <- list(quantile = q, f.quantile = 0)
         return(qroot)
     }
     dim <- length(args$mean)
@@ -422,7 +422,7 @@ qmvt <- function(p, interval = NULL,
     if (args$uni) {
         if (tail == "both.tails") p <- ifelse(p < 0.5, p / 2, 1 - (1 - p)/2)
         q <- qt(p, df = df, ncp = args$mean, lower.tail = (tail != "upper.tail"))
-        qroot <- c(quantile = q, f.quantile = 0)
+        qroot <- list(quantile = q, f.quantile = 0)
         return(qroot)
     }
 

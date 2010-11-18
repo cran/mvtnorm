@@ -1,4 +1,9 @@
-# $Id: CHANGES 219 2010-11-16 17:18:01Z thothorn $
+# $Id: CHANGES 220 2010-11-18 12:16:31Z thothorn $
+
+        0.9-95 (18.11.2010)
+
+        q{mvt,mvnorm} shall always return a list, not a vector
+	checks for correlation matrices are less picky now
 
         0.9-94 (16.11.2010)
 
