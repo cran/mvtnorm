@@ -1,5 +1,9 @@
 # $Id: CHANGES 220 2010-11-18 12:16:31Z thothorn $
 
+        0.9-96 (28.01.2011)
+
+        use fixed interval when sigma is specified in qmvt
+
         0.9-95 (18.11.2010)
 
         q{mvt,mvnorm} shall always return a list, not a vector

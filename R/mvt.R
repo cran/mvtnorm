@@ -445,9 +445,8 @@ qmvt <- function(p, interval = NULL,
     }
 
     if (is.null(interval) || length(interval) != 2) {
-        if (delta == 0) {
+        if (delta == 0 & is.null(args$sigma)) {
             cr <- args$corr
-            if (!is.null(args$sigma)) cr <- cov2cor(args$sigma)
             interval <- approx_interval(p = p, tail = tail, 
                                         corr = cr, df = df)
         } else {
