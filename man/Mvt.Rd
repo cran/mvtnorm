@@ -11,7 +11,7 @@
 }
 \usage{
 rmvt(n, sigma = diag(2), df = 1, delta = rep(0, nrow(sigma)),
-     type = c("shifted", "Kshirsagar"))
+     type = c("shifted", "Kshirsagar"), ...)
 dmvt(x, delta, sigma, df = 1, log = TRUE,
      type = "shifted")
 }
@@ -21,7 +21,7 @@ dmvt(x, delta, sigma, df = 1, log = TRUE,
  \item{n}{Number of observations.}
  \item{delta}{ the vector of noncentrality parameters of length n, for
    \code{type = "shifted"} delta specifies the mode.}
- \item{sigma}{Covariance matrix, default is \code{diag(ncol(x))}.}
+ \item{sigma}{Correlation matrix, default is \code{diag(ncol(x))}.}
  \item{df}{ degree of freedom as integer.}
  \item{log}{Logical; if \code{TRUE}, densities d are given as log(d).}
  \item{type}{ type of the noncentral multivariate t distribution
@@ -42,6 +42,8 @@ dmvt(x, delta, sigma, df = 1, log = TRUE,
               in \code{\link{pmvt}} (for reasons of backward 
               compatibility).
 	    }
+ \item{\dots}{ additional arguments to \code{\link{rmvnorm}},
+               for example \code{method}.}
 	  }
 \details{
   For type = "shifted" the following density is implemented

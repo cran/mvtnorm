@@ -1,4 +1,4 @@
-# $Id: mvt.R 220 2010-11-18 12:16:31Z thothorn $ 
+# $Id: mvt.R 225 2011-04-21 09:53:35Z thothorn $ 
 
 chkcorr <- function(x) {
 
@@ -244,21 +244,21 @@ mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
 
 rmvt <- function(n, sigma = diag(2), df = 1, 
      delta = rep(0, nrow(sigma)),
-     type = c("shifted", "Kshirsagar")) {
+     type = c("shifted", "Kshirsagar"), ...) {
 
     if (length(delta) != nrow(sigma))
       stop("delta and sigma have non-conforming size")
 
     if (df == 0)
-        return(rmvnorm(n, mean = delta, sigma = sigma))
+        return(rmvnorm(n, mean = delta, sigma = sigma, ...))
     type <- match.arg(type)
 
     if (type == "Kshirsagar")
-        return(rmvnorm(n, mean = delta, sigma = sigma)/
+        return(rmvnorm(n, mean = delta, sigma = sigma, ...)/
                sqrt(rchisq(n, df)/df))
 
     if (type == "shifted"){
-        sims <- rmvnorm(n, sigma = sigma)/sqrt(rchisq(n, df)/df)
+        sims <- rmvnorm(n, sigma = sigma, ...)/sqrt(rchisq(n, df)/df)
         return(sweep(sims, 2, delta, "+"))
     }
     ### was: rmvnorm(n,sigma=sigma)/sqrt(rchisq(n,df)/df)
@@ -282,7 +282,8 @@ dmvt <- function(x, delta, sigma, df = 1,
     if (NCOL(x) != NCOL(sigma)) {
         stop("x and sigma have non-conforming size")
     }
-    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps))) {
+    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), 
+                     check.attributes = FALSE)) {
         stop("sigma must be a symmetric matrix")
     }
     if (length(delta) != NROW(sigma)) {
@@ -320,11 +321,12 @@ approx_interval <- function(p, tail, corr, df = 0) {
              ### multivariate quantile (corr == 0, independence)
              qfun(p^(1 / NCOL(corr))))
 
+    if (tail == "upper.tail")
+        ret <- rev(-ret)
+
     ### just to please uniroot
     ret <- ret * c(0.9, 1.1)
 
-    if (tail == "upper.tail")
-        ret <- rev(-ret)
     ret
 }
 
@@ -445,7 +447,7 @@ qmvt <- function(p, interval = NULL,
     }
 
     if (is.null(interval) || length(interval) != 2) {
-        if (delta == 0 & is.null(args$sigma)) {
+        if (isTRUE(all.equal(max(abs(delta)), 0)) & is.null(args$sigma)) {
             cr <- args$corr
             interval <- approx_interval(p = p, tail = tail, 
                                         corr = cr, df = df)

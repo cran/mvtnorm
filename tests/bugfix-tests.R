@@ -253,3 +253,17 @@ pmvt(lower, upper, corr = corrMat, delta=mn, df=df, type = "shifted")
 ind2 <- apply(sims2, 1, comp, lower=lower, upper=upper)
 mean(ind2)
 pmvt(lower, upper, corr = corrMat, delta=mn, df=df, type = "Kshirsagar")
+
+### approx_interval for tail = "upper" went wild
+### spotted by Ravi Varadhan <rvaradhan@jhmi.edu>
+m <- 10
+rho <- 0.1
+k <- 2
+alpha <- 0.05
+cc_z <- numeric(m)
+var <- matrix(c(1,rho,rho,1), nrow=2, ncol=2, byrow=T)
+i <- 1
+q1 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var)$quantile
+q2 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var,
+         interval = c(0, 5))$quantile
+stopifnot(all.equal(round(q1, 4), round(q2, 4)))

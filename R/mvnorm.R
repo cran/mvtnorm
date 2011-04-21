@@ -1,9 +1,10 @@
-# $Id: mvnorm.R 203 2010-01-07 13:21:43Z thothorn $
+# $Id: mvnorm.R 222 2011-01-31 14:02:02Z thothorn $
 
 rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
                    method=c("eigen", "svd", "chol"))
 {    
-    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps))) {
+    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), 
+                     check.attributes = FALSE)) {
         stop("sigma must be a symmetric matrix")
     }
     if (length(mean) != nrow(sigma)) {
@@ -58,7 +59,8 @@ dmvnorm <- function (x, mean, sigma, log=FALSE)
     if (NCOL(x) != NCOL(sigma)) {
         stop("x and sigma have non-conforming size")
     }
-    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps))) {
+    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), 
+                     check.attributes = FALSE)) {
         stop("sigma must be a symmetric matrix")
     }
     if (length(mean) != NROW(sigma)) {

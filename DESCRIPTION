@@ -1,7 +1,7 @@
 Package: mvtnorm
 Title: Multivariate Normal and t Distributions
-Version: 0.9-96
-Date: 2011-01-28
+Version: 0.9-99
+Date: 2011-04-21
 Author: Alan Genz, Frank Bretz, Tetsuhisa Miwa, Xuefei Mi, Friedrich
         Leisch, Fabian Scheipl, Bjoern Bornkamp, Torsten Hothorn
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
@@ -10,6 +10,6 @@ Description: Computes multivariate normal and t probabilities,
 Imports: stats
 Depends: R(>= 1.9.0)
 License: GPL-2
-Packaged: 2011-01-28 14:23:52 UTC; hothorn
+Packaged: 2011-04-21 09:53:47 UTC; hothorn
 Repository: CRAN
-Date/Publication: 2011-01-28 16:01:36
+Date/Publication: 2011-04-24 06:57:05
