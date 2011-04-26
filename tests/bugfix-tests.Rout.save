@@ -1,6 +1,6 @@
 
-R version 2.12.0 (2010-10-15)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.13.0 (2011-04-13)
+Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: i686-pc-linux-gnu (32-bit)
 
@@ -374,4 +374,37 @@ attr(,"error")
 [1] 6.650863e-05
 attr(,"msg")
 [1] "Normal Completion"
+> 
+> ### approx_interval for tail = "upper" went wild
+> ### spotted by Ravi Varadhan <rvaradhan@jhmi.edu>
+> m <- 10
+> rho <- 0.1
+> k <- 2
+> alpha <- 0.05
+> cc_z <- numeric(m)
+> var <- matrix(c(1,rho,rho,1), nrow=2, ncol=2, byrow=T)
+> i <- 1
+> q1 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var)$quantile
+> q2 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var,
++          interval = c(0, 5))$quantile
+> stopifnot(all.equal(round(q1, 4), round(q2, 4)))
+> 
+> ### grrr, still problems in approx_interval
+> qmvnorm(.95, sigma = tcrossprod(c(0.009, 0.75, 0.25)))
+$quantile
+[1] 1.233641
+
+$f.quantile
+[1] 1.652806e-07
+attr(,"error")
+[1] 0
+attr(,"msg")
+[1] "Normal Completion"
+
+$iter
+[1] 13
+
+$estim.prec
+[1] 6.103516e-05
+
 > 

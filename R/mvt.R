@@ -306,6 +306,7 @@ dmvt <- function(x, delta, sigma, df = 1,
 }
 
 ### find suitable interval to search for quantile
+### does not take sigma into account; disable for the time being (0.9-999)
 approx_interval <- function(p, tail, corr, df = 0) {
 
     qfun <- function(p) {
@@ -379,7 +380,7 @@ qmvnorm <- function(p, interval = NULL,
     }
 
     if (is.null(interval) || length(interval) != 2) {
-        if (mean == 0) {
+        if (FALSE) { ### if(mean == 0) {
             cr <- args$corr
             if (!is.null(args$sigma)) cr <- cov2cor(args$sigma)
             interval <- approx_interval(p = p, tail = tail, 
@@ -447,7 +448,7 @@ qmvt <- function(p, interval = NULL,
     }
 
     if (is.null(interval) || length(interval) != 2) {
-        if (isTRUE(all.equal(max(abs(delta)), 0)) & is.null(args$sigma)) {
+        if (FALSE) { ### if (isTRUE(all.equal(max(abs(delta)), 0)) & is.null(args$sigma)) {
             cr <- args$corr
             interval <- approx_interval(p = p, tail = tail, 
                                         corr = cr, df = df)

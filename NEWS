@@ -1,5 +1,10 @@
 # $Id: CHANGES 225 2011-04-21 09:53:35Z thothorn $
 
+        0.9-999 (26.04.2011)
+
+	still problems in fix approx_interval (when !is.null(sigma));
+        disable for the time being
+
         0.9-99 (21.04.2011)
 
 	fix bug in approx_interval spotted by Ravi Varadhan

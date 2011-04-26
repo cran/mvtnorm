@@ -267,3 +267,6 @@ q1 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var)$quantile
 q2 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var,
          interval = c(0, 5))$quantile
 stopifnot(all.equal(round(q1, 4), round(q2, 4)))
+
+### grrr, still problems in approx_interval
+qmvnorm(.95, sigma = tcrossprod(c(0.009, 0.75, 0.25)))
