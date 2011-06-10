@@ -21,63 +21,17 @@
 *       Original source available from
 *       http://www.math.wsu.edu/faculty/genz/software/fort77/tvpack.f
 *
-      PROGRAM TVTST
-      INTEGER I, J, NU, NT
-      PARAMETER ( NT = 20 )
-      DOUBLE PRECISION TVTL, LIMIT(3,NT), SIGMA(3,NT), EPS, V
-      DATA ( LIMIT(I,1), I = 1, 3 ), ( SIGMA(I,1), I = 1, 3 )
-     &     / .5D0, .5D0, .8D0, .1D0, .6D0, .8D0 /
-      DATA ( LIMIT(I,2), I = 1, 3 ), ( SIGMA(I,2), I = 1, 3 )
-     &     / -2.5D0, .5D0, .8D0, .1D0, -.6D0, -.8D0 /
-      DATA ( LIMIT(I,3), I = 1, 3 ), ( SIGMA(I,3), I = 1, 3 )
-     &     / 1.5D0, .5D0, .8D0, .1D0, .6D0, .8D0 /
-      DATA ( LIMIT(I,4), I = 1, 3 ), ( SIGMA(I,4), I = 1, 3 )
-     &     / .5D0, .5D0, .8D0, .1D0, -.6D0, -.8D0 /
-      DATA ( LIMIT(I,5), I = 1, 3 ), ( SIGMA(I,5), I = 1, 3 )
-     &     / .5D0, .5D0, .8D0, .1D0, -.5D0, .5D0 /
-      DATA ( LIMIT(I,6), I = 1, 3 ), ( SIGMA(I,6), I = 1, 3 )
-     &     / -1.5D0, .5D0, .8D0, .1D0, -.5D0, .5D0 /
-      DATA ( LIMIT(I,7), I = 1, 3 ), ( SIGMA(I,7), I = 1, 3 )
-     &     / 1.5D0, .5D0, .8D0, .1D0, .5D0, -.5D0 /
-      DATA ( LIMIT(I,8), I = 1, 3 ), ( SIGMA(I,8), I = 1, 3 )
-     &     / -.5D0, 1D0, 1.2D0, -.4D0, .2D0, .7D0 /
-      DATA ( LIMIT(I,9), I = 1, 3 ), ( SIGMA(I,9), I = 1, 3 )
-     &     / 1D0, 1D0, 2D0, .4D0, .8D0, .8D0 /
-      DATA ( LIMIT(I,10), I = 1, 3 ), ( SIGMA(I,10), I = 1, 3 )
-     &     / 1D0, 2D0, 1D0, .4D0, .8D0, .8D0 /
-      DATA ( LIMIT(I,11), I = 1, 3 ), ( SIGMA(I,11), I = 1, 3 )
-     &     / -2D0, -2D0, -2D0, .4D0, .8D0, .8D0 /
-      DATA ( LIMIT(I,12), I = 1, 3 ), ( SIGMA(I,12), I = 1, 3 )
-     *     / 1D0, 2D0, 3D0, -.998D0, -0.248D0, 0.248D0 /
-      DATA ( LIMIT(I,13), I = 1, 3 ), ( SIGMA(I,13), I = 1, 3 )
-     *     / -1D0, 2D0, 3D0, .25D0, 0.25D0, 0.25D0 /
-      DATA ( LIMIT(I,14), I = 1, 3 ), ( SIGMA(I,14), I = 1, 3 )
-     *     /  1D0, 1D0, 3D0, .998D0, 0.2482D0, 0.2487D0 /
-      DATA ( LIMIT(I,15), I = 1, 3 ), ( SIGMA(I,15), I = 1, 3 )
-     *     /  1D0, 1D0, 3D0, .998D0, 0.5D0, 0.5D0 /
-      DATA ( LIMIT(I,16), I = 1, 3 ), ( SIGMA(I,16), I = 1, 3 )
-     *     /  1D0, 1D0, 3D0, .99D0, 0.99D0, 0.99D0 /
-      DATA ( LIMIT(I,17), I = 1, 3 ), ( SIGMA(I,17), I = 1, 3 )
-     *     /  1D0, 2D0, 3D0, -1D0, -.99D0, .99D0 /
-      DATA ( LIMIT(I,18), I = 1, 3 ), ( SIGMA(I,18), I = 1, 3 )
-     *     /  1D0, 2D0, 3D0, 1D0, -.99D0, -.99D0 /
-      DATA ( LIMIT(I,19), I = 1, 3 ), ( SIGMA(I,19), I = 1, 3 )
-     *     /  1D0, -1D0, 1D0, .998D0, -0.2482D0, -0.2482D0 /
-      DATA ( LIMIT(I,NT), I = 1, 3 ), ( SIGMA(I,NT), I = 1, 3 )
-     *     /  1D0, -1D0, 2D0, .99992D0, 0.64627D0, 0.63975D0 /
-      EPS = 1D-6
-      PRINT '(''      Trivariate t Test with EPS ='', E10.1)', EPS
-      DO NU = 0, 12, 3
-         PRINT '(''NU   B1   B2   B3    R21      R31      R32    TVT'')'
-         DO J = 1, NT 
-            V = TVTL( NU, LIMIT(1,J), SIGMA(1,J), EPS )
-            PRINT '(I2,3F5.1,3F9.5,F13.10)', NU, 
-     &           ( LIMIT(I,J), I = 1, 3 ), ( SIGMA(I,J), I = 1, 3 ), V
-         END DO
-      END DO
-      END
 *
-      DOUBLE PRECISION FUNCTION TVTL( NU, H, R, EPSI )
+* For 64bit machines, wrapping the FUNCTIONS by SUBROUTINEs
+* to be called from R didn't work (don't ask me why).
+* Therefore, I defined TVTL and BVTL as SUBROUTINEs
+*
+* I also replaced the univariates pdfs with the corresponding
+* R functions
+*
+* <TH>
+*
+      SUBROUTINE TVTLRCALL( NU, H, R, EPSI, TVTL )
 *    
 *     A function for computing trivariate normal and t-probabilities.
 *     This function uses algorithms developed from the ideas 
@@ -108,7 +62,7 @@
       EXTERNAL TVTMFN
       INTEGER NU, NUC
       DOUBLE PRECISION H(3), H1, H2, H3, R(3), R12, R13, R23, EPSI
-      DOUBLE PRECISION ONE, ZRO, EPS, ZROS(3), HS(3), TVT
+      DOUBLE PRECISION ONE, ZRO, EPS, ZROS(3), HS(3), TVT, TVTL
       DOUBLE PRECISION RUA, RUB, AR, RUC, PT, BVTL, PHID, ADONET
       PARAMETER ( ZRO = 0, ONE = 1 )
       COMMON /TVTMBK/ H1, H2, H3, R23, RUA, RUB, AR, RUC, NUC
@@ -385,6 +339,12 @@
 *      ENDIF
 *      END
 *
+* For 64bit machines, wrapping the FUNCTIONS by SUBROUTINEs
+* to be called from R didn't work (don't ask me why).
+* Therefore, I defined TVTL and BVTL as SUBROUTINEs
+*
+* However, FUNCTION BVTL is still called from TVTL!
+*
       DOUBLE PRECISION FUNCTION BVTL( NU, DH, DK, R )
 *
 *     A function for computing bivariate t probabilities.
@@ -412,6 +372,118 @@
 *
       INTEGER NU, J, HS, KS
       DOUBLE PRECISION DH, DK, R
+      DOUBLE PRECISION TPI, PI, ORS, HRK, KRH, BVT, SNU, BVND, STUDNT
+      DOUBLE PRECISION GMPH, GMPK, XNKH, XNHK, QHRK, HKN, HPK, HKRN
+      DOUBLE PRECISION BTNCKH, BTNCHK, BTPDKH, BTPDHK, ONE, EPS
+      PARAMETER ( ONE = 1, EPS = 1D-15 )
+      IF ( NU .LT. 1 ) THEN
+         BVTL = BVND( -DH, -DK, R )
+      ELSE IF ( 1 - R .LE. EPS ) THEN
+            BVTL = STUDNT( NU, MIN( DH, DK ) )
+      ELSE IF ( R + 1  .LE. EPS ) THEN
+         IF ( DH .GT. -DK )  THEN
+            BVTL = STUDNT( NU, DH ) - STUDNT( NU, -DK )
+         ELSE
+            BVTL = 0
+         END IF
+      ELSE
+         PI = ACOS(-ONE)
+         TPI = 2*PI
+         SNU = NU
+         SNU = SQRT(SNU)
+         ORS = 1 - R*R  
+         HRK = DH - R*DK  
+         KRH = DK - R*DH  
+         IF ( ABS(HRK) + ORS .GT. 0 ) THEN
+            XNHK = HRK**2/( HRK**2 + ORS*( NU + DK**2 ) ) 
+            XNKH = KRH**2/( KRH**2 + ORS*( NU + DH**2 ) ) 
+         ELSE
+            XNHK = 0  
+            XNKH = 0  
+         END IF
+         HS = SIGN( ONE, DH - R*DK )  
+         KS = SIGN( ONE, DK - R*DH ) 
+         IF ( MOD( NU, 2 ) .EQ. 0 ) THEN
+            BVT = ATAN2( SQRT(ORS), -R )/TPI 
+            GMPH = DH/SQRT( 16*( NU + DH**2 ) )  
+            GMPK = DK/SQRT( 16*( NU + DK**2 ) )  
+            BTNCKH = 2*ATAN2( SQRT( XNKH ), SQRT( 1 - XNKH ) )/PI  
+            BTPDKH = 2*SQRT( XNKH*( 1 - XNKH ) )/PI 
+            BTNCHK = 2*ATAN2( SQRT( XNHK ), SQRT( 1 - XNHK ) )/PI  
+            BTPDHK = 2*SQRT( XNHK*( 1 - XNHK ) )/PI 
+            DO J = 1, NU/2
+               BVT = BVT + GMPH*( 1 + KS*BTNCKH ) 
+               BVT = BVT + GMPK*( 1 + HS*BTNCHK ) 
+               BTNCKH = BTNCKH + BTPDKH  
+               BTPDKH = 2*J*BTPDKH*( 1 - XNKH )/( 2*J + 1 )  
+               BTNCHK = BTNCHK + BTPDHK  
+               BTPDHK = 2*J*BTPDHK*( 1 - XNHK )/( 2*J + 1 )  
+               GMPH = GMPH*( 2*J - 1 )/( 2*J*( 1 + DH**2/NU ) ) 
+               GMPK = GMPK*( 2*J - 1 )/( 2*J*( 1 + DK**2/NU ) ) 
+            END DO
+         ELSE
+            QHRK = SQRT( DH**2 + DK**2 - 2*R*DH*DK + NU*ORS )  
+            HKRN = DH*DK + R*NU  
+            HKN = DH*DK - NU  
+            HPK = DH + DK 
+            BVT = ATAN2( -SNU*( HKN*QHRK + HPK*HKRN ),
+     &                          HKN*HKRN-NU*HPK*QHRK )/TPI
+            IF ( BVT .LT. -EPS ) BVT = BVT + 1
+            GMPH = DH/( TPI*SNU*( 1 + DH**2/NU ) )  
+            GMPK = DK/( TPI*SNU*( 1 + DK**2/NU ) )  
+            BTNCKH = SQRT( XNKH )  
+            BTPDKH = BTNCKH 
+            BTNCHK = SQRT( XNHK )  
+            BTPDHK = BTNCHK  
+            DO J = 1, ( NU - 1 )/2
+               BVT = BVT + GMPH*( 1 + KS*BTNCKH ) 
+               BVT = BVT + GMPK*( 1 + HS*BTNCHK ) 
+               BTPDKH = ( 2*J - 1 )*BTPDKH*( 1 - XNKH )/( 2*J )  
+               BTNCKH = BTNCKH + BTPDKH  
+               BTPDHK = ( 2*J - 1 )*BTPDHK*( 1 - XNHK )/( 2*J )  
+               BTNCHK = BTNCHK + BTPDHK  
+               GMPH = 2*J*GMPH/( ( 2*J + 1 )*( 1 + DH**2/NU ) ) 
+               GMPK = 2*J*GMPK/( ( 2*J + 1 )*( 1 + DK**2/NU ) ) 
+            END DO
+         END IF
+         BVTL = BVT 
+      END IF
+*     END BVTL
+      END
+*
+* For 64bit machines, wrapping the FUNCTIONS by SUBROUTINEs
+* to be called from R didn't work (don't ask me why).
+* Therefore, I defined TVTL and BVTL as SUBROUTINEs
+*
+* This is just a copy of BVTL (ugly, but I can't help it)
+*
+      SUBROUTINE BVTLRCALL( NU, DH, DK, R, BVTL )
+*
+*     A function for computing bivariate t probabilities.
+*
+*       Alan Genz
+*       Department of Mathematics
+*       Washington State University
+*       Pullman, WA 99164-3113
+*       Email : alangenz@wsu.edu
+*
+*    This function is based on the method described by 
+*        Dunnett, C.W. and M. Sobel, (1954),
+*        A bivariate generalization of Student's t-distribution
+*        with tables for certain special cases,
+*        Biometrika 41, pp. 153-169.
+*
+* BVTL - calculate the probability that X < DH and Y < DK. 
+*
+* parameters
+*
+*   NU number of degrees of freedom
+*   DH 1st lower integration limit
+*   DK 2nd lower integration limit
+*   R   correlation coefficient
+*
+      INTEGER NU, J, HS, KS
+      DOUBLE PRECISION DH, DK, R, BVTL
       DOUBLE PRECISION TPI, PI, ORS, HRK, KRH, BVT, SNU, BVND, STUDNT
       DOUBLE PRECISION GMPH, GMPK, XNKH, XNHK, QHRK, HKN, HPK, HKRN
       DOUBLE PRECISION BTNCKH, BTNCHK, BTPDKH, BTPDHK, ONE, EPS

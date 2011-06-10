@@ -1,4 +1,4 @@
-# $Id: mvt.R 225 2011-04-21 09:53:35Z thothorn $ 
+# $Id: mvt.R 226 2011-04-26 16:03:39Z thothorn $ 
 
 chkcorr <- function(x) {
 

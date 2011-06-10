@@ -420,7 +420,9 @@ int checkall(int *vector,int length,int value)
 SEXP C_miwa(SEXP steps, SEXP corr, SEXP upper, SEXP lower, SEXP infin) {
 
     SEXP answer;
-    int dim,diml, i,ii, j,k,l,i5,i6,i7,i8, ncone;
+    int dim;
+    /* int diml; ### was not used */
+    int i,ii, j,k,l,i5,i6,i7,i8, ncone;
     int infinlength;
 
 /* 
@@ -435,7 +437,7 @@ infinvalue is used to take the value of infin.
     dim = LENGTH(upper);
     dupper = REAL(upper);
     dcorr = REAL(corr);
-    diml = LENGTH(lower);
+    /* diml = LENGTH(lower); ### was not used */
     dlower = REAL(lower);
     infinvalue = INTEGER(infin);
     infinlength = LENGTH(infin);
