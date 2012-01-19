@@ -1,4 +1,10 @@
-# $Id: CHANGES 228 2011-06-10 13:55:51Z thothorn $
+# $Id: CHANGES 232 2012-01-19 17:06:59Z thothorn $
+
+        0.9-9992 (19.01.2012)
+
+        qmvt(..., df = 0, ...) gave NaN
+
+        R CMD check works on x64 with GCC 4.6.2 (Debian 4.6.2-11) 
 
         0.9-9991 (10.06.2011)
 

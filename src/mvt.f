@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f 208 2010-07-06 14:24:11Z thothorn $
+*    $Id: mvt.f 231 2011-11-07 13:48:07Z thothorn $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
@@ -77,7 +77,7 @@
 *           Call the lattice rule integration subroutine
 *
             CALL MVKBRV( ND, IVLS, MAXPTS, 1, MVSUBR, ABSEPS, RELEPS, 
-     &                    E, V, INFORM )
+     &                    E(1), V, INFORM )
             ERROR = E(1)
             VALUE = V(1)
          ENDIF

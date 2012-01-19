@@ -270,3 +270,7 @@ stopifnot(all.equal(round(q1, 4), round(q2, 4)))
 
 ### grrr, still problems in approx_interval
 qmvnorm(.95, sigma = tcrossprod(c(0.009, 0.75, 0.25)))
+
+### qmvt(..., df = 0, ...) didn't work
+### spotted by Ulrich Halekoh <Ulrich.Halekoh@agrsci.dk>
+stopifnot(is.finite(qmvt(.95, df = 0, corr = matrix(1))$quantile))

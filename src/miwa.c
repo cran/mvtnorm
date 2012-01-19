@@ -390,6 +390,7 @@ void gridcalc(struct GRID *g)
       - g->z[i-1] * g->q[i][1] + g->q[i][0];
     g->q[i][3] = - g->w2[i] * g->d[i]
       - g->z[i-1] * g->q[i][2] + 2.0 * g->q[i][1];
+    if (i == 1) Rprintf("");
   }
 
   g->n = ngrd;

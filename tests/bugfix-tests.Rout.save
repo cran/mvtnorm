@@ -1,5 +1,5 @@
 
-R version 2.13.0 (2011-04-13)
+R version 2.13.1 (2011-07-08)
 Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: i686-pc-linux-gnu (32-bit)
@@ -407,4 +407,8 @@ $iter
 $estim.prec
 [1] 6.103516e-05
 
+> 
+> ### qmvt(..., df = 0, ...) didn't work
+> ### spotted by Ulrich Halekoh <Ulrich.Halekoh@agrsci.dk>
+> stopifnot(is.finite(qmvt(.95, df = 0, corr = matrix(1))$quantile))
 > 

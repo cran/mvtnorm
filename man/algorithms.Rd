@@ -13,7 +13,9 @@ Miwa(steps = 128)
 TVPACK(abseps = 1e-6)
 }
 \arguments{
-  \item{maxpts}{ maximum number of function values as integer. }
+  \item{maxpts}{ maximum number of function values as integer. The internal
+                 FORTRAN code always uses a minimum number depending on the dimension.
+                 (for example 752 for three-dimensional problems).}
   \item{abseps}{ absolute error tolerance as double. }
   \item{releps}{ relative error tolerance as double. }
   \item{steps}{ number of grid points to be evaluated. }

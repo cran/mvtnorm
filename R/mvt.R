@@ -1,4 +1,4 @@
-# $Id: mvt.R 226 2011-04-26 16:03:39Z thothorn $ 
+# $Id: mvt.R 229 2011-09-05 07:19:28Z thothorn $ 
 
 chkcorr <- function(x) {
 
@@ -424,7 +424,11 @@ qmvt <- function(p, interval = NULL,
     args <- checkmvArgs(lower, upper, delta, corr, sigma)
     if (args$uni) {
         if (tail == "both.tails") p <- ifelse(p < 0.5, p / 2, 1 - (1 - p)/2)
-        q <- qt(p, df = df, ncp = args$mean, lower.tail = (tail != "upper.tail"))
+        if (df == 0) {
+            q <- qnorm(p, mean = args$mean, lower.tail = (tail != "upper.tail"))
+        } else {
+            q <- qt(p, df = df, ncp = args$mean, lower.tail = (tail != "upper.tail"))
+        }
         qroot <- list(quantile = q, f.quantile = 0)
         return(qroot)
     }
