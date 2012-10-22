@@ -5,7 +5,7 @@
 \description{
   These functions provide information about the multivariate t
   distribution with non-centrality parameter (or mode) \code{delta},
-  covariance matrix \code{sigma} and degrees of freedom \code{df}. 
+  scale matrix \code{sigma} and degrees of freedom \code{df}. 
   \code{dmvt} gives the density and \code{rmvt}
   generates random deviates.
 }
@@ -51,7 +51,7 @@ dmvt(x, delta, sigma, df = 1, log = TRUE,
   where
   \deqn{c = \Gamma((\nu+m)/2)/((\pi \nu)^{m/2}\Gamma(\nu/2)|S|^{1/2}),}
   here \eqn{S} is a positive definite symmetric matrix (which might be
-  the correlation or the covariance matrix), \eqn{delta} is the
+  the correlation or the scale matrix), \eqn{delta} is the
   non-centrality vector and  \eqn{\nu} are the degrees of freedom.
 }
   

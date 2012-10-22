@@ -1,4 +1,4 @@
-# $Id: mvt.R 229 2011-09-05 07:19:28Z thothorn $ 
+# $Id: mvt.R 241 2012-09-02 15:20:49Z thothorn $ 
 
 chkcorr <- function(x) {
 
@@ -160,6 +160,8 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
     if (any(df < 0))
         stop("cannot compute multivariate t distribution with ",
              sQuote("df"), " < 0")
+    if (!isTRUE(all.equal(as.integer(df), df)))
+        stop(sQuote("df"), " is not an integer")
     if (carg$uni) {
         if (df > 0)
             RET <- list(value = pt(carg$upper, df=df, ncp=carg$mean) -
@@ -269,6 +271,8 @@ dmvt <- function(x, delta, sigma, df = 1,
 {
     if (df == 0)
         return(dmvnorm(x, mean = delta, sigma = sigma, log = log))
+
+    type <- match.arg(type)
 
     if (is.vector(x)) {
         x <- matrix(x, ncol = length(x))

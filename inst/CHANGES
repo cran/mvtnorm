@@ -1,5 +1,10 @@
 # $Id: CHANGES 232 2012-01-19 17:06:59Z thothorn $
 
+        0.9-9993 (22.10.2012)
+
+        sigma is called `scale' matrix of {dpq}mvt, thanks to
+        Richard Boys <Richard.Boys@ncl.ac.uk> for the hint
+
         0.9-9992 (19.01.2012)
 
         qmvt(..., df = 0, ...) gave NaN

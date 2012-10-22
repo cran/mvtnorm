@@ -20,7 +20,7 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
    \code{type = "shifted"} delta specifies the mode.}
   \item{df}{ degree of freedom as integer. Normal probabilities are computed for \code{df=0}.}
   \item{corr}{ the correlation matrix of dimension n.}
-  \item{sigma}{ the covariance matrix of dimension n. Either \code{corr} or
+  \item{sigma}{ the scale matrix of dimension n. Either \code{corr} or
                 \code{sigma} can be specified. If \code{sigma} is given, the  
                 problem is standardized. If neither \code{corr} nor
                 \code{sigma} is given, the identity matrix is used 
@@ -74,7 +74,7 @@ is the multivariate normal distribution and \eqn{m} is the number of rows of
 \eqn{A}.
 
 For \code{type = "shifted"}, a positive definite symmetric matrix
-\eqn{S} (which might be the correlation or the covariance matrix),
+\eqn{S} (which might be the correlation or the scale matrix),
 non-centrality vector \eqn{\delta} and degrees of freedom \eqn{\nu} the
 following integral is evaluated:
 
@@ -157,7 +157,7 @@ V <- diag(1/n)
 df <- 130
 C <- c(1,1,1,0,0,-1,0,0,1,0,0,-1,0,0,1,0,0,0,-1,-1,0,0,-1,0,0)
 C <- matrix(C, ncol=5)
-### covariance matrix
+### scale matrix
 cv <- C \%*\% V \%*\% t(C)
 ### correlation matrix
 dv <- t(1/sqrt(diag(cv)))
@@ -183,7 +183,7 @@ b
 
 stopifnot(round(a, 2) == round(b, 2))
 
-# correlation and covariance matrix
+# correlation and scale matrix
 
 a <- pmvt(lower=-Inf, upper=2, delta=rep(0,5), df=3,
           sigma = diag(5)*2)
