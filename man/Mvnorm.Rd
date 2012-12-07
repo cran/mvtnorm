@@ -11,8 +11,7 @@
 \usage{
 dmvnorm(x, mean, sigma, log=FALSE)
 rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
-        method=c("eigen", "svd", "chol"))
-
+        method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE)
 }
 \arguments{
  \item{x}{Vector or matrix of quantiles. If \code{x} is a matrix, each
@@ -25,6 +24,11 @@ rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
   \code{sigma}, possible methods are eigenvalue decomposition
 	(\code{"eigen"}, default), singular value decomposition
 	(\code{"svd"}), and Cholesky decomposition (\code{"chol"}).}
+ \item{pre0.9_9994}{Logical; if \code{FALSE}, the output produced in mvtnorm
+                    versions up to 0.9-9993 is reproduced. In 0.9-9994, the 
+                    output is organized such that \code{rmvnorm(10,...)} has the
+                    same first ten rows as \code{rmvnorm(100, ...)} when called
+                    with the same seed.}
 } 
 \author{Friedrich Leisch and Fabian Scheipl}
 \seealso{\code{\link{pmvnorm}}, \code{\link{rnorm}}, \code{\link{qmvnorm}}}

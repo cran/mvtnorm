@@ -1,7 +1,7 @@
-# $Id: mvnorm.R 222 2011-01-31 14:02:02Z thothorn $
+# $Id: mvnorm.R 243 2012-12-06 12:42:34Z thothorn $
 
 rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
-                   method=c("eigen", "svd", "chol"))
+                   method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE)
 {    
     if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), 
                      check.attributes = FALSE)) {
@@ -39,7 +39,7 @@ rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
         retval <- retval[,o]
     }
     
-    retval <- matrix(rnorm(n * ncol(sigma)), nrow = n) %*%  retval
+    retval <- matrix(rnorm(n * ncol(sigma)), nrow = n, byrow = !pre0.9_9994) %*%  retval
     retval <- sweep(retval, 2, mean, "+")
     colnames(retval) <- names(mean)
     retval

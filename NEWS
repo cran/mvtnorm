@@ -1,4 +1,18 @@
-# $Id: CHANGES 232 2012-01-19 17:06:59Z thothorn $
+# $Id: CHANGES 244 2012-12-07 10:42:39Z thothorn $
+
+        0.9-9994 (06.12.2012)
+
+        set.seed(29)
+        rmvnorm(10, ...)
+
+        produces the same first ten rows as
+
+        set.seed(29)
+        rmvnorm(100, ...)
+
+        as suggested by Paul Johnson <pauljohn@ku.edu>. There is a new
+        argument pre0.9_9993 for changing back to the `old' output. This
+        _DOES NOT_  apply to rmvt.
 
         0.9-9993 (22.10.2012)
 

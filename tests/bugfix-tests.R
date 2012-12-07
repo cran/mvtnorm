@@ -225,8 +225,8 @@ sigma <- diag(d)%*%sigma%*%diag(d)
 corrMat <- cov2cor(sigma)
 
 ## sigma handed over
-sims1 <- rmvt(n, sigma = sigma, delta = mn, df=df, type = "shifted")
-sims2 <- rmvt(n, sigma = sigma, delta = mn, df=df, type = "Kshirsagar")
+sims1 <- rmvt(n, sigma = sigma, delta = mn, df=df, type = "shifted", pre0.9_9994 = TRUE)
+sims2 <- rmvt(n, sigma = sigma, delta = mn, df=df, type = "Kshirsagar", pre0.9_9994 = TRUE)
 lower <- mn-d*2
 upper <- mn+d*3
 comp <- function(x, lower, upper){
@@ -240,8 +240,8 @@ mean(ind2)
 pmvt(lower, upper, sigma = sigma, delta=mn, df=df, type = "Kshirsagar")
 
 ## corrMat handed over
-sims1 <- rmvt(n, sigma = corrMat, delta = mn, df=df, type = "shifted")
-sims2 <- rmvt(n, sigma = corrMat, delta = mn, df=df, type = "Kshirsagar")
+sims1 <- rmvt(n, sigma = corrMat, delta = mn, df=df, type = "shifted", pre0.9_9994 = TRUE)
+sims2 <- rmvt(n, sigma = corrMat, delta = mn, df=df, type = "Kshirsagar", pre0.9_9994 = TRUE)
 lower <- mn-d*0.5
 upper <- mn+d
 comp <- function(x, lower, upper){

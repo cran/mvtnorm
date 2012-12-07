@@ -1,6 +1,6 @@
 
-R version 2.13.1 (2011-07-08)
-Copyright (C) 2011 The R Foundation for Statistical Computing
+R version 2.15.2 (2012-10-26) -- "Trick or Treat"
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: i686-pc-linux-gnu (32-bit)
 
@@ -322,8 +322,8 @@ attr(,"msg")
 > corrMat <- cov2cor(sigma)
 > 
 > ## sigma handed over
-> sims1 <- rmvt(n, sigma = sigma, delta = mn, df=df, type = "shifted")
-> sims2 <- rmvt(n, sigma = sigma, delta = mn, df=df, type = "Kshirsagar")
+> sims1 <- rmvt(n, sigma = sigma, delta = mn, df=df, type = "shifted", pre0.9_9994 = TRUE)
+> sims2 <- rmvt(n, sigma = sigma, delta = mn, df=df, type = "Kshirsagar", pre0.9_9994 = TRUE)
 > lower <- mn-d*2
 > upper <- mn+d*3
 > comp <- function(x, lower, upper){
@@ -349,8 +349,8 @@ attr(,"msg")
 [1] "Normal Completion"
 > 
 > ## corrMat handed over
-> sims1 <- rmvt(n, sigma = corrMat, delta = mn, df=df, type = "shifted")
-> sims2 <- rmvt(n, sigma = corrMat, delta = mn, df=df, type = "Kshirsagar")
+> sims1 <- rmvt(n, sigma = corrMat, delta = mn, df=df, type = "shifted", pre0.9_9994 = TRUE)
+> sims2 <- rmvt(n, sigma = corrMat, delta = mn, df=df, type = "Kshirsagar", pre0.9_9994 = TRUE)
 > lower <- mn-d*0.5
 > upper <- mn+d
 > comp <- function(x, lower, upper){
@@ -412,3 +412,6 @@ $estim.prec
 > ### spotted by Ulrich Halekoh <Ulrich.Halekoh@agrsci.dk>
 > stopifnot(is.finite(qmvt(.95, df = 0, corr = matrix(1))$quantile))
 > 
+> proc.time()
+   user  system elapsed 
+ 15.424   0.152  15.582 
