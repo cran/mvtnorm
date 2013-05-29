@@ -1,4 +1,9 @@
-# $Id: CHANGES 244 2012-12-07 10:42:39Z thothorn $
+# $Id: CHANGES 245 2013-05-29 14:10:53Z thothorn $
+
+        0.9-9995 (29.05.2013)
+
+        update to version 2013-06-29 of mvtdst.f from Alan's website
+        (fixed a bug for 2-dim pmvt)
 
         0.9-9994 (06.12.2012)
 

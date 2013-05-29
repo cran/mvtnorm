@@ -274,3 +274,15 @@ qmvnorm(.95, sigma = tcrossprod(c(0.009, 0.75, 0.25)))
 ### qmvt(..., df = 0, ...) didn't work
 ### spotted by Ulrich Halekoh <Ulrich.Halekoh@agrsci.dk>
 stopifnot(is.finite(qmvt(.95, df = 0, corr = matrix(1))$quantile))
+
+### spotted by <Tobias.Mielke@aptivsolutions.com> and fixed
+### in mvtdst.f by Alan 2013-05-29
+corr <- matrix(1, ncol = 2, nrow = 2)
+p <- c(pmvnorm(lower=c(-Inf,-Inf),upper=c(1.96,1.96),mean=c(1.72,1.72),corr=corr),
+       pmvt(lower=c(-Inf,-Inf),upper=c(1.96,1.96),delta=c(1.72,1.72),df=0,corr=corr),
+       pmvt(lower=c(-Inf,-Inf),upper=c(1.96,1.96) - c(1.72,1.72),df=0,corr=corr),
+       pmvt(lower=c(-Inf,-Inf),upper=c(1.96,1.96) - c(1.72,1.72),df=100,corr=corr),
+       pmvt(lower=c(-Inf,-Inf),upper=c(1.96,1.96), delta=c(1.72,1.72),df=100,corr=corr))
+stopifnot(all(abs(p - mean(p)) < 1 / 100))
+
+

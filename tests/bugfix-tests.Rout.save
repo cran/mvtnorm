@@ -1,8 +1,7 @@
 
-R version 2.15.2 (2012-10-26) -- "Trick or Treat"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
-Platform: i686-pc-linux-gnu (32-bit)
+R Under development (unstable) (2013-05-16 r62756) -- "Unsuffered Consequences"
+Copyright (C) 2013 The R Foundation for Statistical Computing
+Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -362,16 +361,16 @@ attr(,"msg")
 > pmvt(lower, upper, corr = corrMat, delta=mn, df=df, type = "shifted")
 [1] 0.996872
 attr(,"error")
-[1] 2.462503e-05
+[1] 2.461945e-05
 attr(,"msg")
 [1] "Normal Completion"
 > ind2 <- apply(sims2, 1, comp, lower=lower, upper=upper)
 > mean(ind2)
 [1] 0.98827
 > pmvt(lower, upper, corr = corrMat, delta=mn, df=df, type = "Kshirsagar")
-[1] 0.9882898
+[1] 0.9882905
 attr(,"error")
-[1] 6.650863e-05
+[1] 6.344011e-05
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -412,6 +411,18 @@ $estim.prec
 > ### spotted by Ulrich Halekoh <Ulrich.Halekoh@agrsci.dk>
 > stopifnot(is.finite(qmvt(.95, df = 0, corr = matrix(1))$quantile))
 > 
+> ### spotted by <Tobias.Mielke@aptivsolutions.com> and fixed
+> ### in mvtdst.f by Alan 2013-05-29
+> corr <- matrix(1, ncol = 2, nrow = 2)
+> p <- c(pmvnorm(lower=c(-Inf,-Inf),upper=c(1.96,1.96),mean=c(1.72,1.72),corr=corr),
++        pmvt(lower=c(-Inf,-Inf),upper=c(1.96,1.96),delta=c(1.72,1.72),df=0,corr=corr),
++        pmvt(lower=c(-Inf,-Inf),upper=c(1.96,1.96) - c(1.72,1.72),df=0,corr=corr),
++        pmvt(lower=c(-Inf,-Inf),upper=c(1.96,1.96) - c(1.72,1.72),df=100,corr=corr),
++        pmvt(lower=c(-Inf,-Inf),upper=c(1.96,1.96), delta=c(1.72,1.72),df=100,corr=corr))
+> stopifnot(all(abs(p - mean(p)) < 1 / 100))
+> 
+> 
+> 
 > proc.time()
    user  system elapsed 
- 15.424   0.152  15.582 
+  7.340   0.060   7.404 
