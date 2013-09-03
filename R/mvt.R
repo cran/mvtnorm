@@ -1,4 +1,4 @@
-# $Id: mvt.R 241 2012-09-02 15:20:49Z thothorn $ 
+# $Id: mvt.R 257 2013-09-16 07:45:39Z thothorn $
 
 chkcorr <- function(x) {
 
@@ -12,7 +12,7 @@ chkcorr <- function(x) {
     !ret
 }
 
-checkmvArgs <- function(lower, upper, mean, corr, sigma) 
+checkmvArgs <- function(lower, upper, mean, corr, sigma)
 {
     UNI <- FALSE
     if (!is.numeric(lower) || !is.vector(lower))
@@ -29,7 +29,7 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
     lower <- rec[,"lower"]
     upper <- rec[,"upper"]
     if (!all(lower <= upper))
-        stop("at least one element of ", sQuote("lower"), " is larger than ", 
+        stop("at least one element of ", sQuote("lower"), " is larger than ",
              sQuote("upper"))
     mean <- rec[,"mean"]
     if (any(is.na(mean)))
@@ -41,7 +41,7 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
     }
     if (!is.null(corr) && !is.null(sigma)) {
         sigma <- NULL
-        warning("both ", sQuote("corr"), " and ", sQuote("sigma"), 
+        warning("both ", sQuote("corr"), " and ", sQuote("sigma"),
                 " specified: ignoring ", sQuote("sigma"))
     }
     if (!is.null(corr)) {
@@ -51,18 +51,18 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
              if (length(corr) == 1)
                 UNI <- TRUE
              if (length(corr) != length(lower))
-               stop(sQuote("diag(corr)"), " and ", sQuote("lower"), 
+               stop(sQuote("diag(corr)"), " and ", sQuote("lower"),
                     " are of different length")
          } else {
              if (length(corr) == 1) {
                  UNI <- TRUE
                  corr <- corr[1,1]
                  if (length(lower) != 1)
-                   stop(sQuote("corr"), " and ", sQuote("lower"), 
+                   stop(sQuote("corr"), " and ", sQuote("lower"),
                         " are of different length")
              } else {
-                 if (length(diag(corr)) != length(lower))        
-                     stop(sQuote("diag(corr)"), " and ", sQuote("lower"), 
+                 if (length(diag(corr)) != length(lower))
+                     stop(sQuote("diag(corr)"), " and ", sQuote("lower"),
                           " are of different length")
                  if (!chkcorr(corr))
                      stop(sQuote("corr"), " is not a correlation matrix")
@@ -75,19 +75,19 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
          if (!is.matrix(sigma)) {
             if (length(sigma) == 1)
                 UNI <- TRUE
-            if (length(sigma) != length(lower))        
-               stop(sQuote("diag(sigma)"), " and ", sQuote("lower"), 
+            if (length(sigma) != length(lower))
+               stop(sQuote("diag(sigma)"), " and ", sQuote("lower"),
                     " are of different length")
          } else {
             if (length(sigma) == 1) {
-                UNI <- TRUE       
+                UNI <- TRUE
                 sigma <- sigma[1,1]
-                if (length(lower) != 1) 
-                  stop(sQuote("sigma"), " and ", sQuote("lower"), 
+                if (length(lower) != 1)
+                  stop(sQuote("sigma"), " and ", sQuote("lower"),
                        " are of different length")
             } else {
-              if (length(diag(sigma)) != length(lower))                     
-                 stop(sQuote("diag(sigma)"), " and ", sQuote("lower"), 
+              if (length(diag(sigma)) != length(lower))
+                 stop(sQuote("diag(sigma)"), " and ", sQuote("lower"),
                       " are of different length")
               if (!isTRUE(all.equal(sigma, t(sigma))) || any(diag(sigma) < 0))
                  stop(sQuote("sigma"), " is not a covariance matrix")
@@ -134,8 +134,8 @@ pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL
 }
 
 pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
-                 df=1, corr=NULL, sigma=NULL, 
-                 algorithm = GenzBretz(), 
+                 df=1, corr=NULL, sigma=NULL,
+                 algorithm = GenzBretz(),
                  type = c("Kshirsagar", "shifted"), ...)
 {
     type <- match.arg(type)
@@ -157,13 +157,13 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
 
     if (is.null(df))
         stop(sQuote("df"), " not specified")
-    if (any(df < 0))
+    if (df < 0) # MH: was any(..)
         stop("cannot compute multivariate t distribution with ",
              sQuote("df"), " < 0")
-    if (!isTRUE(all.equal(as.integer(df), df)))
+    if(is.finite(df) && (df != as.integer(df))) # MH: was !isTRUE(all.equal(as.integer(df), df))
         stop(sQuote("df"), " is not an integer")
     if (carg$uni) {
-        if (df > 0)
+        if (df > 0) # df = Inf is taken care of by pt()
             RET <- list(value = pt(carg$upper, df=df, ncp=carg$mean) -
                                 pt(carg$lower, df=df, ncp=carg$mean),
                        error = 0, msg="univariate: using pt")
@@ -171,7 +171,7 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
             RET <- list(value = pnorm(carg$upper, mean = carg$mean) -
                                 pnorm(carg$lower, mean=carg$mean),
                        error = 0, msg="univariate: using pnorm")
-    } else {
+    } else { # mvt() takes care of df = 0 || df = Inf
         if (!is.null(carg$corr)) {
             RET <- mvt(lower=carg$lower, upper=carg$upper, df=df, corr=carg$corr,
                        delta=carg$mean,  algorithm = algorithm, ...)
@@ -189,6 +189,9 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
     return(RET$value)
 }
 
+## identical(., Inf) would be faster but not vectorized
+isInf <- function(x) x > 0 & is.infinite(x) # check for  Inf
+isNInf <- function(x) x < 0 & is.infinite(x) # check for -Inf
 
 mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
 {
@@ -201,7 +204,7 @@ mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
         algorithm <- do.call(algorithm, list())
 
     ### handle cases where the support is the empty set
-    if (any(abs(lower - upper) < sqrt(.Machine$double.eps)) || 
+    if (any(abs(lower - upper) < sqrt(.Machine$double.eps)) ||
         any(is.na(lower - upper))) {
         RET <- list(value = 0, error = 0, msg = "lower == upper")
         return(RET)
@@ -213,21 +216,48 @@ mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
     if (length(lower) != n) stop("wrong dimensions")
     if (length(upper) != n) stop("wrong dimensions")
 
-    if (n > 1000) stop("only dimensions 1 <= n <= 1000 allowed") 
+    if (n > 1000) stop("only dimensions 1 <= n <= 1000 allowed")
 
-    infin <- rep(2, n)   
-    infin[upper == Inf] <- 1
-    infin[lower == -Inf] <- 0
-    infin[lower == -Inf & upper == Inf] <- -1
+    infin <- rep(2, n)
+    infin[ isInf(upper)] <- 1
+    infin[isNInf(lower)] <- 0
+    infin[isNInf(lower) & isInf(upper)] <- -1
+
+    ### fix for Miwa algo:
+    ### pmvnorm(lower=c(-Inf, 0, 0), upper=c(0, Inf, Inf), 
+    ###         mean=c(0, 0, 0), sigma=S, algorithm = Miwa()) 
+    ###         returned NA
+
+    if (class(algorithm) == "Miwa") {
+        if (any(infin == -1) & n >= 3) {
+            WhereBothInfIs <- which(infin == -1) 
+            n <- n - length(WhereBothInfIs)
+            corr <- corr[-WhereBothInfIs, -WhereBothInfIs]
+            upper <- upper[-WhereBothInfIs]
+            lower <- lower[-WhereBothInfIs]
+        }
+
+        if (any(infin == 0) & n >= 2) {
+            WhereNegativInfIs <- which(infin==0)
+            inversecorr <- rep(1, n)
+            inversecorr[WhereNegativInfIs] <- -1   
+            corr <- diag(inversecorr) %*% corr %*% diag(inversecorr)
+            infin[WhereNegativInfIs] <- 1
+
+            tempsaveupper <- upper[WhereNegativInfIs]
+            upper[WhereNegativInfIs] <- -lower[WhereNegativInfIs]
+            lower[WhereNegativInfIs] <- -tempsaveupper
+        }
+    } 
 
     ### this is a bug in `mvtdst' not yet fixed
-    if (all(infin < 0)) 
+    if (all(infin < 0))
         return(list(value = 1, error = 0, msg = "Normal Completion"))
-    
+
     if (n > 1) {
         corrF <- matrix(as.vector(corr), ncol=n, byrow=TRUE)
         corrF <- corrF[upper.tri(corrF)]
-    } else corrF <- corr 
+    } else corrF <- corr
 
 
     ret <- probval(algorithm, n, df, lower, upper, infin, corr, corrF, delta)
@@ -239,37 +269,38 @@ mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
     if (inform == 2) msg <- "N greater 1000 or N < 1"
     if (inform == 3) msg <- "Covariance matrix not positive semidefinite"
     if (is.null(msg)) msg <- inform
-    
+
     RET <- list(value = value, error = error, msg = msg)
     return(RET)
 }
 
-rmvt <- function(n, sigma = diag(2), df = 1, 
-     delta = rep(0, nrow(sigma)),
-     type = c("shifted", "Kshirsagar"), ...) {
-
+rmvt <- function(n, sigma = diag(2), df = 1,
+                 delta = rep(0, nrow(sigma)),
+                 type = c("shifted", "Kshirsagar"), ...)
+{
     if (length(delta) != nrow(sigma))
-      stop("delta and sigma have non-conforming size")
-
-    if (df == 0)
+        stop("delta and sigma have non-conforming size")
+    if (hasArg(mean)) # MH: normal mean variance mixture != t distribution (!)
+        stop("Providing 'mean' does *not* sample from a multivariate t distribution!")
+    if (df == 0 || isInf(df)) # MH: now (also) properly allow df = Inf
         return(rmvnorm(n, mean = delta, sigma = sigma, ...))
     type <- match.arg(type)
-
-    if (type == "Kshirsagar")
-        return(rmvnorm(n, mean = delta, sigma = sigma, ...)/
-               sqrt(rchisq(n, df)/df))
-
-    if (type == "shifted"){
-        sims <- rmvnorm(n, sigma = sigma, ...)/sqrt(rchisq(n, df)/df)
-        return(sweep(sims, 2, delta, "+"))
-    }
-    ### was: rmvnorm(n,sigma=sigma)/sqrt(rchisq(n,df)/df)
+    switch(type,
+           "Kshirsagar" = {
+               return(rmvnorm(n, mean = delta, sigma = sigma, ...)/
+                      sqrt(rchisq(n, df)/df))
+           },
+           "shifted" = {
+               sims <- rmvnorm(n, sigma = sigma, ...)/sqrt(rchisq(n, df)/df)
+               return(sweep(sims, 2, delta, "+"))
+           },
+           stop("wrong 'type'"))
 }
 
-dmvt <- function(x, delta, sigma, df = 1, 
+dmvt <- function(x, delta, sigma, df = 1,
                  log = TRUE, type = "shifted")
 {
-    if (df == 0)
+    if (df == 0 || isInf(df)) # MH: now (also) properly allow df = Inf
         return(dmvnorm(x, mean = delta, sigma = sigma, log = log))
 
     type <- match.arg(type)
@@ -286,7 +317,7 @@ dmvt <- function(x, delta, sigma, df = 1,
     if (NCOL(x) != NCOL(sigma)) {
         stop("x and sigma have non-conforming size")
     }
-    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), 
+    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps),
                      check.attributes = FALSE)) {
         stop("sigma must be a symmetric matrix")
     }
@@ -301,11 +332,11 @@ dmvt <- function(x, delta, sigma, df = 1,
     logdet <- sum(log(eigen(sigma, symmetric = TRUE,
                             only.values = TRUE)$values))
 
-    logretval <- lgamma((m + df)/2) - 
-                 (lgamma(df / 2) + 0.5 * (logdet + m * logb(pi * df))) -
-                 0.5 * (df + m) * logb(1 + distval / df)
+    logretval <- lgamma((m + df)/2) -
+                 (lgamma(df / 2) + 0.5 * (logdet + m * log(pi * df))) -
+                 0.5 * (df + m) * log(1 + distval / df)
     if (log)
-        return(logretval) 
+        return(logretval)
     return(exp(logretval))
 }
 
@@ -335,16 +366,16 @@ approx_interval <- function(p, tail, corr, df = 0) {
     ret
 }
 
-qmvnorm <- function(p, interval = NULL, 
-                    tail = c("lower.tail", "upper.tail", "both.tails"), 
-                    mean = 0, corr = NULL, sigma = NULL, algorithm = 
+qmvnorm <- function(p, interval = NULL,
+                    tail = c("lower.tail", "upper.tail", "both.tails"),
+                    mean = 0, corr = NULL, sigma = NULL, algorithm =
                     GenzBretz(), ...)
 {
-    if (length(p) != 1 || (p <= 0 || p >= 1)) 
+    if (length(p) != 1 || (p <= 0 || p >= 1))
         stop(sQuote("p"), " is not a double between zero and one")
 
     dots <- dots2GenzBretz(...)
-    if (!is.null(dots$algorithm) && !is.null(algorithm)) 
+    if (!is.null(dots$algorithm) && !is.null(algorithm))
         algorithm <- dots$algorithm
 
     tail <- match.arg(tail)
@@ -360,7 +391,7 @@ qmvnorm <- function(p, interval = NULL,
         if (is.null(args$sigma))
           stop(sQuote("sigma"), " not specified: cannot compute qnorm")
         if (tail == "both.tails") p <- ifelse(p < 0.5, p / 2, 1 - (1 - p)/2)
-        q <- qnorm(p, mean = args$mean, sd = args$sigma, 
+        q <- qnorm(p, mean = args$mean, sd = args$sigma,
                    lower.tail = (tail != "upper.tail"))
         qroot <- list(quantile = q, f.quantile = 0)
         return(qroot)
@@ -379,7 +410,7 @@ qmvnorm <- function(p, interval = NULL,
                   upp <- rep(      q, dim)
            },)
            pmvnorm(lower = low, upper = upp, mean = args$mean,
-                   corr = args$corr, sigma = args$sigma, 
+                   corr = args$corr, sigma = args$sigma,
                    algorithm = algorithm) - p
     }
 
@@ -387,7 +418,7 @@ qmvnorm <- function(p, interval = NULL,
         if (FALSE) { ### if(mean == 0) {
             cr <- args$corr
             if (!is.null(args$sigma)) cr <- cov2cor(args$sigma)
-            interval <- approx_interval(p = p, tail = tail, 
+            interval <- approx_interval(p = p, tail = tail,
                                         corr = cr, df = 0)
         } else {
             interval <- c(ifelse(tail == "both.tails", 0, -10), 10)
@@ -403,17 +434,17 @@ qmvnorm <- function(p, interval = NULL,
     qroot
 }
 
-qmvt <- function(p, interval = NULL, 
-                 tail = c("lower.tail", "upper.tail", "both.tails"), 
+qmvt <- function(p, interval = NULL,
+                 tail = c("lower.tail", "upper.tail", "both.tails"),
                  df = 1, delta = 0, corr = NULL, sigma = NULL,
-                 algorithm = GenzBretz(), 
+                 algorithm = GenzBretz(),
                  type = c("Kshirsagar", "shifted"), ...) {
 
-    if (length(p) != 1 || (p <= 0 || p >= 1)) 
+    if (length(p) != 1 || (p <= 0 || p >= 1))
         stop(sQuote("p"), " is not a double between zero and one")
 
     dots <- dots2GenzBretz(...)
-    if (!is.null(dots$algorithm)  && !is.null(algorithm)) 
+    if (!is.null(dots$algorithm)  && !is.null(algorithm))
         algorithm <- dots$algorithm
     type <- match.arg(type)
 
@@ -428,7 +459,7 @@ qmvt <- function(p, interval = NULL,
     args <- checkmvArgs(lower, upper, delta, corr, sigma)
     if (args$uni) {
         if (tail == "both.tails") p <- ifelse(p < 0.5, p / 2, 1 - (1 - p)/2)
-        if (df == 0) {
+        if (df == 0 || isInf(df)) { # MH: now (also) properly allow df = Inf
             q <- qnorm(p, mean = args$mean, lower.tail = (tail != "upper.tail"))
         } else {
             q <- qt(p, df = df, ncp = args$mean, lower.tail = (tail != "upper.tail"))
@@ -458,11 +489,11 @@ qmvt <- function(p, interval = NULL,
     if (is.null(interval) || length(interval) != 2) {
         if (FALSE) { ### if (isTRUE(all.equal(max(abs(delta)), 0)) & is.null(args$sigma)) {
             cr <- args$corr
-            interval <- approx_interval(p = p, tail = tail, 
+            interval <- approx_interval(p = p, tail = tail,
                                         corr = cr, df = df)
         } else {
             interval <- c(ifelse(tail == "both.tails", 0, -10), 10)
-        } 
+        }
     }
 
     if (is.null(dots$uniroot)) {
@@ -491,13 +522,15 @@ probval <- function(x, ...)
 
 probval.GenzBretz <- function(x, n, df, lower, upper, infin, corr, corrF, delta) {
 
-    lower[lower == -Inf] <- 0
-    upper[upper == Inf] <- 0
+    if(isInf(df)) df <- 0 # MH: deal with df=Inf (internally requires df=0!)
+
+    lower[isNInf(lower)] <- 0
+    upper[ isInf(upper)] <- 0
 
     error <- 0; value <- 0; inform <- 0
     ret <- .Fortran("mvtdst", N = as.integer(n),
                               NU = as.integer(df),
-                              LOWER = as.double(lower), 
+                              LOWER = as.double(lower),
                               UPPER = as.double(upper),
                               INFIN = as.integer(infin),
                               CORREL = as.double(corrF),
@@ -513,14 +546,14 @@ probval.GenzBretz <- function(x, n, df, lower, upper, infin, corr, corrF, delta)
 
 probval.Miwa <- function(x, n, df, lower, upper, infin, corr, corrF, delta) {
 
-    if (df != 0)
+    if (!( df==0 || isInf(df) ))
         stop("Miwa algorithm cannot compute t-probabilities")
 
-    if (n > 20) 
+    if (n > 20)
         stop("Miwa algorithm cannot compute exact probabilities for n > 20")
 
     sc <- try(solve(corr))
-    if (inherits(sc, "try-error")) 
+    if (inherits(sc, "try-error"))
         stop("Miwa algorithm cannot compute probabilities for singular problems")
 
     p <- .Call("C_miwa", steps = as.integer(x$steps),

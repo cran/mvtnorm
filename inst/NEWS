@@ -1,4 +1,15 @@
-# $Id: CHANGES 245 2013-05-29 14:10:53Z thothorn $
+# $Id: NEWS 257 2013-09-16 07:45:39Z thothorn $
+
+        0.9-9996 (16.09.2013)
+
+        documentation updates/corrections/examples by Marius Hofert
+        df = Inf
+        rmvt(): argument 'mean' not allowed anymore (prone to misuse)
+
+        pmvnorm(lower=c(-Inf, 0, 0), upper=c(0, Inf, Inf),
+                mean=c(0, 0, 0), sigma=S, algorithm = Miwa())
+        returned NaN, fixed by Xuefei Mi
+
 
         0.9-9995 (29.05.2013)
 
@@ -28,7 +39,7 @@
 
         qmvt(..., df = 0, ...) gave NaN
 
-        R CMD check works on x64 with GCC 4.6.2 (Debian 4.6.2-11) 
+        R CMD check works on x64 with GCC 4.6.2 (Debian 4.6.2-11)
 
         0.9-9991 (10.06.2011)
 
@@ -79,7 +90,7 @@
 
         0.9-93 (30.08.2010, not published)
 
-        interface to Alan's TVPACK algorithms for 2- and 3-d 
+        interface to Alan's TVPACK algorithms for 2- and 3-d
         probabilities by Bjoern Bornkamp added.
 
         0.9-92 (06.07.2010)
@@ -90,7 +101,7 @@
         0.9-91 (13.04.2010)
 
         better search interval for uniroot in qmv{t,norm} speeds up
-        quantile estimation; suggestion by Björn Bornkamp 
+        quantile estimation; suggestion by Björn Bornkamp
         <bornkamp@statistik.tu-dortmund.de>
 
         0.9-9 (27.01.2010)
@@ -127,7 +138,7 @@
 
 	0.9-1 (02.07.2008)
 
-        better check for covariance matrices, suggested by 
+        better check for covariance matrices, suggested by
         James Rogers  <James.A.Rogers@pfizer.com>
 
 
@@ -137,7 +148,7 @@
         dimensions by Miwa's method thanks to Tetsuhisa Miwa and Xuefei Mi;
         both have been added as `authors'.
 
-        new argument `algorithm' defaulting to `GenzBretz()' with 
+        new argument `algorithm' defaulting to `GenzBretz()' with
         `Miwa()' being the alternative. Those two functions are now used
         to specify hyper parameters such as `abseps'.
 
@@ -150,8 +161,8 @@
 
 	0.8-2 (10.02.2008)
 
-	rmvnorm() now issues a warning for non-symmetric sigma and uses 
-        the eigenvalue decomposition as default. 
+	rmvnorm() now issues a warning for non-symmetric sigma and uses
+        the eigenvalue decomposition as default.
 
         make gfortran 4.3 happy
 
@@ -192,7 +203,7 @@
 
 	0.7-1 (18.11.2004)
 
-	use #!/bin/sh 
+	use #!/bin/sh
 
 	0.7-0 (14.10.2004)
 
@@ -206,7 +217,7 @@
 	0.6-8 (03.06.2004)
 
 	EXIT statements are not supported by `f2c', Alan added GOTO
-        statements to `MVCHNC' 
+        statements to `MVCHNC'
 
 	0.6-7 (27.05.2004)
 
@@ -247,7 +258,7 @@
 	0.5-15 (16.06.2003)
 
 	a note on one-sided probabilities in `pmvt'
-	correlation matrices in cats example a little bit nicer 	
+	correlation matrices in cats example a little bit nicer
 
 	0.5-14 (06.05.2003)
 
@@ -258,7 +269,7 @@
 	allow df=0 for pmvt
 
 	0.5-11 (29.04.2003)
-	
+
 	package npmc trys to use 'mvt' which is internal: export it anyway
 
 	0.5-10 (23.04.2003)
@@ -267,7 +278,7 @@
 
 	0.5-9 (13.02.2003)
 
-	log argument added to dmvnorm, thanks to 
+	log argument added to dmvnorm, thanks to
         Jerome Asselin <jerome@hivnet.ubc.ca>
 
 	0.5-8 (21.01.2003)

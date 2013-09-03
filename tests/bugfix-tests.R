@@ -285,4 +285,13 @@ p <- c(pmvnorm(lower=c(-Inf,-Inf),upper=c(1.96,1.96),mean=c(1.72,1.72),corr=corr
        pmvt(lower=c(-Inf,-Inf),upper=c(1.96,1.96), delta=c(1.72,1.72),df=100,corr=corr))
 stopifnot(all(abs(p - mean(p)) < 1 / 100))
 
-
+### spotted and fixed by Xuefei Mi
+m <- 3
+S <- diag(m)
+S[2, 1] <- S[1, 2] <- 1/4
+S[3, 1] <- S[1, 3] <- 1/5
+S[3, 2] <- S[2, 3] <- 1/3
+# NaN was given.
+p <- pmvnorm(lower=c(-Inf, 0, 0), upper=c(0, Inf, Inf), mean=c(0, 0, 0),
+             sigma=S, algorithm = Miwa())
+stopifnot(!is.na(p))
