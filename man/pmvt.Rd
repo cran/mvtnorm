@@ -3,14 +3,14 @@
 \title{ Multivariate t Distribution }
 \description{
 
-  Computes the the distribution function of the multivariate t distribution 
-  for arbitrary limits, degrees of freedom and correlation matrices 
+  Computes the the distribution function of the multivariate t distribution
+  for arbitrary limits, degrees of freedom and correlation matrices
   based on algorithms by Genz and Bretz.
 
 }
 \usage{
 pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
-     df=1, corr=NULL, sigma=NULL, algorithm = GenzBretz(), 
+     df=1, corr=NULL, sigma=NULL, algorithm = GenzBretz(),
      type = c("Kshirsagar", "shifted"), ...)
 }
 \arguments{
@@ -21,9 +21,9 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
   \item{df}{ degree of freedom as integer. Normal probabilities are computed for \code{df=0}.}
   \item{corr}{ the correlation matrix of dimension n.}
   \item{sigma}{ the scale matrix of dimension n. Either \code{corr} or
-                \code{sigma} can be specified. If \code{sigma} is given, the  
+                \code{sigma} can be specified. If \code{sigma} is given, the
                 problem is standardized. If neither \code{corr} nor
-                \code{sigma} is given, the identity matrix is used 
+                \code{sigma} is given, the identity matrix is used
                 for \code{sigma}. }
   \item{algorithm}{ an object of class \code{\link{GenzBretz}} or \code{\link{TVPACK}} defining the
                     hyper parameters of this algorithm.}
@@ -66,19 +66,19 @@ numerically evaluated
 \deqn{I = 2^{1-\nu/2} / \Gamma(\nu/2) \int_0^\infty s^{\nu-1} \exp(-s^2/2) \Phi(s \cdot lower/\sqrt{\nu} - \delta,
 s \cdot upper/\sqrt{\nu} - \delta) \, ds }
 
-where 
+where
 
-\deqn{\Phi(a,b) = (det(A)(2\pi)^m)^{-1/2} \int_a^b \exp(-x^\prime Ax/2) \, dx} 
+\deqn{\Phi(a,b) = (det(A)(2\pi)^m)^{-1/2} \int_a^b \exp(-x^\prime Ax/2) \, dx}
 
 is the multivariate normal distribution and \eqn{m} is the number of rows of
 \eqn{A}.
 
 For \code{type = "shifted"}, a positive definite symmetric matrix
 \eqn{S} (which might be the correlation or the scale matrix),
-non-centrality vector \eqn{\delta} and degrees of freedom \eqn{\nu} the
+mode (vector) \eqn{\delta} and degrees of freedom \eqn{\nu} the
 following integral is evaluated:
 
-\deqn{c\int_{lower_1}^{upper_1}...\int_{lower_m}^{upper_m} 
+\deqn{c\int_{lower_1}^{upper_1}...\int_{lower_m}^{upper_m}
   (1+(x-\delta)'S^{-1}(x-\delta)/\nu)^{-(\nu+m)/2}\, dx_1 ... dx_m,
 }
 
@@ -88,12 +88,12 @@ where
 
 and \eqn{m} is the number of rows of \eqn{S}.
 
-Note that both \code{-Inf} and \code{+Inf} may be specified in 
+Note that both \code{-Inf} and \code{+Inf} may be specified in
 the lower and upper integral limits in order to compute one-sided
-probabilities. 
+probabilities.
 
-Univariate problems are passed to \code{\link{pt}}. 
-If \code{df = 0}, normal probabilities are returned. 
+Univariate problems are passed to \code{\link{pt}}.
+If \code{df = 0}, normal probabilities are returned.
 
 }
 
@@ -103,7 +103,7 @@ The evaluated distribution function is returned with attributes
   \item{msg}{status messages.}
 }
 
-\references{ 
+\references{
 
 Genz, A. and Bretz, F. (1999), Numerical computation of multivariate
 t-probabilities with application to power calculation of multiple
@@ -119,13 +119,13 @@ trivariate normal and t-probabilities, \emph{Statistics and
 Computing}, \bold{14}, 251--260.
 
 Genz, A. and Bretz, F. (2009), \emph{Computation of Multivariate Normal and
-t Probabilities}. Lecture Notes in Statistics, Vol. 195. Springer-Verlag,  
+t Probabilities}. Lecture Notes in Statistics, Vol. 195. Springer-Verlag,
 Heidelberg.
 
 S. Kotz and S. Nadarajah (2004), \emph{Multivariate t Distributions and
   Their Applications}. Cambridge University Press. Cambridge.
 
-Edwards D. and Berry, Jack J. (1987), The efficiency of simulation-based 
+Edwards D. and Berry, Jack J. (1987), The efficiency of simulation-based
 multiple comparisons. \emph{Biometrics}, \bold{43}, 913--928.
 
 }
@@ -167,7 +167,7 @@ delta <- rep(0,5)
 myfct <- function(q, alpha) {
   lower <- rep(-q, ncol(cv))
   upper <- rep(q, ncol(cv))
-  pmvt(lower=lower, upper=upper, delta=delta, df=df, 
+  pmvt(lower=lower, upper=upper, delta=delta, df=df,
        corr=cr, abseps=0.0001) - alpha
 }
 
@@ -188,7 +188,7 @@ stopifnot(round(a, 2) == round(b, 2))
 a <- pmvt(lower=-Inf, upper=2, delta=rep(0,5), df=3,
           sigma = diag(5)*2)
 b <- pmvt(lower=-Inf, upper=2/sqrt(2), delta=rep(0,5),
-          df=3, corr=diag(5))  
+          df=3, corr=diag(5))
 attributes(a) <- NULL
 attributes(b) <- NULL
 a

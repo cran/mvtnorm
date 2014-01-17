@@ -1,4 +1,9 @@
-# $Id: NEWS 257 2013-09-16 07:45:39Z thothorn $
+# $Id: NEWS 260 2014-01-17 12:37:57Z thothorn $
+
+        0.9-9997 (17.01.2014)
+
+	T. Miwa fixed a runtime error in miwa.c reported by UB sanitizer
+
 
         0.9-9996 (16.09.2013)
 

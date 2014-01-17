@@ -103,7 +103,8 @@ double orschm(int m, double *r, double *h, struct GRID *g)
     }
     else{
       for(j=0, k=ngrd; j <= ngrd; j++)
-        for( ; z[i][k] <= g->z[j] && k >= 0; k--)
+/* Tetsuhisa Thu, 16 Jan 2014; was  for( ; z[i][k] <= g->z[j] && k >= 0; k--) */
+        for( ; k >= 0 && z[i][k] <= g->z[j]; k--)        
           id[i][k] = j;
       for( ; k >= 0; k--)
         id[i][k] = ngrd+1;
