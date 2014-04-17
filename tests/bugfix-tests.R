@@ -45,6 +45,8 @@ dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE)
 stopifnot(all.equal(dmvnorm(x=0, mean=30,log=TRUE), 
                     dnorm(0,30,log=TRUE)))
 
+stopifnot(all.equal(dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE, trustme = TRUE), 
+                    dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE, trustme = FALSE)))
 # large df
 pnorm(2)^2
 pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=25, corr=diag(2))

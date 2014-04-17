@@ -1,4 +1,4 @@
-# $Id: mvnorm.R 264 2014-04-04 10:19:18Z thothorn $
+# $Id: mvnorm.R 267 2014-04-17 12:43:08Z thothorn $
 
 rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
                    method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE)
@@ -45,7 +45,7 @@ rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
     retval
 }
 
-dmvnorm <- function (x, mean, sigma, log=FALSE)
+dmvnorm <- function (x, mean, sigma, log = FALSE, trustme = FALSE)
 {
     if (is.vector(x)) {
         x <- matrix(x, ncol = length(x))
@@ -56,21 +56,30 @@ dmvnorm <- function (x, mean, sigma, log=FALSE)
     if (missing(sigma)) {
         sigma <- diag(ncol(x))
     }
-    if (NCOL(x) != NCOL(sigma)) {
-        stop("x and sigma have non-conforming size")
-    }
-    if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), 
-                     check.attributes = FALSE)) {
-        stop("sigma must be a symmetric matrix")
-    }
-    if (length(mean) != NROW(sigma)) {
-        stop("mean and sigma have non-conforming size")
-    }
     if( !is.null(dim(mean)) ) dim(mean) <- NULL
 
-    ### <faster code contributed by Matteo Fasiolo mf364 at bath.ac.uk
-    dec <- chol(sigma)
-    tmp <- forwardsolve(t(dec), t(x) - mean)
+    if (!trustme) {
+        if (NCOL(x) != NCOL(sigma)) {
+            stop("x and sigma have non-conforming size")
+        }
+        if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps), 
+                         check.attributes = FALSE)) {
+            stop("sigma must be a symmetric matrix")
+        }
+        if (length(mean) != NROW(sigma)) {
+            stop("mean and sigma have non-conforming size")
+        }
+
+        ### <faster code contributed by Matteo Fasiolo mf364 at bath.ac.uk
+        dec <- try(chol(sigma))
+        if (inherits(dec, "try-error")) {
+            warning("cannot compute chol(sigma)")
+            return(NaN)
+        }
+    } else {
+        dec <- chol(sigma)
+    }
+    tmp <- forwardsolve(dec, t(x) - mean, transpose = TRUE)
     rss <- colSums(tmp ^ 2)
     logretval <- - sum(log(diag(dec))) - 0.5 * length(mean) * log(2 * pi) - 0.5 * rss
     ### />
@@ -80,4 +89,3 @@ dmvnorm <- function (x, mean, sigma, log=FALSE)
     if(log) return(logretval)
     exp(logretval)
 }
-  

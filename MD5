@@ -1,6 +1,6 @@
-bd7130fd2d74750e3cbf7a2c444351e3 *DESCRIPTION
+00f45d68a3b550b11e9dc34792c141c5 *DESCRIPTION
 3184fa9310305897d72dd088cf3a0959 *NAMESPACE
-dd0a6edc16f0654fab7fa892ae5e8477 *R/mvnorm.R
+29dc388d8ddc63e0752c7deba2f49761 *R/mvnorm.R
 2b82a782797e55230a25122ac2d48414 *R/mvt.R
 af4caf11a42847a6ad0daf4188b9bca6 *R/tvpack.R
 8e06109b52becb918de342e7883b9118 *build/vignette.rds
@@ -9,8 +9,8 @@ d6585676e607702c2f4b6352110e6868 *cleanup
 a95aec3cc4b032a5fc9e9fa29ead13cb *inst/NEWS
 73e21a346386350ffebe0b09cafa5ad5 *inst/doc/MVT_Rnews.R
 e83251e0ceb0e3a2aec9f3d101e41ea6 *inst/doc/MVT_Rnews.Rnw
-2351ec37b1c83939feb7d9085939e0c7 *inst/doc/MVT_Rnews.pdf
-ec452017afc5f93630e22a4f4fec77a4 *man/Mvnorm.Rd
+1460b94cfe4d7e540e453830d6070034 *inst/doc/MVT_Rnews.pdf
+1c66c758819466ae2c10c9b76f795571 *man/Mvnorm.Rd
 72ae0af4728c40eb4560d32d01e45cfb *man/Mvt.Rd
 9da61cd180a96a6b142fc6a1a7227f85 *man/algorithms.Rd
 a505a4637a1c4e9286ceac7b06e05e27 *man/pmvnorm.Rd
@@ -24,8 +24,8 @@ a4266b1fde94323ca6134e3b3631cda2 *src/randomF77.c
 df7afb6fa540a64c95ff2da2e744363a *src/tvpack.f
 daabdadeb702f2415f8b9543abdb0751 *src/tvpackAux.c
 bf3cac977c889605ae5ceaf48b4487e9 *tests/Examples/mvtnorma-Ex.Rout.save
-00427f67c05b2e09b9c4887398e827cc *tests/bugfix-tests.R
-3b3c0a65b54536e420a42bee762a2755 *tests/bugfix-tests.Rout.save
+60e1ae0c0e2ead3d65fe0a8a4036d3f1 *tests/bugfix-tests.R
+232911939c6e7932f2f417b0f9f341c9 *tests/bugfix-tests.Rout.save
 914bb2c0a13c131a876e91df3504ba8d *tests/regtest-TVPACK.R
 19d3b601a8366298936565b360b3c7f2 *tests/regtest-TVPACK.Rout.save
 4a901f691ec9d1b375e31d69963bbd37 *tests/rmvnorm.R

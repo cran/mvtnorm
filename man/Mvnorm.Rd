@@ -9,7 +9,7 @@
   \code{sigma}. 
 }
 \usage{
-dmvnorm(x, mean, sigma, log=FALSE)
+dmvnorm(x, mean, sigma, log = FALSE, trustme = FALSE)
 rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
         method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE)
 }
@@ -20,6 +20,7 @@ rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
  \item{mean}{Mean vector, default is \code{rep(0, length = ncol(x))}.}
  \item{sigma}{Covariance matrix, default is \code{diag(ncol(x))}.}
  \item{log}{Logical; if \code{TRUE}, densities d are given as log(d).}
+ \item{trustme}{Logical; skip checks for full speed. You're on your own here!}
  \item{method}{Matrix decomposition used to determine the matrix root of
   \code{sigma}, possible methods are eigenvalue decomposition
 	(\code{"eigen"}, default), singular value decomposition

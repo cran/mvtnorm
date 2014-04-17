@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2014-01-16 r64804) -- "Unsuffered Consequences"
+R version 3.0.3 (2014-03-06) -- "Warm Puppy"
 Copyright (C) 2014 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
@@ -70,6 +70,8 @@ attr(,"msg")
 > stopifnot(all.equal(dmvnorm(x=0, mean=30,log=TRUE), 
 +                     dnorm(0,30,log=TRUE)))
 > 
+> stopifnot(all.equal(dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE, trustme = TRUE), 
++                     dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE, trustme = FALSE)))
 > # large df
 > pnorm(2)^2
 [1] 0.9550173
@@ -403,9 +405,6 @@ attr(,"msg")
 $iter
 [1] 13
 
-$init.it
-[1] NA
-
 $estim.prec
 [1] 6.103516e-05
 
@@ -437,4 +436,4 @@ $estim.prec
 > 
 > proc.time()
    user  system elapsed 
-  7.192   0.128   7.327 
+  7.188   0.080   7.271 
