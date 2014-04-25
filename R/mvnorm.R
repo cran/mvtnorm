@@ -1,4 +1,4 @@
-# $Id: mvnorm.R 267 2014-04-17 12:43:08Z thothorn $
+# $Id: mvnorm.R 270 2014-04-25 08:49:30Z thothorn $
 
 rmvnorm<-function (n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
                    method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE)
@@ -79,7 +79,7 @@ dmvnorm <- function (x, mean, sigma, log = FALSE, trustme = FALSE)
     } else {
         dec <- chol(sigma)
     }
-    tmp <- forwardsolve(dec, t(x) - mean, transpose = TRUE)
+    tmp <- backsolve(dec, t(x) - mean, transpose = TRUE)
     rss <- colSums(tmp ^ 2)
     logretval <- - sum(log(diag(dec))) - 0.5 * length(mean) * log(2 * pi) - 0.5 * rss
     ### />

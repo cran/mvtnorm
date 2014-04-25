@@ -1,5 +1,5 @@
 
-R version 3.0.3 (2014-03-06) -- "Warm Puppy"
+R Under development (unstable) (2014-04-24 r65482) -- "Unsuffered Consequences"
 Copyright (C) 2014 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
@@ -405,6 +405,9 @@ attr(,"msg")
 $iter
 [1] 13
 
+$init.it
+[1] NA
+
 $estim.prec
 [1] 6.103516e-05
 
@@ -434,6 +437,28 @@ $estim.prec
 +              sigma=S, algorithm = Miwa())
 > stopifnot(!is.na(p))
 > 
+> ### introduced with dmvnorm in 0.9-9999
+> set.seed(29)
+> ### dmvnorm up to 0.9-9997
+> d1 <- function(x, mean, sigma) {
++     distval <- mahalanobis(x, center = mean, cov = sigma)
++     logdet <- sum(log(eigen(sigma, symmetric=TRUE,
++                                    only.values=TRUE)$values))
++     -(ncol(x)*log(2*pi) + logdet + distval)/2
++ }
+> ### current version
+> d2 <- function(...) dmvnorm(..., log = TRUE)
+> for (i in 1:100) {
++   p <- sample(2:10, 1)
++   Sigma <- tcrossprod(matrix(runif(p^2) * 2, ncol = p))
++   x <- matrix(rnorm(p), nr = 1)
++   m <- runif(p)
++   ld1 <- d1(x=x, mean=m, sigma=Sigma)
++   ld2 <- d2(x=x, mean=m, sigma=Sigma)
++  
++   stopifnot(isTRUE(all.equal(ld1, ld2)))
++ }
+> 
 > proc.time()
    user  system elapsed 
-  7.188   0.080   7.271 
+  6.768   0.060   6.831 

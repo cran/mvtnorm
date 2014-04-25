@@ -297,3 +297,25 @@ S[3, 2] <- S[2, 3] <- 1/3
 p <- pmvnorm(lower=c(-Inf, 0, 0), upper=c(0, Inf, Inf), mean=c(0, 0, 0),
              sigma=S, algorithm = Miwa())
 stopifnot(!is.na(p))
+
+### introduced with dmvnorm in 0.9-9999
+set.seed(29)
+### dmvnorm up to 0.9-9997
+d1 <- function(x, mean, sigma) {
+    distval <- mahalanobis(x, center = mean, cov = sigma)
+    logdet <- sum(log(eigen(sigma, symmetric=TRUE,
+                                   only.values=TRUE)$values))
+    -(ncol(x)*log(2*pi) + logdet + distval)/2
+}
+### current version
+d2 <- function(...) dmvnorm(..., log = TRUE)
+for (i in 1:100) {
+  p <- sample(2:10, 1)
+  Sigma <- tcrossprod(matrix(runif(p^2) * 2, ncol = p))
+  x <- matrix(rnorm(p), nr = 1)
+  m <- runif(p)
+  ld1 <- d1(x=x, mean=m, sigma=Sigma)
+  ld2 <- d2(x=x, mean=m, sigma=Sigma)
+ 
+  stopifnot(isTRUE(all.equal(ld1, ld2)))
+}

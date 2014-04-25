@@ -1,6 +1,14 @@
-# $Id: NEWS 262 2014-03-26 18:32:41Z thothorn $
+# $Id: NEWS 270 2014-04-25 08:49:30Z thothorn $
 
-        0.9-9998 (xx.03.2014)
+	0.9-99991 (25.04.2014)
+
+        version 0.9-9999 introduced new bug in dmvnorm
+
+        0.9-9999 (17.04.2014)
+
+        dmvnorm (again) returns NaN in case sigma is not decomposable
+
+        0.9-9998 (21.03.2014)
 
         faster code for dmvnorm by Matteo Fasiolo <mf364 at bath.ac.uk>
 
