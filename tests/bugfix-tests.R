@@ -9,7 +9,7 @@ a <- 4.048
 shi <- -9
 slo <- -10
 mu <- -5
-sig <- matrix(c(1,1,1,2),ncol=2) 
+sig <- matrix(c(1,1,1,2),ncol=2)
 pmvnorm(lower=c(-a,slo),upper=c(a,shi),mean=c(mu,2*mu),sigma=sig)
 
 # check if set.seed works (starting from 0.5-7)
@@ -42,11 +42,17 @@ stopifnot(all.equal(a, pnorm(2, sd=sqrt(.5))))
 dmvnorm(x=c(0,0), mean=c(1,1),log=TRUE)
 dmvnorm(x=c(0,0), mean=c(25,25),log=TRUE)
 dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE)
-stopifnot(all.equal(dmvnorm(x=0, mean=30,log=TRUE), 
-                    dnorm(0,30,log=TRUE)))
+stopifnot(all.equal(dmvnorm(x=0, mean=30, log=TRUE),
+		    dnorm  (0,	      30, log=TRUE)))
 
-stopifnot(all.equal(dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE, trustme = TRUE), 
-                    dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE, trustme = FALSE)))
+stopifnot(
+    all.equal(dmvnorm(x=c(0,0), mean =c(30,30),log=TRUE) -> f.,
+              dmvt   (x=c(0,0), delta=c(30,30),log=TRUE, df=Inf))
+    ,
+    all.equal(f., dmvt(x=c(0,0), delta=c(30,30),log=TRUE, df=10000),
+              tolerance = 0.09)
+)
+
 # large df
 pnorm(2)^2
 pmvt(lower=c(-Inf,-Inf), upper=c(2,2), delta=c(0, 0), df=25, corr=diag(2))
@@ -87,8 +93,8 @@ stopifnot(pmvnorm(lower=c(Inf,1)) == 0)
 stopifnot(pmvnorm(lower=c(-2,0),upper=c(-1,1),corr=matrix(rep(1,4),2,2)) == 0)
 
 # bugged Fritz (long time ago)
-stopifnot(all.equal(pmvnorm(-Inf, c(Inf, 0), 0, diag(2)), pmvnorm(-Inf,
-                    c(Inf, 0), 0)))
+stopifnot(all.equal(pmvnorm(-Inf, c(Inf, 0), 0, diag(2)),
+		    pmvnorm(-Inf, c(Inf, 0), 0)))
 
 # this is a bug in `mvtdst' nobody was able to fix yet :-(
 stopifnot(pmvnorm(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0)) == 1)
@@ -134,7 +140,7 @@ a <- 4.048
 shi <- -9
 slo <- -10
 mu <- -5
-sig <- matrix(c(1,1,1,2),ncol=2) 
+sig <- matrix(c(1,1,1,2),ncol=2)
 pmvnormM(lower=c(-a,slo),upper=c(a,shi),mean=c(mu,2*mu),sigma=sig)
 
 # check if set.seed works (starting from 0.5-7)
@@ -170,8 +176,8 @@ stopifnot(pmvnormM(upper=c(-Inf,1)) == 0)
 stopifnot(pmvnormM(lower=c(Inf,1)) == 0)
 
 # bugged Fritz (long time ago)
-stopifnot(all.equal(pmvnormM(-Inf, c(Inf, 0), 0, diag(2)), pmvnormM(-Inf,
-                    c(Inf, 0), 0)))
+stopifnot(all.equal(pmvnormM(-Inf, c(Inf, 0), 0, diag(2)),
+		    pmvnormM(-Inf, c(Inf, 0), 0)))
 
 # this is a bug in `mvtdst' nobody was able to fix yet :-(
 stopifnot(pmvnormM(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0)) == 1)
@@ -309,6 +315,7 @@ d1 <- function(x, mean, sigma) {
 }
 ### current version
 d2 <- function(...) dmvnorm(..., log = TRUE)
+
 for (i in 1:100) {
   p <- sample(2:10, 1)
   Sigma <- tcrossprod(matrix(runif(p^2) * 2, ncol = p))
@@ -316,6 +323,18 @@ for (i in 1:100) {
   m <- runif(p)
   ld1 <- d1(x=x, mean=m, sigma=Sigma)
   ld2 <- d2(x=x, mean=m, sigma=Sigma)
- 
-  stopifnot(isTRUE(all.equal(ld1, ld2)))
+
+  stopifnot(all.equal(ld1, ld2))
 }
+
+### --- Singular Sigma --- Now treated the same as  dnorm(*, sd=0):  "Inf or 0"
+L <- diag(10*(1:4))
+L[lower.tri(L)] <- 1:6
+L[3,3] <- 0 # to make it singular
+L
+(Sig <- tcrossprod(L))
+set.seed(123)
+fx <- dmvnorm(rbind(0, 1:4, matrix(rnorm(4*10), ncol=4)), sigma = Sig)
+stopifnot(identical(fx, c(Inf, rep(0, 1+10))))
+## gave NaN for a long time, then error, then NaN, now we have converged ;-)
+

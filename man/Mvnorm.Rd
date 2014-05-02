@@ -6,31 +6,32 @@
   These functions provide the density function and a random number
   generator for the multivariate normal
   distribution with mean equal to \code{mean} and covariance matrix
-  \code{sigma}. 
+  \code{sigma}.
 }
 \usage{
-dmvnorm(x, mean, sigma, log = FALSE, trustme = FALSE)
+dmvnorm(x, mean = rep(0, p), sigma = diag(p), log = FALSE)
 rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
         method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE)
 }
 \arguments{
- \item{x}{Vector or matrix of quantiles. If \code{x} is a matrix, each
+ \item{x}{vector or matrix of quantiles. If \code{x} is a matrix, each
    row is taken to be a quantile.}
- \item{n}{Number of observations.}
- \item{mean}{Mean vector, default is \code{rep(0, length = ncol(x))}.}
- \item{sigma}{Covariance matrix, default is \code{diag(ncol(x))}.}
- \item{log}{Logical; if \code{TRUE}, densities d are given as log(d).}
- \item{trustme}{Logical; skip checks for full speed. You're on your own here!}
- \item{method}{Matrix decomposition used to determine the matrix root of
-  \code{sigma}, possible methods are eigenvalue decomposition
-	(\code{"eigen"}, default), singular value decomposition
-	(\code{"svd"}), and Cholesky decomposition (\code{"chol"}).}
- \item{pre0.9_9994}{Logical; if \code{FALSE}, the output produced in mvtnorm
-                    versions up to 0.9-9993 is reproduced. In 0.9-9994, the 
+ \item{n}{number of observations.}
+ \item{mean}{mean vector, default is \code{rep(0, length = ncol(x))}.}
+ \item{sigma}{covariance matrix, default is \code{diag(ncol(x))}.}
+ \item{log}{logical; if \code{TRUE}, densities d are given as log(d).}
+ \item{method}{string specifying the matrix decomposition used to
+   determine the matrix root of \code{sigma}.  Possible methods are
+   eigenvalue decomposition (\code{"eigen"}, default),
+   singular value decomposition (\code{"svd"}), and
+   Cholesky decomposition (\code{"chol"}).  The
+   Cholesky is typically fastest, not by much though.}
+ \item{pre0.9_9994}{logical; if \code{FALSE}, the output produced in mvtnorm
+                    versions up to 0.9-9993 is reproduced. In 0.9-9994, the
                     output is organized such that \code{rmvnorm(10,...)} has the
                     same first ten rows as \code{rmvnorm(100, ...)} when called
                     with the same seed.}
-} 
+}
 \author{Friedrich Leisch and Fabian Scheipl}
 \seealso{\code{\link{pmvnorm}}, \code{\link{rnorm}}, \code{\link{qmvnorm}}}
 \examples{

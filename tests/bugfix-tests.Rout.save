@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2014-04-24 r65482) -- "Unsuffered Consequences"
+R version 3.1.0 (2014-04-10) -- "Spring Dance"
 Copyright (C) 2014 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
@@ -26,7 +26,7 @@ Type 'q()' to quit R.
 > shi <- -9
 > slo <- -10
 > mu <- -5
-> sig <- matrix(c(1,1,1,2),ncol=2) 
+> sig <- matrix(c(1,1,1,2),ncol=2)
 > pmvnorm(lower=c(-a,slo),upper=c(a,shi),mean=c(mu,2*mu),sigma=sig)
 [1] 0.04210555
 attr(,"error")
@@ -67,11 +67,17 @@ attr(,"msg")
 [1] -626.8379
 > dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE)
 [1] -901.8379
-> stopifnot(all.equal(dmvnorm(x=0, mean=30,log=TRUE), 
-+                     dnorm(0,30,log=TRUE)))
+> stopifnot(all.equal(dmvnorm(x=0, mean=30, log=TRUE),
++ 		    dnorm  (0,	      30, log=TRUE)))
 > 
-> stopifnot(all.equal(dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE, trustme = TRUE), 
-+                     dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE, trustme = FALSE)))
+> stopifnot(
++     all.equal(dmvnorm(x=c(0,0), mean =c(30,30),log=TRUE) -> f.,
++               dmvt   (x=c(0,0), delta=c(30,30),log=TRUE, df=Inf))
++     ,
++     all.equal(f., dmvt(x=c(0,0), delta=c(30,30),log=TRUE, df=10000),
++               tolerance = 0.09)
++ )
+> 
 > # large df
 > pnorm(2)^2
 [1] 0.9550173
@@ -178,8 +184,8 @@ attr(,"msg")
 > stopifnot(pmvnorm(lower=c(-2,0),upper=c(-1,1),corr=matrix(rep(1,4),2,2)) == 0)
 > 
 > # bugged Fritz (long time ago)
-> stopifnot(all.equal(pmvnorm(-Inf, c(Inf, 0), 0, diag(2)), pmvnorm(-Inf,
-+                     c(Inf, 0), 0)))
+> stopifnot(all.equal(pmvnorm(-Inf, c(Inf, 0), 0, diag(2)),
++ 		    pmvnorm(-Inf, c(Inf, 0), 0)))
 > 
 > # this is a bug in `mvtdst' nobody was able to fix yet :-(
 > stopifnot(pmvnorm(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0)) == 1)
@@ -225,7 +231,7 @@ attr(,"msg")
 > shi <- -9
 > slo <- -10
 > mu <- -5
-> sig <- matrix(c(1,1,1,2),ncol=2) 
+> sig <- matrix(c(1,1,1,2),ncol=2)
 > pmvnormM(lower=c(-a,slo),upper=c(a,shi),mean=c(mu,2*mu),sigma=sig)
 [1] 0.04210555
 attr(,"error")
@@ -266,8 +272,8 @@ attr(,"msg")
 > stopifnot(pmvnormM(lower=c(Inf,1)) == 0)
 > 
 > # bugged Fritz (long time ago)
-> stopifnot(all.equal(pmvnormM(-Inf, c(Inf, 0), 0, diag(2)), pmvnormM(-Inf,
-+                     c(Inf, 0), 0)))
+> stopifnot(all.equal(pmvnormM(-Inf, c(Inf, 0), 0, diag(2)),
++ 		    pmvnormM(-Inf, c(Inf, 0), 0)))
 > 
 > # this is a bug in `mvtdst' nobody was able to fix yet :-(
 > stopifnot(pmvnormM(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0)) == 1)
@@ -448,6 +454,7 @@ $estim.prec
 + }
 > ### current version
 > d2 <- function(...) dmvnorm(..., log = TRUE)
+> 
 > for (i in 1:100) {
 +   p <- sample(2:10, 1)
 +   Sigma <- tcrossprod(matrix(runif(p^2) * 2, ncol = p))
@@ -455,10 +462,32 @@ $estim.prec
 +   m <- runif(p)
 +   ld1 <- d1(x=x, mean=m, sigma=Sigma)
 +   ld2 <- d2(x=x, mean=m, sigma=Sigma)
-+  
-+   stopifnot(isTRUE(all.equal(ld1, ld2)))
++ 
++   stopifnot(all.equal(ld1, ld2))
 + }
+> 
+> ### --- Singular Sigma --- Now treated the same as  dnorm(*, sd=0):  "Inf or 0"
+> L <- diag(10*(1:4))
+> L[lower.tri(L)] <- 1:6
+> L[3,3] <- 0 # to make it singular
+> L
+     [,1] [,2] [,3] [,4]
+[1,]   10    0    0    0
+[2,]    1   20    0    0
+[3,]    2    4    0    0
+[4,]    3    5    6   40
+> (Sig <- tcrossprod(L))
+     [,1] [,2] [,3] [,4]
+[1,]  100   10   20   30
+[2,]   10  401   82  103
+[3,]   20   82   20   26
+[4,]   30  103   26 1670
+> set.seed(123)
+> fx <- dmvnorm(rbind(0, 1:4, matrix(rnorm(4*10), ncol=4)), sigma = Sig)
+> stopifnot(identical(fx, c(Inf, rep(0, 1+10))))
+> ## gave NaN for a long time, then error, then NaN, now we have converged ;-)
+> 
 > 
 > proc.time()
    user  system elapsed 
-  6.768   0.060   6.831 
+  6.788   0.036   6.828 

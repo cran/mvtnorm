@@ -12,7 +12,8 @@
 \usage{
 rmvt(n, sigma = diag(2), df = 1, delta = rep(0, nrow(sigma)),
      type = c("shifted", "Kshirsagar"), ...)
-dmvt(x, delta, sigma, df = 1, log = TRUE, type = "shifted")
+dmvt(x, delta = rep(0, p), sigma = diag(p), df = 1, log = TRUE,
+     type = "shifted")
 }
 \arguments{
   \item{x}{vector or matrix of quantiles. If \code{x} is a matrix, each
