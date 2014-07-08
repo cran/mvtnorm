@@ -1,4 +1,4 @@
-f3a831d483de2fbf2f8d45923bd100c7 *DESCRIPTION
+1f342141fd4a0672e9346952d30b44fb *DESCRIPTION
 3d52380a057a5cbf822e9d7b2faabfc9 *NAMESPACE
 dc9d89a7f60d34597fc9ccc98371e6df *R/mvnorm.R
 5a3a5c0130ee294ff505dc9a7ca8a332 *R/mvt.R
@@ -6,10 +6,10 @@ af4caf11a42847a6ad0daf4188b9bca6 *R/tvpack.R
 ce69bfe98aaf55e67c4fda9f1be79704 *build/vignette.rds
 d6585676e607702c2f4b6352110e6868 *cleanup
 505ff756e67a74636dcdace7127ac2d8 *inst/CITATION
-bcac0aa06e9c13a81f46bc3eb77c4082 *inst/NEWS
+e8f4be5c06562baf23c0d3cd9002537c *inst/NEWS
 73e21a346386350ffebe0b09cafa5ad5 *inst/doc/MVT_Rnews.R
 e83251e0ceb0e3a2aec9f3d101e41ea6 *inst/doc/MVT_Rnews.Rnw
-d9b134857b7e0fa6e5a04288655b11b5 *inst/doc/MVT_Rnews.pdf
+9881f311e806def0a5aed0f55f2ca76b *inst/doc/MVT_Rnews.pdf
 18d186ba9ace287fe0083853e50afeb9 *man/Mvnorm.Rd
 3feddf7815d3fce164f79555beb55cf2 *man/Mvt.Rd
 9da61cd180a96a6b142fc6a1a7227f85 *man/algorithms.Rd
