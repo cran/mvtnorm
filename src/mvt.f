@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f 245 2013-05-29 14:10:53Z thothorn $
+*    $Id: mvt.f 291 2014-11-11 15:55:04Z thothorn $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
@@ -1077,114 +1077,13 @@
 *     P =  1 - K  I     exp(-t*t/2) t**(N-1) dt, for N >= 1.
 *               N  0
 *
-      INTEGER I, N, NO
-      DOUBLE PRECISION P, TWO, R, RO, LRP, LKN, MVPHNV, MVCHNC
-      PARAMETER ( LRP = -.22579135264472743235D0, TWO = 2 )
-*                 LRP =   LOG( SQRT( 2/PI ) )
-      SAVE NO, LKN
-      DATA NO / 0 /
-      IF ( N .LE. 1 ) THEN
-         R = -MVPHNV( P/2 )
-      ELSE IF ( P .LT. 1 ) THEN
-         IF ( N .EQ. 2 ) THEN
-            R = SQRT( -2*LOG(P) )
-         ELSE
-            IF ( N .NE. NO ) THEN
-               NO = N
-               LKN = 0
-               DO I = N-2, 2, -2
-                  LKN = LKN - LOG( DBLE(I) )
-               END DO
-               IF ( MOD( N, 2 ) .EQ. 1 ) LKN = LKN + LRP
-            END IF
-            IF ( N .GE. -5*LOG(1-P)/4 ) THEN
-               R = TWO/( 9*N )
-               R = N*( -MVPHNV(P)*SQRT(R) + 1 - R )**3
-               IF ( R .GT. 2*N+6 ) THEN
-                  R = 2*( LKN - LOG(P) ) + ( N - 2 )*LOG(R)
-               END IF
-            ELSE
-               R = EXP( ( LOG( (1-P)*N ) - LKN )*TWO/N )
-            END IF
-            R = SQRT(R)
-            RO = R
-            R = MVCHNC( LKN, N, P, R )
-            IF ( ABS( R - RO ) .GT. 1D-6 ) THEN
-               RO = R
-               R = MVCHNC( LKN, N, P, R )
-               IF ( ABS( R - RO ) .GT. 1D-6 ) R = MVCHNC( LKN, N, P, R )
-            END IF
-         END IF
-      ELSE
-         R = 0
-      END IF
-      MVCHNV = R
-      END
-*
-      DOUBLE PRECISION FUNCTION MVCHNC( LKN, N, P, R )
-*
-*     Third order Schroeder correction to R for MVCHNV
-*
-      INTEGER I, N
-      DOUBLE PRECISION P, R, LKN, DF, RR, RN, CHI, MVPHI
-      DOUBLE PRECISION LRP, TWO, AL, DL, AI, BI, CI, DI, EPS
-      PARAMETER ( LRP = -.22579135264472743235D0, TWO = 2, EPS = 1D-14 )
-*                 LRP =   LOG( SQRT( 2/PI ) )
-      RR = R*R
-      IF ( N .LT. 2 ) THEN
-         CHI = 2*MVPHI(-R)
-      ELSE IF ( N .LT. 100 ) THEN
-*
-*        Use standard Chi series
-*
-         RN = 1
-         DO I = N - 2, 2, -2
-            RN = 1 + RR*RN/I
-         END DO
-         RR = RR/2
-         IF ( MOD( N, 2 ) .EQ. 0 ) THEN
-            CHI = EXP(       LOG(   RN ) - RR )
-         ELSE
-            CHI = EXP( LRP + LOG( R*RN ) - RR ) + 2*MVPHI(-R)
-         ENDIF
-      ELSE
-         RR = RR/2
-         AL = N/TWO
-         CHI = EXP( -RR + AL*LOG(RR) + LKN + LOG(TWO)*( N - 2 )/2 )
-         IF ( RR .LT. AL + 1 ) THEN 
-*
-*           Use Incomplete Gamma series
-*
-            DL = CHI
-            DO I = 1, 1000
-               DL = DL*RR/( AL + I ) 
-               CHI = CHI + DL
-               IF ( ABS( DL*RR/( AL + I + 1 - RR ) ) .LT. EPS ) GO TO 10
-            END DO
- 10         CHI = 1 - CHI/AL
-         ELSE
-*
-*           Use Incomplete Gamma continued fraction
-*
-            BI = RR + 1 - AL
-            CI = 1/EPS
-            DI = BI
-            CHI = CHI/BI 
-            DO I = 1, 250
-               AI = I*( AL - I )
-               BI = BI + 2
-               CI = BI + AI/CI
-               IF ( CI .EQ. 0 ) CI = EPS 
-               DI = BI + AI/DI
-               IF ( DI .EQ. 0 ) DI = EPS 
-               DL = CI/DI
-               CHI = CHI*DL
-               IF ( ABS( DL - 1 ) .LT. EPS ) GO TO 20
-            END DO
-         END IF
-      END IF
- 20   DF =  ( P - CHI )/EXP( LKN + ( N - 1 )*LOG(R) - RR )
-      MVCHNC = R - DF*( 1 - DF*( R - ( N - 1 )/R )/2 )   
+
+      INTEGER N
+      DOUBLE PRECISION P, sqrtqchisqint, x
+      
+      x = sqrtqchisqint(N, P)
+      MVCHNV = x
+                
       END
 *
       SUBROUTINE MVKBRV( NDIM, MINVLS, MAXVLS, NF, FUNSUB, 

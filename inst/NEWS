@@ -1,10 +1,17 @@
 
+Changes in version 1.0-1 (2014-11-11)
+
+  o  replace internal MVCHNV FORTRAN FUNCTION with
+     R's sqrt(qchisq(p, n, FALSE, FALSE). This fixes a
+     problem where NaN was returned as reported by
+     David Charles Airey <airey_david_charles_at_lilly.com>
+
 Changes in version 1.0-0 (2014-07-08)
 
-  o  After 14 years, we now feel save enough to publish mvtnorm 1.0-0.
+  o  After 14 years, we now feel safe enough to publish mvtnorm 1.0-0.
      Many packages depend, import, or suggest mvtnorm, so this version
      change also indicates that the package is now stable and, to a very
-     large extend, the API is frozen. We will of course continue to fix 
+     large extent, the API is frozen. We will of course continue to fix 
      bugs or other problems but new features are unlikely to go into this
      package.
 
@@ -60,14 +67,14 @@ Changes in version 0.9-9994 (2012-12-06)
      set.seed(29)
      rmvnorm(100, ...)
 
-  o  as suggested by Paul Johnson <pauljohn@ku.edu>. There is a new
+  o  as suggested by Paul Johnson <pauljohn_at_ku.edu>. There is a new
      argument pre0.9_9993 for changing back to the `old' output. This
      _DOES NOT_  apply to rmvt.
 
 Changes in version 0.9-9993 (2012-10-22)
 
   o  sigma is called `scale' matrix of {dpq}mvt, thanks to
-     Richard Boys <Richard.Boys@ncl.ac.uk> for the hint
+     Richard Boys <Richard.Boys_at_ncl.ac.uk> for the hint
 
 Changes in version 0.9-9992 (2012-01-19)
 
@@ -91,7 +98,7 @@ Changes in version 0.9-999 (2011-04-26)
 Changes in version 0.9-99 (2011-04-21)
 
   o  fix bug in approx_interval spotted by Ravi Varadhan
-     <rvaradhan@jhmi.edu>
+     <rvaradhan_at_jhmi.edu>
 
 Changes in version 0.9-98 (2011-04-19)
 
@@ -100,7 +107,7 @@ Changes in version 0.9-98 (2011-04-19)
 Changes in version 0.9-97 (2011-01-31)
 
   o  use check.attributes = FALSE in isSymmetric calls
-     (requested by Nick Sabbe <nick.sabbe@ugent.be>)
+     (requested by Nick Sabbe <nick.sabbe_at_ugent.be>)
 
 Changes in version 0.9-96 (2011-01-28)
 
@@ -117,10 +124,10 @@ Changes in version 0.9-94 (2010-11-16)
      argument)
 
   o  add support for one-dimensional quantiles (requested by Jerry Lewis
-     <jerry.lewis@biogenidec.com>)
+     <jerry.lewis_at_biogenidec.com>)
 
   o  documentation fixes for problems spotted by
-     Jerry Lewis <jerry.lewis@biogenidec.com>
+     Jerry Lewis <jerry.lewis_at_biogenidec.com>
 
   o  interface to Alan's TVPACK algorithms for 2- and 3-d
      probabilities by Bjoern Bornkamp added.
@@ -134,7 +141,7 @@ Changes in version 0.9-91 (2010-04-13)
 
   o  better search interval for uniroot in qmv{t,norm} speeds up
      quantile estimation; suggestion by Björn Bornkamp
-     <bornkamp@statistik.tu-dortmund.de>
+     <bornkamp_at_statistik.tu-dortmund.de>
 
 Changes in version 0.9-9 (2010-01-27)
 
@@ -155,7 +162,7 @@ Changes in version 0.9-6 (2009-03-25)
 Changes in version 0.9-5 (2009-03-17)
 
   o  fix FORTRAN bug spotted by Alex Lenkoski
-     <lenkoski@stat.washington.edu>
+     <lenkoski_at_stat.washington.edu>
 
 Changes in version 0.9-3 (2008-12-22)
 
@@ -171,7 +178,7 @@ Changes in version 0.9-2 (2008-07-08)
 Changes in version 0.9-1 (2008-07-02)
 
   o  better check for covariance matrices, suggested by
-     James Rogers  <James.A.Rogers@pfizer.com>
+     James Rogers  <James.A.Rogers_at_pfizer.com>
 
 
 Changes in version 0.9-0 (2008-04-01)
@@ -201,14 +208,14 @@ Changes in version 0.8-2 (2008-02-10)
 
 Changes in version 0.8-1 (2007-07-24)
 
-  o  Orion Poplawski <orion@cora.nwra.com> spotted a meaningless check in
+  o  Orion Poplawski <orion_at_cora.nwra.com> spotted a meaningless check in
      the regression tests
 
 
 Changes in version 0.8-0 (2007-07-23)
 
   o  upgrade to 7/7 version of MVTDST (includes better support for
-     dimensions > 100). Thanks to Karen Conneely <conneely@umich.edu>
+     dimensions > 100). Thanks to Karen Conneely <conneely_at_umich.edu>
      for motivating the update and for checking the new version.
 
   o  rmvnorm() now can also use a Cholesky decomposition to compute
@@ -243,7 +250,7 @@ Changes in version 0.7-0 (2004-10-14)
 
   o  a coding session with Frank produced `qmv{t,norm}'.
      try to check if the support specified by `lower' and `upper' is
-     empty (problem spotted by Peter Thomson <peter@statsresearch.co.nz>)
+     empty (problem spotted by Peter Thomson <peter_at_statsresearch.co.nz>)
      Alan's fix prevents negative values to be returned.
 
   o  some cosmetics
@@ -313,7 +320,7 @@ Changes in version 0.5-10 (2003-04-23)
 Changes in version 0.5-9 (2003-02-13)
 
   o  log argument added to dmvnorm, thanks to
-     Jerome Asselin <jerome@hivnet.ubc.ca>
+     Jerome Asselin <jerome_at_hivnet.ubc.ca>
 
 Changes in version 0.5-8 (2003-01-21)
 
