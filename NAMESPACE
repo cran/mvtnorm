@@ -1,4 +1,5 @@
-useDynLib(mvtnorm)
+
+useDynLib(mvtnorm, .registration = TRUE)
 
 importFrom("stats",
 	   pnorm, qnorm, rnorm,

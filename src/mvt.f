@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f 291 2014-11-11 15:55:04Z thothorn $
+*    $Id: mvt.f 297 2014-12-16 17:24:38Z thothorn $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
@@ -63,8 +63,6 @@
       COMMON /PTBLCK/IVLS
       IVLS = 0
 
-      CALL rndstart()
-
       IF ( N .GT. 1000 .OR. N .LT. 1 ) THEN
          VALUE = 0
          ERROR = 1
@@ -82,8 +80,6 @@
             VALUE = V(1)
          ENDIF
       ENDIF
-      
-      CALL rndend()
       
       END
 *

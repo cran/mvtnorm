@@ -44,4 +44,8 @@ done
 
 find . -name "DEADJOE" -exec rm -f {} \;
 
+find . -name "mvtnormAPI*gz" -exec rm -f {} \;
+
+find . -name "mvtnormAPI.Rcheck" -exec rm -rf {} \;
+
 exit 0

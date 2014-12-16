@@ -1,4 +1,4 @@
-# $Id: mvt.R 275 2014-05-02 22:07:27Z mmaechler $
+# $Id: mvt.R 296 2014-12-16 15:50:18Z thothorn $
 
 chkcorr <- function(x) {
 
@@ -517,19 +517,20 @@ probval.GenzBretz <- function(x, n, df, lower, upper, infin, corr, corrF, delta)
     upper[ isInf(upper)] <- 0
 
     error <- 0; value <- 0; inform <- 0
-    ret <- .Fortran("mvtdst", N = as.integer(n),
-                              NU = as.integer(df),
-                              LOWER = as.double(lower),
-                              UPPER = as.double(upper),
-                              INFIN = as.integer(infin),
-                              CORREL = as.double(corrF),
-                              DELTA = as.double(delta),
-                              MAXPTS = as.integer(x$maxpts),
-                              ABSEPS = as.double(x$abseps),
-                              RELEPS = as.double(x$releps),
-                              error = as.double(error),
-                              value = as.double(value),
-                              inform = as.integer(inform), PACKAGE="mvtnorm")
+    ret <- .C("C_mvtdst", N = as.integer(n),
+                          NU = as.integer(df),
+                          LOWER = as.double(lower),
+                          UPPER = as.double(upper),
+                          INFIN = as.integer(infin),
+                          CORREL = as.double(corrF),
+                          DELTA = as.double(delta),
+                          MAXPTS = as.integer(x$maxpts),
+                          ABSEPS = as.double(x$abseps),
+                          RELEPS = as.double(x$releps),
+                          error = as.double(error),
+                          value = as.double(value),
+                          inform = as.integer(inform),
+                          RND = as.integer(1)) ### init RNG
     ret
 }
 
