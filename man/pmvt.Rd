@@ -171,6 +171,7 @@ myfct <- function(q, alpha) {
        corr=cr, abseps=0.0001) - alpha
 }
 
+### uniroot for this simple problem
 round(uniroot(myfct, lower=1, upper=5, alpha=0.95)$root, 3)
 
 # compare pmvt and pmvnorm for large df:

@@ -1,6 +1,6 @@
 
-R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
-Copyright (C) 2014 The R Foundation for Statistical Computing
+R Under development (unstable) (2015-06-30 r68608) -- "Unsuffered Consequences"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -402,20 +402,7 @@ $quantile
 [1] 1.233641
 
 $f.quantile
-[1] 1.652806e-07
-attr(,"error")
-[1] 0
-attr(,"msg")
-[1] "Normal Completion"
-
-$iter
-[1] 13
-
-$init.it
-[1] NA
-
-$estim.prec
-[1] 6.103516e-05
+[1] 2.270684e-14
 
 > 
 > ### qmvt(..., df = 0, ...) didn't work
@@ -664,6 +651,53 @@ $estim.prec
 > .Random.seed <- RS
 > stopifnot(!is.na(f()$value))
 > 
+> ### check tail with new quantile algorithm
+> p <- .95
+> stopifnot(identical(round(qmvnorm(p, sigma = diag(3), tail = "upper")$quantile, 2),
++           round(qnorm(p^(1/3), lower = FALSE), 2)))
+> stopifnot(identical(round(qmvnorm(p, sigma = diag(3), tail = "lower")$quantile, 2),
++           round(qnorm(p^(1/3), lower = TRUE), 2)))
+> set.seed(29)
+> p <- .95
+> d <- 4
+> qmvnorm(p, sigma = diag(d), tail = "lower")
+$quantile
+[1] 2.234002
+
+$f.quantile
+[1] 4.437343e-31
+
+> qmvnorm(p, sigma = diag(d), tail = "upper")
+$quantile
+[1] -2.234002
+
+$f.quantile
+[1] 4.437343e-31
+
+> qmvnorm(p, sigma = diag(d), tail = "both")
+$quantile
+[1] 2.490916
+
+$f.quantile
+[1] 2.702327e-14
+
+> p <- 1 - .95
+> d <- 4
+> qmvnorm(p, sigma = diag(d), tail = "lower")
+$quantile
+[1] -0.06805531
+
+$f.quantile
+[1] 6.591495e-32
+
+> qmvnorm(p, sigma = diag(d), tail = "upper")
+$quantile
+[1] 0.06805531
+
+$f.quantile
+[1] 5.243344e-32
+
+> 
 > proc.time()
    user  system elapsed 
-  6.984   0.035   7.013 
+  8.062   0.042   8.106 

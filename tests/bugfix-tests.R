@@ -514,3 +514,20 @@ f <- function() {
 ### error and value are NaN (already in FORTRAN)
 .Random.seed <- RS
 stopifnot(!is.na(f()$value))
+
+### check tail with new quantile algorithm
+p <- .95
+stopifnot(identical(round(qmvnorm(p, sigma = diag(3), tail = "upper")$quantile, 2),
+          round(qnorm(p^(1/3), lower = FALSE), 2)))
+stopifnot(identical(round(qmvnorm(p, sigma = diag(3), tail = "lower")$quantile, 2),
+          round(qnorm(p^(1/3), lower = TRUE), 2)))
+set.seed(29)
+p <- .95
+d <- 4
+qmvnorm(p, sigma = diag(d), tail = "lower")
+qmvnorm(p, sigma = diag(d), tail = "upper")
+qmvnorm(p, sigma = diag(d), tail = "both")
+p <- 1 - .95
+d <- 4
+qmvnorm(p, sigma = diag(d), tail = "lower")
+qmvnorm(p, sigma = diag(d), tail = "upper")

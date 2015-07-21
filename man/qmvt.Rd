@@ -5,7 +5,7 @@
 
 Computes the equicoordinate quantile function of the multivariate t
 distribution for arbitrary correlation matrices
-based on inversion of qmvt.
+based on inversion of \code{\link{qmvt}}.
 
 }
 \usage{
@@ -17,7 +17,7 @@ qmvt(p, interval = NULL, tail = c("lower.tail",
 \arguments{
   \item{p}{ probability.}
   \item{interval}{ optional, a vector containing the end-points of the interval to be
-          searched by \code{\link{uniroot}}.}
+          searched.  This argument is IGNORED since 1.0-3.}
   \item{tail}{ specifies which quantiles should be computed.
                \code{lower.tail} gives the quantile \eqn{x} for which
                \eqn{P[X \le x] = p}, \code{upper.tail} gives \eqn{x} with
@@ -50,17 +50,14 @@ qmvt(p, interval = NULL, tail = c("lower.tail",
 \details{
 
   Only equicoordinate quantiles are computed, i.e., the quantiles in each
-  dimension coincide. Currently, the distribution function is inverted by
-  using the
-  \code{\link{uniroot}} function which may result in limited accuracy of the
-  quantiles.
+  dimension coincide. As of version 1.0-3, the distribution function is inverted by
+  minimising the squared difference of the distribution function and \code{p}. The result
+  is seed dependend.
 }
 \value{
-  A list with four components: \code{quantile} and \code{f.quantile}
-  give the location of the quantile and the value of the function
-  evaluated at that point. \code{iter} and \code{estim.prec} give the number
-  of iterations used and an approximate estimated precision from
-  \code{\link{uniroot}}.
+  A list with two components: \code{quantile} and \code{f.quantile} 
+  give the location of the quantile and the difference between the distribution
+  function evaluated at the quantile and \code{p}.
 }
 \seealso{\code{\link{pmvnorm}}, \code{\link{qmvnorm}}}
 \examples{
@@ -69,20 +66,34 @@ qmvt(0.95, df = 16, tail = "both")
 
 ## check behavior for df=0 and df=Inf
 Sigma <- diag(2)
+set.seed(29)
 q0 <- qmvt(0.95, sigma = Sigma, df = 0,   tail = "both")$quantile
+set.seed(29)
 q8 <- qmvt(0.95, sigma = Sigma, df = Inf, tail = "both")$quantile
+set.seed(29)
 qn <- qmvnorm(0.95, sigma = Sigma, tail = "both")$quantile
 stopifnot(identical(q0, q8),
-          identical(q0, qn))
+          isTRUE(all.equal(q0, qn, tol = (.Machine$double.eps)^(1/3))))
 
 ## if neither sigma nor corr are provided, corr = 1 is used internally
 df <- 0
+set.seed(29)
 qt95 <- qmvt(0.95, df = df, tail = "both")$quantile
-stopifnot(identical(qt95, qmvt(0.95, df = df, corr  = 1, tail = "both")$quantile),
-          identical(qt95, qmvt(0.95, df = df, sigma = 1, tail = "both")$quantile))
+set.seed(29)
+qt95.c <- qmvt(0.95, df = df, corr  = 1, tail = "both")$quantile
+set.seed(29)
+qt95.s <- qmvt(0.95, df = df, sigma = 1, tail = "both")$quantile
+stopifnot(identical(qt95, qt95.c),
+          identical(qt95, qt95.s))
+
 df <- 4
+set.seed(29)
 qt95 <- qmvt(0.95, df = df, tail = "both")$quantile
-stopifnot(identical(qt95, qmvt(0.95, df = df, corr  = 1, tail = "both")$quantile),
-          identical(qt95, qmvt(0.95, df = df, sigma = 1, tail = "both")$quantile))
+set.seed(29)
+qt95.c <- qmvt(0.95, df = df, corr  = 1, tail = "both")$quantile
+set.seed(29)
+qt95.s <- qmvt(0.95, df = df, sigma = 1, tail = "both")$quantile
+stopifnot(identical(qt95, qt95.c),
+          identical(qt95, qt95.s))
 }
 \keyword{distribution}

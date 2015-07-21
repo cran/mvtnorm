@@ -1,4 +1,4 @@
-# $Id: mvt.R 296 2014-12-16 15:50:18Z thothorn $
+# $Id: mvt.R 305 2015-07-21 11:12:52Z thothorn $
 
 chkcorr <- function(x) {
 
@@ -334,32 +334,6 @@ dmvt <- function(x, delta = rep(0, p), sigma = diag(p), df = 1,
     if (log) logretval else exp(logretval)
 }
 
-### find suitable interval to search for quantile
-### does not take sigma into account; disable for the time being (0.9-999)
-approx_interval <- function(p, tail, corr, df = 0) {
-
-    qfun <- function(p) {
-        if (df == 0) return(qnorm(p))
-        return(qt(p, df = df))
-    }
-
-    if (tail == "both.tails")
-        p <- p + (1 - p) / 2
-
-             ### univariate quantile (corr == 1, perfect correlation)
-    ret <- c(qfun(p),
-             ### multivariate quantile (corr == 0, independence)
-             qfun(p^(1 / NCOL(corr))))
-
-    if (tail == "upper.tail")
-        ret <- rev(-ret)
-
-    ### just to please uniroot
-    ret <- ret * c(0.9, 1.1)
-
-    ret
-}
-
 qmvnorm <- function(p, interval = NULL,
                     tail = c("lower.tail", "upper.tail", "both.tails"),
                     mean = 0, corr = NULL, sigma = NULL, algorithm =
@@ -390,7 +364,13 @@ qmvnorm <- function(p, interval = NULL,
     }
     dim <- length(args$mean)
 
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+        runif(1)
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+
     pfct <- function(q) {
+        ### use the same seed for different values of q
+        assign(".Random.seed", R.seed, envir = .GlobalEnv)
         switch(tail, "both.tails" = {
                   low <- rep(-abs(q), dim)
                   upp <- rep( abs(q), dim)
@@ -401,28 +381,21 @@ qmvnorm <- function(p, interval = NULL,
                   low <- rep(   -Inf, dim)
                   upp <- rep(      q, dim)
            },)
-           pmvnorm(lower = low, upper = upp, mean = args$mean,
-                   corr = args$corr, sigma = args$sigma,
-                   algorithm = algorithm) - p
+           ret <- pmvnorm(lower = low, upper = upp, mean = args$mean,
+                          corr = args$corr, sigma = args$sigma,
+                          algorithm = algorithm) - p
+           return(ret^2)
     }
 
-    if (is.null(interval) || length(interval) != 2) {
-        if (FALSE) { ### if(mean == 0) {
-            cr <- args$corr
-            if (!is.null(args$sigma)) cr <- cov2cor(args$sigma)
-            interval <- approx_interval(p = p, tail = tail,
-                                        corr = cr, df = 0)
-        } else {
-            interval <- c(if(tail == "both.tails") 0 else -10, 10)
-        }
-    }
+    pstart <- switch(tail, "both.tails" = (1 - (1 - p)/2)^(1/dim),
+                           "upper.tail" = 1 - p^(1/dim),
+                           "lower.tail" = p^(1/dim))
+    qroot <- optim(qnorm(pstart), pfct, method = "BFGS", control = list(maxit = 1000))
 
-    if (is.null(dots$uniroot)) {
-        qroot <- uniroot(pfct, interval = interval)
-    } else {
-        qroot <- do.call("uniroot", list(pfct, interval = interval, dots$uniroot))
-    }
-    names(qroot)[1:2] <- c("quantile", "f.quantile")
+    if (qroot$convergence != 0)
+        stop("Search for quantile terminated unsuccessfully:", qroot$message)
+
+    qroot <- list(quantile = qroot$par, f.quantile = qroot$value)
     qroot
 }
 
@@ -461,7 +434,13 @@ qmvt <- function(p, interval = NULL,
 
     dim <- length(args$mean)
 
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
+        runif(1)
+    R.seed <- get(".Random.seed", envir = .GlobalEnv)
+
     pfct <- function(q) {
+        ### use the same seed for different values of q
+        assign(".Random.seed", R.seed, envir = .GlobalEnv)
         switch(tail, "both.tails" = {
                   low <- rep(-abs(q), dim)
                   upp <- rep( abs(q), dim)
@@ -472,29 +451,24 @@ qmvt <- function(p, interval = NULL,
                   low <- rep(   -Inf, dim)
                   upp <- rep(      q, dim)
            },)
-           pmvt(lower = low, upper = upp, df = df, delta = args$mean,
-                corr = args$corr, sigma = args$sigma,
-                algorithm = algorithm, type = type) - p
+           ret <- pmvt(lower = low, upper = upp, df = df, delta = args$mean,
+                       corr = args$corr, sigma = args$sigma,
+                       algorithm = algorithm, type = type) - p
+           return(ret^2)
     }
 
-    if (is.null(interval) || length(interval) != 2) {
-        if (FALSE) { ### if (isTRUE(all.equal(max(abs(delta)), 0)) & is.null(args$sigma)) {
-            cr <- args$corr
-            interval <- approx_interval(p = p, tail = tail,
-                                        corr = cr, df = df)
-        } else {
-            interval <- c(if(tail == "both.tails") 0 else -10, 10)
-        }
-    }
+    pstart <- switch(tail, "both.tails" = (1 - (1 - p)/2)^(1/dim),          
+                           "upper.tail" = 1 - p^(1/dim),
+                           "lower.tail" = p^(1/dim))    
+    par <- ifelse(is.finite(df) && (df > 0), qt(pstart, df = df), qnorm(pstart))
+    qroot <- optim(par, pfct, method = "BFGS", control = list(maxit = 1000))
 
-    qroot <-
-        if (is.null(dots$uniroot)) {
-            uniroot(pfct, interval = interval)
-        } else {
-            do.call("uniroot", list(pfct, interval = interval, dots$uniroot))
-        }
-    names(qroot)[1:2] <- c("quantile", "f.quantile")
+    if (qroot$convergence != 0)
+        stop("Search for quantile terminated unsuccessfully:", qroot$message)
+
+    qroot <- list(quantile = qroot$par, f.quantile = qroot$value)
     qroot
+
 }
 
 GenzBretz <- function(maxpts = 25000, abseps = 0.001, releps = 0) {

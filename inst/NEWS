@@ -1,4 +1,13 @@
 
+Changes in version 1.0-3 (2015-07-21)
+
+  o  new algorithm for quantile estimation. Quantiles are 
+     now computed by minimising the squared distance between the 
+     distribution function and the probability whereas previous versions
+     used uniroot(). The procedure is now performed multiple times with
+     difference random seeds in order to stabilise the results. The
+     \code{interval} argument to the quantile functions is IGNORED now.
+
 Changes in version 1.0-2 (2014-12-16)
 
   o  start providing C interfaces to the underlying algorithms.
