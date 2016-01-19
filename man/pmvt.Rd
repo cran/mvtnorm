@@ -21,13 +21,13 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
   \item{df}{ degree of freedom as integer. Normal probabilities are computed for \code{df=0}.}
   \item{corr}{ the correlation matrix of dimension n.}
   \item{sigma}{ the scale matrix of dimension n. Either \code{corr} or
-                \code{sigma} can be specified. If \code{sigma} is given, the
-                problem is standardized. If neither \code{corr} nor
-                \code{sigma} is given, the identity matrix is used
-                for \code{sigma}. }
-  \item{algorithm}{ an object of class \code{\link{GenzBretz}} or \code{\link{TVPACK}} defining the
-                    hyper parameters of this algorithm.}
- \item{type}{ type of the noncentral multivariate t distribution
+    \code{sigma} can be specified. If \code{sigma} is given, the
+    problem is standardized. If neither \code{corr} nor
+    \code{sigma} is given, the identity matrix is used
+    for \code{sigma}. }
+  \item{algorithm}{ an object of class \code{\link{GenzBretz}} or
+    \code{\link{TVPACK}} defining the hyper parameters of this algorithm.}
+  \item{type}{ type of the noncentral multivariate t distribution
               to be computed. \code{type = "Kshirsagar"} corresponds
               to formula (1.4) in Genz and Bretz (2009) (see also
 	      Chapter 5.1 in Kotz and Nadarajah (2004)). This is the
@@ -48,13 +48,17 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
 
 \details{
 
-This program involves the computation of central and noncentral
+This function involves the computation of central and noncentral
 multivariate t-probabilities with arbitrary correlation matrices.
 It involves both the computation of singular and nonsingular
-probabilities. The methodology is based on randomized quasi Monte Carlo
-methods and described in Genz and Bretz (1999, 2002).
+probabilities.  The methodology (for default \code{algorithm =
+  GenzBretz()}) is based on randomized quasi Monte Carlo methods and
+described in Genz and Bretz (1999, 2002).
+\cr
+Because of the randomization, the result for this algorithm (slightly)
+depends on \code{\link{.Random.seed}}.
 
-For 2- and 3-dimensional problems one can also use the TVPACK routines
+For 2- and 3-dimensional problems one can also use the \code{\link{TVPACK}} routines
 described by Genz (2004), which only handles semi-infinite integration
 regions (and for \code{type = "Kshirsagar"} only central problems).
 
@@ -63,8 +67,9 @@ For \code{type = "Kshirsagar"} and a given correlation matrix
 semi-definite) and degrees of freedom \eqn{\nu} the following values are
 numerically evaluated
 
+%% FIXME add non-LaTeX alternative \deqn{LaTeX}{non-LaTex}
 \deqn{I = 2^{1-\nu/2} / \Gamma(\nu/2) \int_0^\infty s^{\nu-1} \exp(-s^2/2) \Phi(s \cdot lower/\sqrt{\nu} - \delta,
-s \cdot upper/\sqrt{\nu} - \delta) \, ds }
+  s \cdot upper/\sqrt{\nu} - \delta) \, ds }
 
 where
 
@@ -100,7 +105,7 @@ If \code{df = 0}, normal probabilities are returned.
 \value{
 The evaluated distribution function is returned with attributes
   \item{error}{estimated absolute error and}
-  \item{msg}{status messages.}
+  \item{msg}{status message (a \code{\link{character}} string).}
 }
 
 \references{

@@ -11,13 +11,16 @@ based on inversion of \code{\link{pmvnorm}}.
 \usage{
 qmvnorm(p, interval = NULL, tail = c("lower.tail", 
         "upper.tail", "both.tails"), mean = 0, corr = NULL, 
-        sigma = NULL, algorithm = GenzBretz(), ...)
+        sigma = NULL, algorithm = GenzBretz(),
+        ptol = 0.001, maxiter = 500, trace = FALSE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{p}{ probability.}
-  \item{interval}{ optional, a vector containing the end-points of the interval to be
-          searched. This argument is IGNORED since 1.0-3.}
+  \item{interval}{ optional, a vector containing the end-points of the
+    interval to be searched. Does not need to contain the true quantile,
+    just used as starting values by the root-finder. If equal to NULL
+    a guess is used.}
   \item{tail}{ specifies which quantiles should be computed.
                \code{lower.tail} gives the quantile \eqn{x} for which 
                \eqn{P[X \le x] = p}, \code{upper.tail} gives \eqn{x} with 
@@ -35,15 +38,18 @@ qmvnorm(p, interval = NULL, tail = c("lower.tail",
                   \code{\link{Miwa}} or \code{\link{TVPACK}}
                   specifying both the algorithm to be used as well as
                   the associated hyper parameters.}
+  \item{ptol, maxiter, trace}{Parameters passed to the stochastic root-finding
+    algorithm. Iteration stops when the 95\% confidence interval
+    for the predicted quantile is inside [p-ptol, p+ptol]. \code{maxiter} is the
+    maximum number of iterations for the root finding algorithm. \code{trace}
+    prints the iterations of the root finder.}
   \item{...}{ additional parameters to be passed to 
               \code{\link{GenzBretz}}.}
 }
 \details{
 
   Only equicoordinate quantiles are computed, i.e., the quantiles in each
-  dimension coincide. As of version 1.0-3, the distribution function is inverted by 
-  minimising the squared difference of the distribution function and \code{p}. The result
-  is seed dependend.
+  dimension coincide. The result is seed dependend.
 }
 \value{
   A list with two components: \code{quantile} and \code{f.quantile} 

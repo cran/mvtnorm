@@ -12,7 +12,7 @@
  *
  * Note
  *   An exact value is given only for rho=0.5 and h=0.
- * 
+ *
  */
 
 #include  "miwa.h"
@@ -20,15 +20,8 @@
 #define PEPS    1.0e-8
 
 #define SMLHGRD 16  /* small number of grid points */
-extern void gridcalc(struct GRID *grid);
-
-extern double orthant(int m, double r[][MAXM][MAXM], double h[][MAXM],
-                      int *ncone, struct GRID *grid);
-
 
 #define REPS    (1.0e-6)  /* rho < REPS means rho=0 */
-
-extern double orschm(int m, double *r, double *h, struct GRID *g);
 
 /* coefficients b[] for cubic polynomial */
 static void b_calc(int j, struct GRID *g, double *f, double *df,
@@ -56,7 +49,7 @@ static double dlt_f(int j, struct GRID *g,
 }
 
 
-double orschm(int m, double *r, double *h, struct GRID *g)
+static double orschm(int m, double *r, double *h, struct GRID *g)
 {
   static int    id[MAXM][MAXGRD];
   static double c[MAXM], d[MAXM], b[MAXGRD][4], fgrd[MAXGRD];
@@ -104,13 +97,13 @@ double orschm(int m, double *r, double *h, struct GRID *g)
     else{
       for(j=0, k=ngrd; j <= ngrd; j++)
 /* Tetsuhisa Thu, 16 Jan 2014; was  for( ; z[i][k] <= g->z[j] && k >= 0; k--) */
-        for( ; k >= 0 && z[i][k] <= g->z[j]; k--)        
+        for( ; k >= 0 && z[i][k] <= g->z[j]; k--)
           id[i][k] = j;
       for( ; k >= 0; k--)
         id[i][k] = ngrd+1;
     }
   }
-  
+
   /* first stage: i=m-1 */
   for(j=0; j <= ngrd; j++){
     z[m-1][j] = c[m-1] + d[m-1]*g->z[j];
@@ -168,8 +161,8 @@ double orschm(int m, double *r, double *h, struct GRID *g)
 }
 
 
-double orthant(int m, double r[][MAXM][MAXM], double h[][MAXM],
-               int *ncone, struct GRID *grid)
+static double orthant(int m, double r[][MAXM][MAXM], double h[][MAXM],
+		      int *ncone, struct GRID *grid)
 {
   int     i, j, u, v, ns, nzs, stg, srch, plus;
   int     nz[MAXM][MAXM], sgn[MAXM][MAXM], nxt[MAXM], dlt[MAXM];
@@ -270,7 +263,7 @@ double orthant(int m, double r[][MAXM][MAXM], double h[][MAXM],
         h[stg+1][j] = (h[stg][i] - r1ik*h[stg][nzs])/c[j];
         r[stg+1][stg+1][j] = sgn[stg][ns]/c[j]*(rik - r1ik);
       }
-        
+
       for(i=stg+1, j=stg+2; j < m-1; i++, j++){
         if(i == nzs)
           i++;
@@ -286,13 +279,13 @@ double orthant(int m, double r[][MAXM][MAXM], double h[][MAXM],
           else
             ruk = r[stg][nzs][u];
 
-          r[stg+1][j][v] = 
+          r[stg+1][j][v] =
             (r[stg][i][u]
              - r[stg][stg][u]/r1k*rik - r[stg][stg][i]/r1k*ruk
              + r[stg][stg][i]*r[stg][stg][u]/r1k/r1k) /c[j]/c[v];
         }
-      }          
-      
+      }
+
       dlt[stg+1] = sgn[stg][ns]*dlt[stg];
       nxt[stg]++;
       stg++;
@@ -307,7 +300,7 @@ double orthant(int m, double r[][MAXM][MAXM], double h[][MAXM],
 #define MAXITR  51  /* maximum number of iterations */
 
 
-double nrml_lq(double p, double ueps, double peps, int *itr)
+static double nrml_lq(double p, double ueps, double peps, int *itr)
 {
   double y, u, f, f1, f2, r, delta;
 
@@ -335,7 +328,7 @@ double nrml_lq(double p, double ueps, double peps, int *itr)
 }
 
 
-void gridcalc(struct GRID *g)
+static void gridcalc(struct GRID *g)
 {
   int     hgrd=(g->n)/2, ngrd=2*hgrd, nres=(hgrd<100)?3:6;
   int     i, itr;
@@ -362,15 +355,15 @@ void gridcalc(struct GRID *g)
   }
 
   pdelta = (nrml_cd(2.5)-0.5) / (hgrd-nres);
-    
+
   for(i=1; i < hgrd-nres; i++){
     g->z[hgrd+i] = 2.0*nrml_lq(0.5+i*pdelta, UEPS, PEPS, &itr);
     g->z[hgrd-i] = - g->z[hgrd+i];
     g->p[hgrd+i] = nrml_cd(g->z[hgrd+i]);
     g->p[hgrd-i] = 1.0 - g->p[hgrd+i];
     g->d[hgrd-i] = g->d[hgrd+i] = nrml_dn(g->z[hgrd+i]);
-  }    
-  
+  }
+
   for(i=0; i < nres; i++){
     g->z[ngrd-nres+i] = 5.0 + i*3.0/nres;
     g->z[nres-i] = - g->z[ngrd-nres+i];
@@ -378,7 +371,7 @@ void gridcalc(struct GRID *g)
     g->p[nres-i] = 1.0 - g->p[ngrd-nres+i];
     g->d[nres-i] = g->d[ngrd-nres+i] = nrml_dn(g->z[ngrd-nres+i]);
   }
-  
+
   g->w[0] = g->w2[0] = g->w3[0] = 0.0;
   g->q[0][0] = g->q[0][1] = g->q[0][2] = g->q[0][3] = 0.0;
   for(i=1; i <= ngrd; i++){
@@ -398,7 +391,7 @@ void gridcalc(struct GRID *g)
   return;
 }
 
-int checkall(int *vector,int length,int value)
+static int checkall(int *vector,int length,int value)
  {
        int returnvalue=1, i = 0;
        for (i=0; i< length ; i++)
@@ -414,11 +407,11 @@ int checkall(int *vector,int length,int value)
 
 /*
  *  interface to R
- * 
+ *
  *  Author: Xuefei Mi <mi@biostat.uni-hannover.de>
  *
  */
- 
+
 SEXP C_miwa(SEXP steps, SEXP corr, SEXP upper, SEXP lower, SEXP infin) {
 
     SEXP answer;
@@ -427,11 +420,11 @@ SEXP C_miwa(SEXP steps, SEXP corr, SEXP upper, SEXP lower, SEXP infin) {
     int i,ii, j,k,l,i5,i6,i7,i8, ncone;
     int infinlength;
 
-/* 
+/*
 infinvalue is used to take the value of infin.
 */
-    
-    
+
+
     double *dupper,*dlower, *dcorr, output,*f, r[MAXM][MAXM][MAXM], hv[MAXM][MAXM], d[MAXM][MAXM];
     int *infinvalue;
     struct GRID   grid;
@@ -444,11 +437,11 @@ infinvalue is used to take the value of infin.
     infinvalue = INTEGER(infin);
     infinlength = LENGTH(infin);
 
- 
+
   for (i = 0; i < dim - 1; i++) {
         for(j = i + 1; j < dim; j++) {
             r[0][i][j] = dcorr[i * dim + j];
-        
+
           /* debug checking for correlation matrix
             Rprintf("r %f\n", r[0][i][j]);
           */
@@ -458,7 +451,7 @@ infinvalue is used to take the value of infin.
     grid.n = INTEGER(steps)[0];
     gridcalc(&grid);
 
- 
+
  PROTECT(answer = allocVector(REALSXP, 1));
 
 
@@ -466,60 +459,60 @@ infinvalue is used to take the value of infin.
 /*
  branch happens here. if only one sided, then just call orthant function once
 
-*/   
+*/
  if (checkall(infinvalue,infinlength,-1)==1 )
  {
   REAL(answer)[0]=1;
  }else if (checkall(infinvalue,infinlength,0)==1 )
  {
-    for (i = 0; i < dim; i++) 
+    for (i = 0; i < dim; i++)
     {
         hv[0][i] = dupper[i];
     }
     REAL(answer)[0] = orthant(dim, r, hv, &ncone, &grid);
-  
- 
+
+
  }else if (checkall(infinvalue,infinlength,1)==1 )
  {
-    for (i = 0; i < dim; i++) 
+    for (i = 0; i < dim; i++)
     {
         hv[0][i] = -dlower[i];
     }
     REAL(answer)[0] = orthant(dim, r, hv, &ncone, &grid);
-  
- 
- } else 
+
+
+ } else
  {
-    for (i = 0; i < dim; i++) 
+    for (i = 0; i < dim; i++)
     {
         hv[0][i] = dupper[i];
     }
     f=dlower;
-  
+
   /*
                    # circle number 0
-  */                   
+  */
                    output= orthant(dim, r, hv, &ncone, &grid);
   /*
                    # circle number 1
-  */                
+  */
                    for (i = 0; i < dim; i++)
                    {
-                     for (ii = 0; ii < dim; ii++) 
+                     for (ii = 0; ii < dim; ii++)
                           {
                              d[0][ii] = dupper[ii];
                            }
                      d[0][i]=f[i];
                     output=output-orthant(dim, r, d, &ncone, &grid);
                    }
-  /*          
+  /*
                    # circle number 2
-  */           
+  */
                    for (i = 0; i < (dim-1) ; i++)
                    {
                      for (j=(i+1); j < dim; j++ )
                      {
-                         for (ii = 0; ii < dim; ii++) 
+                         for (ii = 0; ii < dim; ii++)
                                {
                                   d[0][ii] = dupper[ii];
                                }
@@ -528,10 +521,10 @@ infinvalue is used to take the value of infin.
                     output=output + orthant(dim, r, d, &ncone, &grid);
                     }
                    }
-  /* 
+  /*
                    # circle number 3
-  */                 
-                     if (dim>2) 
+  */
+                     if (dim>2)
                      {
                       for (i = 0; i < (dim-2) ; i++ )
                       {
@@ -539,8 +532,8 @@ infinvalue is used to take the value of infin.
                        {
                          for (k=(j+1); k < dim; k++)
                            {
-                          
-                           for (ii = 0; ii < dim; ii++) 
+
+                           for (ii = 0; ii < dim; ii++)
                                {
                                   d[0][ii] = dupper[ii];
                                }
@@ -549,11 +542,11 @@ infinvalue is used to take the value of infin.
                               d[0][k]=f[k];
                              output=output - orthant(dim, r, d, &ncone, &grid);
                            }
-                        }   
+                        }
                        }
                      }
-                  
-                     if (dim>3) 
+
+                     if (dim>3)
                      {
                       for (i = 0; i < (dim-3) ; i++)
                       {
@@ -561,11 +554,11 @@ infinvalue is used to take the value of infin.
                        {
                          for (k=(j+1); k < (dim-1); k++)
                            {
-                            for (l=(k+1); l < (dim); l++) 
+                            for (l=(k+1); l < (dim); l++)
                              {
-                             
-                            
-                                 for (ii = 0; ii < dim; ii++) 
+
+
+                                 for (ii = 0; ii < dim; ii++)
                                      {
                                         d[0][ii] = dupper[ii];
                                      }
@@ -573,30 +566,30 @@ infinvalue is used to take the value of infin.
                                     d[0][j]=f[j];
                                     d[0][k]=f[k];
                                     d[0][l]=f[l];
-                                 
+
                                   output=output+orthant(dim, r, d, &ncone, &grid);
                               }
                            }
-                        }   
+                        }
                        }
                      }
-                  
-                    if (dim>4) 
+
+                    if (dim>4)
                      {
-                                           
+
                          for (i5 = 0; i5 < (dim-4) ; i5++)
-                      {        
+                      {
                           for (i =(i5+1); i < (dim-3) ; i++)
                       {
                         for (j=(i+1); j < (dim-2); j++ )
                        {
                          for (k=(j+1); k < (dim-1); k++)
                            {
-                            for (l=(k+1); l < (dim); l++) 
+                            for (l=(k+1); l < (dim); l++)
                              {
-                                
-                            
-                                 for (ii = 0; ii < dim; ii++) 
+
+
+                                 for (ii = 0; ii < dim; ii++)
                                      {
                                         d[0][ii] = dupper[ii];
                                      }
@@ -605,33 +598,33 @@ infinvalue is used to take the value of infin.
                                     d[0][j]=f[j];
                                     d[0][k]=f[k];
                                     d[0][l]=f[l];
-                                 
+
                             output=output-orthant(dim, r, d, &ncone, &grid);
                              }
                            }
-                        }   
+                        }
                        }
                        }
                      }
-                   
-                    
-                    if (dim>5) 
+
+
+                    if (dim>5)
                      {
-                     
+
                           for (i6 = 0; i6 < (dim-5) ; i6++)
-                      {                 
+                      {
                           for (i5 = (i6+1); i5 < (dim-4) ; i5++)
-                      {        
+                      {
                           for (i =(i5+1); i < (dim-3) ; i++)
                       {
                           for (j=(i+1); j < (dim-2); j++ )
                        {
                           for (k=(j+1); k < (dim-1); k++)
                            {
-                            for (l=(k+1); l < (dim); l++) 
+                            for (l=(k+1); l < (dim); l++)
                              {
-                            
-                             for (ii = 0; ii < dim; ii++) 
+
+                             for (ii = 0; ii < dim; ii++)
                                      {
                                         d[0][ii] = dupper[ii];
                                      }
@@ -641,39 +634,39 @@ infinvalue is used to take the value of infin.
                                     d[0][j]=f[j];
                                     d[0][k]=f[k];
                                     d[0][l]=f[l];
-                                 
+
                             output=output+orthant(dim, r, d, &ncone, &grid);
-                            
-                            
+
+
                              }
                            }
-                        }   
+                        }
                        }
                        }
                      }
                      }
-                     
-                      
-                    if (dim>6) 
-                     { 
-                       
+
+
+                    if (dim>6)
+                     {
+
                           for (i7 = 0; i7 < (dim-6) ; i7++)
-                      {        
+                      {
                           for (i6 = (i7+1); i6 < (dim-5) ; i6++)
-                      {                 
+                      {
                           for (i5 = (i6+1); i5 < (dim-4) ; i5++)
-                      {        
+                      {
                           for (i =(i5+1); i < (dim-3) ; i++)
                       {
                           for (j=(i+1); j < (dim-2); j++ )
                        {
                           for (k=(j+1); k < (dim-1); k++)
                            {
-                            for (l=(k+1); l < (dim); l++) 
+                            for (l=(k+1); l < (dim); l++)
                              {
-                            
-                            
-                             for (ii = 0; ii < dim; ii++) 
+
+
+                             for (ii = 0; ii < dim; ii++)
                                      {
                                         d[0][ii] = dupper[ii];
                                      }
@@ -684,39 +677,39 @@ infinvalue is used to take the value of infin.
                                     d[0][j]=f[j];
                                     d[0][k]=f[k];
                                     d[0][l]=f[l];
-                                 
+
                             output=output-orthant(dim, r, d, &ncone, &grid);
-                             
+
                              }
                            }
-                        }   
+                        }
                        }
                        }
                      }
                      }
                      }
-                     
-                     if (dim>7) 
-                     { 
-                                            
+
+                     if (dim>7)
+                     {
+
                           for (i8 = 0; i8 < (dim-7) ; i8++)
-                      {     
+                      {
                           for (i7 = (i8+1); i7 < (dim-6) ; i7++)
-                      {        
+                      {
                           for (i6 = (i7+1); i6 < (dim-5) ; i6++)
-                      {                 
+                      {
                           for (i5 = (i6+1); i5 < (dim-4) ; i5++)
-                      {        
+                      {
                           for (i =(i5+1); i < (dim-3) ; i++)
                       {
                           for (j=(i+1); j < (dim-2); j++ )
                        {
                           for (k=(j+1); k < (dim-1); k++)
                            {
-                            for (l=(k+1); l < (dim); l++) 
+                            for (l=(k+1); l < (dim); l++)
                              {
-                                                      
-                             for (ii = 0; ii < dim; ii++) 
+
+                             for (ii = 0; ii < dim; ii++)
                                      {
                                         d[0][ii] = dupper[ii];
                                      }
@@ -728,32 +721,31 @@ infinvalue is used to take the value of infin.
                                     d[0][j]=f[j];
                                     d[0][k]=f[k];
                                     d[0][l]=f[l];
-                                 
+
                             output=output+orthant(dim, r, d, &ncone, &grid);
-                             
+
                              }
                            }
-                        }   
+                        }
                        }
                        }
                      }
                      }
                      }
                      }
-                     
-                     
-                    
-                  
-             
-              
-            
-  
-  
+
+
+
+
+
+
+
+
+
      REAL(answer)[0]=output;
- }  
+ }
     UNPROTECT(1);
 
 
     return(answer);
-
 }

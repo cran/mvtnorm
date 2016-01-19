@@ -1,13 +1,11 @@
 
-R version 2.11.1 (2010-05-31)
-Copyright (C) 2010 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
+Copyright (C) 2015 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
-
-  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -17,7 +15,6 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> 
 > library("mvtnorm")
 > set.seed(29)
 > 
@@ -43,7 +40,7 @@ attr(,"msg")
 [1] "Normal Completion"
 > 
 > ## central t distribution (lower,Inf)
-> lower = -rexp(3,1)
+> lower <- -rexp(3,1)
 > pmvt(lower=lower, upper=rep(Inf,3), corr=corr, df = df, algorithm = ctrl)
 [1] 0.4634843
 attr(,"error")
@@ -67,9 +64,7 @@ attr(,"error")
 [1] 9.86407e-07
 attr(,"msg")
 [1] "Normal Completion"
-> try(pmvt(upper=upper, corr=corr, df = df, algorithm = TVPACK(), delta = delt))
-Error in probval.TVPACK(algorithm, n, df, lower, upper, infin, corr, corrF,  : 
-  TVPACK only possible for the central t-distribution.
+> tools::assertError(pmvt(upper=upper, corr=corr, df = df, algorithm = TVPACK(), delta = delt))
 > 
 > ## central mvn (-Inf, upper)
 > upper <- rexp(3,1)
@@ -104,19 +99,18 @@ attr(,"msg")
 > ## non-central mvn
 > delt <- rexp(3,1/10)
 > upper <- delt+rexp(3,1)
-> pmvnorm(upper=upper, corr=corr, algorithm = ctrl, mean = delt)
+> pmvnorm(upper=upper, corr=corr, algorithm = ctrl,     mean = delt)
 [1] 0.5824373
 attr(,"error")
 [1] 9.416391e-07
 attr(,"msg")
 [1] "Normal Completion"
-> try(pmvnorm(upper=upper, corr=corr, algorithm = TVPACK(), mean = delt))
+> pmvnorm(upper=upper, corr=corr, algorithm = TVPACK(), mean = delt) # should not error
 [1] 0.582434
 attr(,"error")
 [1] 1e-06
 attr(,"msg")
 [1] "Normal Completion"
-> 
 > 
 > ########################################################################
 > ## 2 dim example
@@ -207,4 +201,4 @@ attr(,"msg")
 > 
 > proc.time()
    user  system elapsed 
-  7.824   0.060   7.850 
+  5.132   0.028   5.156 

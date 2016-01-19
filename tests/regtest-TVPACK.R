@@ -1,4 +1,3 @@
-
 library("mvtnorm")
 set.seed(29)
 
@@ -14,7 +13,7 @@ pmvt(upper=upper, corr=corr, df = df, algorithm = ctrl)
 pmvt(upper=upper, corr=corr, df = df, algorithm = TVPACK())
 
 ## central t distribution (lower,Inf)
-lower = -rexp(3,1)
+lower <- -rexp(3,1)
 pmvt(lower=lower, upper=rep(Inf,3), corr=corr, df = df, algorithm = ctrl)
 pmvt(lower=lower, upper=rep(Inf,3), corr=corr, df = df, algorithm = TVPACK())
 
@@ -23,7 +22,7 @@ delt <- rexp(3,1/10)
 upper <- delt+runif(3)
 ctrl <- GenzBretz(maxpts = 2500000, abseps = 0.000001, releps = 0)
 pmvt(upper=upper, corr=corr, df = df, algorithm = ctrl, delta = delt)
-try(pmvt(upper=upper, corr=corr, df = df, algorithm = TVPACK(), delta = delt))
+tools::assertError(pmvt(upper=upper, corr=corr, df = df, algorithm = TVPACK(), delta = delt))
 
 ## central mvn (-Inf, upper)
 upper <- rexp(3,1)
@@ -38,9 +37,8 @@ pmvnorm(lower=lower,upper=rep(Inf, 3), corr=corr, algorithm = TVPACK())
 ## non-central mvn
 delt <- rexp(3,1/10)
 upper <- delt+rexp(3,1)
-pmvnorm(upper=upper, corr=corr, algorithm = ctrl, mean = delt)
-try(pmvnorm(upper=upper, corr=corr, algorithm = TVPACK(), mean = delt))
-
+pmvnorm(upper=upper, corr=corr, algorithm = ctrl,     mean = delt)
+pmvnorm(upper=upper, corr=corr, algorithm = TVPACK(), mean = delt) # should not error
 
 ########################################################################
 ## 2 dim example

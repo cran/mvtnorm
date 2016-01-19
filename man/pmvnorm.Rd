@@ -39,8 +39,10 @@ for algorithm Miwa (useful up to dimension 20) and Genz (2004)
 for the TVPACK algorithm (which covers 2- and 3-dimensional problems
 for semi-infinite integration regions).
 
-Note that both \code{-Inf} and \code{+Inf} may be specified in \code{lower} and
-\code{upper}. For more details see \code{\link{pmvt}}. 
+Note the default algorithm GenzBretz is randomized and hence slightly depends on 
+\code{\link{.Random.seed}} and that both \code{-Inf} and \code{+Inf} may
+be specified in \code{lower} and \code{upper}.  For more details see
+\code{\link{pmvt}}.  
 
 The multivariate normal 
 case is treated as a special case of \code{\link{pmvt}} with \code{df=0} and 

@@ -13,10 +13,11 @@ Miwa(steps = 128)
 TVPACK(abseps = 1e-6)
 }
 \arguments{
-  \item{maxpts}{ maximum number of function values as integer. The internal
-                 FORTRAN code always uses a minimum number depending on the dimension.
-                 (for example 752 for three-dimensional problems).}
-  \item{abseps}{ absolute error tolerance as double. }
+  \item{maxpts}{maximum number of function values as integer.  The internal
+    FORTRAN code always uses a minimum number depending on the dimension.
+    (for example 752 for three-dimensional problems).}
+  \item{abseps}{absolute error tolerance; for \code{TVPACK} only used
+    for dimension 3.}
   \item{releps}{ relative error tolerance as double. }
   \item{steps}{ number of grid points to be evaluated. }
 }
@@ -36,10 +37,10 @@ by Genz (2004).
 
 }
 \value{
-    An object of class \code{GenzBretz} or \code{Miwa} 
+    An object of class \code{GenzBretz} or \code{Miwa}
     defining hyper parameters.
 }
-\references{ 
+\references{
 
 Genz, A. (1992). Numerical computation of multivariate normal probabilities.
 \emph{Journal of Computational and Graphical Statistics}, \bold{1}, 141--150.
@@ -64,5 +65,9 @@ Miwa, A., Hayter J. and Kuriki, S. (2003).
 The evaluation of general non-centred orthant probabilities.
 \emph{Journal of the Royal Statistical Society}, Ser. B, 65, 223--234.
 
+Mi, X., Miwa, T. and Hothorn, T. (2009).
+\code{mvtnorm}: New numerical algorithm for multivariate normal probabilities.
+\emph{The R Journal} \bold{1}(1): 37--39.
+\url{http://journal.r-project.org/archive/2009-1/RJournal_2009-1_Mi+et+al.pdf}
 }
 \keyword{distribution}

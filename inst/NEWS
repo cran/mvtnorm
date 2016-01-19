@@ -1,4 +1,16 @@
 
+Changes in version 1.0-4 (2016-01-19)
+
+  o  a new algorithm for quantile estimation, again. Quantiles are 
+     now computed by a stochastic root finding algorithm. Note
+     that f.quantile in the output of qmv{t,norm} is now (again)
+     the squared difference between the cdf evaluated at the
+     quantile and the level. The \code{interval} argument to the 
+     quantile functions is used as a starting value for the
+     root finder when available.
+
+  o  clean-ups in C and R code and documentation
+
 Changes in version 1.0-3 (2015-07-21)
 
   o  new algorithm for quantile estimation. Quantiles are 

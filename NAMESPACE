@@ -5,7 +5,7 @@ importFrom("stats",
 	   pnorm, qnorm, rnorm, runif,
 	   pt, qt,
 	   rchisq,
-	   cov2cor, optim)
+	   cov2cor, optim, coef, glm, pcauchy, qcauchy, predict, quasi)
 importFrom("methods", hasArg)
 
 export(rmvnorm, dmvnorm, pmvnorm, pmvt, rmvt, qmvnorm, qmvt, dmvt,

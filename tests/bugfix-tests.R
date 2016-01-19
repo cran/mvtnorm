@@ -271,9 +271,10 @@ alpha <- 0.05
 cc_z <- numeric(m)
 var <- matrix(c(1,rho,rho,1), nrow=2, ncol=2, byrow=T)
 i <- 1
-q1 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var)$quantile
+q1 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var,
+              ptol=0.00001)$quantile
 q2 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var,
-         interval = c(0, 5))$quantile
+         interval = c(0, 5), ptol=0.00001)$quantile
 stopifnot(all.equal(round(q1, 4), round(q2, 4)))
 
 ### grrr, still problems in approx_interval

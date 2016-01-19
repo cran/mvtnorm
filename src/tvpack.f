@@ -301,7 +301,7 @@
       ERR = ABS( WID*( RESK - RESG ) )
       END
 *
-*      DOUBLE PRECISION FUNCTION STUDNT( NU, T )
+*     DOUBLE PRECISION FUNCTION STUDNT( NU, T ) -- now using R's pt(.) --> ./C_FORTRAN_interface.c
 *
 *     Student t Distribution Function
 *
@@ -515,7 +515,7 @@
          END IF
          HS = SIGN( ONE, DH - R*DK )  
          KS = SIGN( ONE, DK - R*DH ) 
-         IF ( MOD( NU, 2 ) .EQ. 0 ) THEN
+         IF ( MOD( NU, 2 ) .EQ. 0 ) THEN ! nu is even
             BVT = ATAN2( SQRT(ORS), -R )/TPI 
             GMPH = DH/SQRT( 16*( NU + DH**2 ) )  
             GMPK = DK/SQRT( 16*( NU + DK**2 ) )  
@@ -533,7 +533,7 @@
                GMPH = GMPH*( 2*J - 1 )/( 2*J*( 1 + DH**2/NU ) ) 
                GMPK = GMPK*( 2*J - 1 )/( 2*J*( 1 + DK**2/NU ) ) 
             END DO
-         ELSE
+         ELSE ! nu is odd
             QHRK = SQRT( DH**2 + DK**2 - 2*R*DH*DK + NU*ORS )  
             HKRN = DH*DK + R*NU  
             HKN = DH*DK - NU  
@@ -563,7 +563,7 @@
 *     END BVTL
       END
 *
-*      DOUBLE PRECISION FUNCTION PHID(Z)
+*     DOUBLE PRECISION FUNCTION PHID(Z) --- now using R's  pnorm(.) --> ./C_FORTRAN_interface.c
 *     
 *     Normal distribution probabilities accurate to 1d-15.
 *     Reference: J.L. Schonfelder, Math Comp 32(1978), pp 1232-1240. 

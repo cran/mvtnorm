@@ -20,11 +20,13 @@ void C_mvtdst(int *n, int *nu, double *lower, double *upper,
 
 }
 
+// TVPACK n=3
 void C_tvtlr(int *NU, double *H, double *R, double *EPSI, double *TVTL) {
 
     F77_CALL(tvtlrcall)(NU, H, R, EPSI, TVTL); 
 }
 
+// TVPACK n=2
 void C_bvtlr(int *NU, double *DH, double *DK, double *R, double *BVTL) {
 
     F77_CALL(bvtlrcall)(NU, DH, DK, R, BVTL );
