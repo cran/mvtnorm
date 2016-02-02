@@ -1,4 +1,4 @@
-# $Id: mvt.R 316 2015-12-21 08:35:05Z thothorn $
+# $Id: mvt.R 327 2016-01-29 21:10:37Z bbnkmp $
 
 ##' Do we have a correlation matrix?
 ##' @param x typically a matrix
@@ -333,6 +333,48 @@ dmvt <- function(x, delta = rep(0, p), sigma = diag(p), df = 1,
     if (log) logretval else exp(logretval)
 }
 
+## get start interval for root-finder used in qmvnorm and qmvt
+getInt <- function(p, delta, sigma, tail,
+                   type = c("Kshirsagar", "shifted"), df){
+  type <- match.arg(type)
+  sds <- sqrt(diag(sigma))
+  if(df == 0 | df == Inf){
+    df <- Inf
+    cdf <- function(x, ...)
+      pnorm(x, delta, sds, ...)
+  } else {
+    if(type == "shifted"){
+      cdf <- function(x, ...)
+        pt((x-delta)/sds, df=df, ...)
+    }
+    if(type == "Kshirsagar"){
+      cdf <- function(x, ...)
+        pt(x, ncp=delta/sds, df=df, ...)
+    }
+  }
+  switch(tail, both.tails = {
+    interval <- c(0,10)
+    func <- function(x, delta, sds)
+      prod(cdf(x)-cdf(-x))
+    UB <- max(abs(delta+sds*qt(1-(1-p)/2, df=df)))
+  }, upper.tail = {
+    interval <- c(-10,10)
+    func <- function(x, delta, sds)
+      prod(cdf(x, lower.tail=FALSE))
+    UB <- min(delta+sds*qt(1-p, df=df))
+  }, lower.tail = {
+    interval <- c(-10,10)
+    func <- function(x, delta, sds)
+      prod(cdf(x))
+    UB <- max(delta+sds*qt(p, df=df))
+  }, )
+  LB <- uniroot(function(x)
+                func(x, delta=delta, sds=sds)-p,
+                interval, extendInt = "yes")$root
+  sort(c(LB, UB))
+}
+
+
 qmvnorm <- function(p, interval = NULL,
                     tail = c("lower.tail", "upper.tail", "both.tails"),
                     mean = 0, corr = NULL, sigma = NULL, algorithm =
@@ -389,17 +431,21 @@ qmvnorm <- function(p, interval = NULL,
            return(ret)
     }
     if(is.null(interval)){
-      intp <- switch(tail,
-                     both.tails = (1 - (1 - p)/2)^(c(1,1/dim)),
-                     upper.tail = c(0.5,0.9), ## not so smart
-                     lower.tail = p^c(1,1/dim))
-      interval <- qnorm(intp)*c(0.8, 1.25)
-    } ## note: interval does not need to cover the true root for get_quant_loclin
+      if(is.null(args$sigma)){
+        sig <- args$corr
+      } else {
+        sig <- args$sigma
+      }
+      interval <- getInt(p=p, delta=args$mean, sigma=sig,
+                         tail=tail, df=Inf)
+      dif <- diff(interval)
+      interval <- interval+c(-1,1)*0.2*max(dif,0.1) ## extend range slightly
+    } 
     if(tail == "upper.tail") ## get_quant_loclin assumes an increasing function
       p <- 1-p
     qroot <- get_quant_loclin(pfct, p, interval=interval,
                               link="probit",
-                              ytol=ptol, maxiter=maxiter, verbose=trace)
+                              ptol=ptol, maxiter=maxiter, verbose=trace)
     qroot$f.quantile <- qroot$f.quantile - p
     qroot
 }
@@ -465,23 +511,22 @@ qmvt <- function(p, interval = NULL,
         return(ret)
     }
     if(is.null(interval)){
-      intp <- switch(tail,
-                     both.tails = (1 - (1 - p)/2)^(c(1,1/dim)),
-                     upper.tail = c(0.5,0.9), ## not so smart
-                     lower.tail = p^c(1,1/dim))
-      if(is.finite(df) && (df > 0)){
-        intq <- qt(intp, df = df)
+      if(is.null(args$sigma)){
+        sig <- args$corr
       } else {
-        intq <- qnorm(intp)
+        sig <- args$sigma
       }
-      interval <- intq*c(0.8, 1.25)
-    } ## note: interval does not need to cover the true root for get_quant_loclin, just initial guesses
+      interval <- getInt(p=p, delta=args$mean, sigma=sig,
+                         tail=tail, type=type, df=df)
+      dif <- diff(interval)
+      interval <- interval+c(-1,1)*0.2*max(dif,0.1) ## extend range slightly
+    } 
     if(tail == "upper.tail") ## get_quant_loclin assumes an increasing function
       p <- 1-p
     link <- ifelse(df <= 7 & df > 0, "cauchit", "probit")
     qroot <- get_quant_loclin(pfct, p, interval=interval,
                               link=link,
-                              ytol=ptol, maxiter=maxiter, verbose=trace)
+                              ptol=ptol, maxiter=maxiter, verbose=trace)
     qroot$f.quantile <- qroot$f.quantile - p
     qroot
 }

@@ -665,28 +665,28 @@ attr(,"message")
 > d <- 4
 > qmvnorm(p, sigma = diag(d), tail = "lower")
 $quantile
-[1] 2.234218
+[1] 2.23395
 
 $f.quantile
-[1] 5.987424e-06
+[1] -5.905716e-07
 
 attr(,"message")
 [1] "Normal Completion"
 > qmvnorm(p, sigma = diag(d), tail = "upper")
 $quantile
-[1] -2.233546
+[1] -2.23395
 
 $f.quantile
-[1] 2.00562e-05
+[1] 5.905716e-07
 
 attr(,"message")
 [1] "Normal Completion"
 > qmvnorm(p, sigma = diag(d), tail = "both")
 $quantile
-[1] 2.490927
+[1] 2.490844
 
 $f.quantile
-[1] 2.351382e-07
+[1] -6.108329e-07
 
 attr(,"message")
 [1] "Normal Completion"
@@ -694,23 +694,49 @@ attr(,"message")
 > d <- 4
 > qmvnorm(p, sigma = diag(d), tail = "lower")
 $quantile
-[1] -0.06825996
+[1] -0.06784195
 
 $f.quantile
-[1] -3.44334e-05
+[1] 4.453866e-05
 
 attr(,"message")
 [1] "Normal Completion"
 > qmvnorm(p, sigma = diag(d), tail = "upper")
 $quantile
-[1] 0.06805875
+[1] 0.06784195
 
 $f.quantile
-[1] 2.354719e-07
+[1] -4.453866e-05
 
 attr(,"message")
 [1] "Normal Completion"
 > 
+> ### package schwartz97
+> qmvnorm(p = .5, tail = "lower", mean = c(6.75044368, 0.04996326), 
++         sigma = rbind(c(0.10260550, 0.02096418),
++                       c(0.02096418, 0.16049956)))
+$quantile
+[1] 6.750444
+
+$f.quantile
+[1] -5.662137e-15
+
+attr(,"message")
+[1] "Normal Completion"
+> stint <- c(6.75044332319072, 6.75044368) ## with very narrow start interval
+> qmvnorm(p = .5, tail = "lower", mean = c(6.75044368, 0.04996326),
++         sigma = rbind(c(0.10260550, 0.02096418),
++           c(0.02096418, 0.16049956)), interval=stint)
+$quantile
+[1] 6.750444
+
+$f.quantile
+[1] -1.44329e-15
+
+attr(,"message")
+[1] "Normal Completion"
+> 
+> 
 > proc.time()
    user  system elapsed 
-  6.500   0.036   6.531 
+  7.220   0.028   7.239 

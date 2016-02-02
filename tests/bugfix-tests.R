@@ -532,3 +532,13 @@ p <- 1 - .95
 d <- 4
 qmvnorm(p, sigma = diag(d), tail = "lower")
 qmvnorm(p, sigma = diag(d), tail = "upper")
+
+### package schwartz97
+qmvnorm(p = .5, tail = "lower", mean = c(6.75044368, 0.04996326), 
+        sigma = rbind(c(0.10260550, 0.02096418),
+                      c(0.02096418, 0.16049956)))
+stint <- c(6.75044332319072, 6.75044368) ## with very narrow start interval
+qmvnorm(p = .5, tail = "lower", mean = c(6.75044368, 0.04996326),
+        sigma = rbind(c(0.10260550, 0.02096418),
+          c(0.02096418, 0.16049956)), interval=stint)
+

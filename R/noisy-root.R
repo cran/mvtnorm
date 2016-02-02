@@ -8,26 +8,25 @@ wgts <- function(typred, ttarg){
   (1-dists^3)^3*(dists < 1)
 }
 
-stop_crit <- function(xtol=NULL, ytol=NULL, fit, xest, ttarg, level=0.05){
-  if(!is.null(xtol)){
-    xvals <- c(xest-xtol, xest+xtol)
-    pred <- predict(fit, data.frame(x=xvals), se.fit=TRUE)
-    crit <- qt(1-level/2, df=fit$df.residual)
-    cond1 <- pred$fit[1]+crit*pred$se.fit[1] < ttarg
-    cond2 <- pred$fit[2]-crit*pred$se.fit[2] > ttarg
-    return(list(stop=cond1 & cond2))
+predict_with_se <- function(fit, newdata){
+  pred <- try(predict(fit, newdata, se.fit=TRUE), silent=TRUE)
+  if(inherits(pred, "try-error")){ ## problem with se calculation, use "large" se
+    pred0 <- predict(fit, newdata)
+    pred <- list(fit=pred0, se.fit=rep(0.5,length(pred0)))
   }
-  if(!is.null(ytol)){
-    pred <- predict(fit, data.frame(x=xest), se.fit=TRUE)
-    crit <- qt(1-level/2, df=fit$df.residual)
-    cond1 <- pred$fit[1]+crit*pred$se.fit[1] < ttarg+ytol
-    cond2 <- pred$fit[1]-crit*pred$se.fit[1] > ttarg-ytol
-    return(list(stop=cond1 & cond2))
-  }
+  pred
+}
+
+stop_crit <- function(ptol, fit, xest, ttarg, level=0.05){
+  pred <- predict_with_se(fit, data.frame(x=xest))
+  crit <- qt(1-level/2, df=fit$df.residual)
+  cond1 <- pred$fit[1]+crit*pred$se.fit[1] < ttarg+ptol
+  cond2 <- pred$fit[1]-crit*pred$se.fit[1] > ttarg-ptol
+  return(list(stop=cond1 & cond2))
 }
 
 get_new_points <- function(fit, xest, targ, level=0.05){
-  pred <- predict(fit, data.frame(x=xest), se.fit=TRUE)
+  pred <- predict_with_se(fit, data.frame(x=xest))
   cf <- coef(fit)
   xLB <- (pred$fit-pred$se.fit-cf[1])/cf[2]
   xUB <- (pred$fit+pred$se.fit-cf[1])/cf[2]
@@ -55,7 +54,7 @@ sanitize_y <- function(y){
 }
 
 get_quant_loclin <- function(func, targ, interval, 
-                             ytol=0.005, xtol=NULL, maxiter = 500, 
+                             ptol=0.005, maxiter = 500, 
                              link = c("probit", "cauchit"),
                              verbose = FALSE, ...){
   ## input argument checks
@@ -95,7 +94,7 @@ get_quant_loclin <- function(func, targ, interval,
     tycurpred <- predict(fit, newdata=data.frame(x=xcur))
     weights <- wgts(tycurpred, ttarg)
     fit <- fitlr(xcur, ycur, weights=weights, link=link)
-    stp <- stop_crit(xtol, ytol, fit, xest[i], ttarg)
+    stp <- stop_crit(ptol, fit, xest[i], ttarg)
     if(verbose & i > 1){
       txt <- sprintf("Iteration %i, Estimate: %f, LB: %f (%f), UB: %f (%f)\n",
                      i, xest[i],

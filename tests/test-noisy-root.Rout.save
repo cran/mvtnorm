@@ -28,51 +28,51 @@ Type 'q()' to quit R.
 > ## one-sided, lower tail
 > qu <- qmvt(0.95, df=df, corr=corr)$quantile
 > pmvt(lower=rep(-Inf, dim), upper=rep(qu,dim), corr=corr, df=df)
-[1] 0.9499846
+[1] 0.9499886
 attr(,"error")
-[1] 8.393605e-05
+[1] 8.394993e-05
 attr(,"msg")
 [1] "Normal Completion"
 > 
 > qu <- qmvnorm(0.95, corr=corr)$quantile
 > pmvnorm(lower=rep(-Inf, dim), upper=rep(qu,dim), corr=corr)
-[1] 0.9498987
+[1] 0.9499785
 attr(,"error")
-[1] 6.264527e-05
+[1] 6.265055e-05
 attr(,"msg")
 [1] "Normal Completion"
 > 
 > ## two-sided
 > qu <- qmvt(0.95, df=df, corr=corr, tail="both.tails")$quantile
 > pmvt(lower=rep(-qu, dim), upper=rep(qu,dim), corr=corr, df=df)
-[1] 0.9499186
+[1] 0.949925
 attr(,"error")
-[1] 9.63593e-05
+[1] 9.635837e-05
 attr(,"msg")
 [1] "Normal Completion"
 > 
 > qu <- qmvnorm(0.95, corr=corr, tail="both.tails")$quantile
 > pmvnorm(lower=rep(-qu, dim), upper=rep(qu,dim), corr=corr)
-[1] 0.9498315
+[1] 0.949927
 attr(,"error")
-[1] 0.0001544061
+[1] 0.0001545113
 attr(,"msg")
 [1] "Normal Completion"
 > 
 > ## one-sided, upper tail
 > qu <- qmvt(0.95, df=df, corr=corr, tail="upper.tail")$quantile
 > pmvt(lower=rep(qu, dim), upper=rep(Inf,dim), corr=corr, df=df)
-[1] 0.9499515
+[1] 0.9499528
 attr(,"error")
-[1] 9.714582e-05
+[1] 9.714629e-05
 attr(,"msg")
 [1] "Normal Completion"
 > 
 > qu <- qmvnorm(0.95, corr=corr, tail="upper.tail")$quantile
 > pmvnorm(lower=rep(qu, dim), upper=rep(Inf,dim), corr=corr)
-[1] 0.949987
+[1] 0.9500897
 attr(,"error")
-[1] 7.620839e-05
+[1] 7.617415e-05
 attr(,"msg")
 [1] "Normal Completion"
 > 
@@ -96,4 +96,4 @@ attr(,"msg")
 > 
 > proc.time()
    user  system elapsed 
- 10.975   0.023  10.996 
+  8.040   0.012   8.039 
