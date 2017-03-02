@@ -48,6 +48,10 @@ fitlr <- function(x, y, weights, link){
   return(fit)
 }
 
+sanitize_x <- function(x, minx){
+  pmax(x, minx)
+}
+
 sanitize_y <- function(y){
   eps <- .Machine$double.eps
   pmax(pmin(1-eps,y),eps)
@@ -56,6 +60,7 @@ sanitize_y <- function(y){
 get_quant_loclin <- function(func, targ, interval, 
                              ptol=0.005, maxiter = 500, 
                              link = c("probit", "cauchit"),
+                             minx = -Inf,
                              verbose = FALSE, ...){
   ## input argument checks
   if(interval[2] <= interval[1])
@@ -65,7 +70,7 @@ get_quant_loclin <- function(func, targ, interval,
   x <- y <- numeric(4+maxiter)
   xest <- numeric(1+maxiter)
   ## first three evaluations
-  x[1:3] <- c(interval, mean(interval))
+  x[1:3] <- sanitize_x(c(interval, mean(interval)), minx)
   res <- lapply(x[1:3], function(x) func(x, ...))
   y[1:3] <- sapply(res, function(x) sanitize_y(x))
   ## check for non-monotone function
@@ -84,7 +89,7 @@ get_quant_loclin <- function(func, targ, interval,
   ycur <- y[1:3];xcur <- x[1:3]
   fit <- fitlr(xcur, ycur, weights=rep(1,3), link=link)
   xest[1] <- get_est(fit, ttarg)
-  x[4] <- xest[1]
+  x[4] <- sanitize_x(xest[1], minx)
   y[4] <- sanitize_y(func(x[4], ...))
   count <- 4
 
@@ -105,7 +110,7 @@ get_quant_loclin <- function(func, targ, interval,
     if(stp$stop)
       break
     xest[i+1] <- get_est(fit, ttarg)
-    new_x <- get_new_points(fit, xest[i+1], targ)
+    new_x <- sanitize_x(get_new_points(fit, xest[i+1], targ), minx)
     new_y <- lapply(new_x, function(x) func(x, ...))
     ind <- (count+1):(count+2)
     x[ind] <- new_x

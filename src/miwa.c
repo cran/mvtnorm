@@ -293,6 +293,8 @@ static double orthant(int m, double r[][MAXM][MAXM], double h[][MAXM],
     }
   }
 
+/* Rprintf("p: %f\n", p); */
+
   return (p);
 }
 
@@ -521,6 +523,9 @@ infinvalue is used to take the value of infin.
                     output=output + orthant(dim, r, d, &ncone, &grid);
                     }
                    }
+/* Rprintf("output: %f\n", output); */
+
+
   /*
                    # circle number 3
   */

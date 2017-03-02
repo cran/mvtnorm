@@ -16,7 +16,7 @@ citEntry(entry = "Manual",
                              as.person("Torsten Hothorn")),
          year = year,
          note = note,
-         url = "http://CRAN.R-project.org/package=mvtnorm",
+         url = "https://CRAN.R-project.org/package=mvtnorm",
 
          textVersion =
          paste("Alan Genz, Frank Bretz, Tetsuhisa Miwa, Xuefei Mi, Friedrich Leisch, Fabian Scheipl, Torsten Hothorn",

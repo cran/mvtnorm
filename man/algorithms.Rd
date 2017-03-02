@@ -68,6 +68,6 @@ The evaluation of general non-centred orthant probabilities.
 Mi, X., Miwa, T. and Hothorn, T. (2009).
 \code{mvtnorm}: New numerical algorithm for multivariate normal probabilities.
 \emph{The R Journal} \bold{1}(1): 37--39.
-\url{http://journal.r-project.org/archive/2009-1/RJournal_2009-1_Mi+et+al.pdf}
+\url{https://journal.r-project.org/archive/2009-1/RJournal_2009-1_Mi+et+al.pdf}
 }
 \keyword{distribution}

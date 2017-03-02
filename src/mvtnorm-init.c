@@ -51,6 +51,7 @@ static const R_CallMethodDef callMethods[] = {
 
 void R_init_mvtnorm(DllInfo *dll)
 {
-    R_registerRoutines(dll, NULL, callMethods, cMethods, NULL);
+    R_registerRoutines(dll, cMethods, callMethods, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
     R_RegisterCCallable("mvtnorm", "C_mvtdst", (DL_FUNC) &C_mvtdst);
 }

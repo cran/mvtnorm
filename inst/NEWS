@@ -1,4 +1,8 @@
 
+Changes in version 1.0-6 (2017-03-01)
+
+  o  use registered C routines
+
 Changes in version 1.0-5 (2016-02-02)
 
   o  improvements in quantile estimation

@@ -1,4 +1,4 @@
-# $Id: mvt.R 327 2016-01-29 21:10:37Z bbnkmp $
+# $Id: mvt.R 334 2017-03-01 14:59:37Z thothorn $
 
 ##' Do we have a correlation matrix?
 ##' @param x typically a matrix
@@ -443,9 +443,11 @@ qmvnorm <- function(p, interval = NULL,
     } 
     if(tail == "upper.tail") ## get_quant_loclin assumes an increasing function
       p <- 1-p
+    minx <- ifelse(tail == "both.tails", 0, -Inf)
     qroot <- get_quant_loclin(pfct, p, interval=interval,
                               link="probit",
-                              ptol=ptol, maxiter=maxiter, verbose=trace)
+                              ptol=ptol, maxiter=maxiter,
+                              minx=minx, verbose=trace)
     qroot$f.quantile <- qroot$f.quantile - p
     qroot
 }
@@ -523,10 +525,12 @@ qmvt <- function(p, interval = NULL,
     } 
     if(tail == "upper.tail") ## get_quant_loclin assumes an increasing function
       p <- 1-p
+    minx <- ifelse(tail == "both.tails", 0, -Inf)
     link <- ifelse(df <= 7 & df > 0, "cauchit", "probit")
     qroot <- get_quant_loclin(pfct, p, interval=interval,
                               link=link,
-                              ptol=ptol, maxiter=maxiter, verbose=trace)
+                              ptol=ptol, maxiter=maxiter,
+                              minx=minx, verbose=trace)
     qroot$f.quantile <- qroot$f.quantile - p
     qroot
 }
@@ -553,7 +557,7 @@ probval.GenzBretz <- function(x, n, df, lower, upper, infin, corr, corrF, delta)
     upper[ isInf(upper)] <- 0
 
     error <- 0; value <- 0; inform <- 0
-    .C("C_mvtdst",
+    .C(C_mvtdst,
        N = as.integer(n),
        NU = as.integer(df),
        LOWER = as.double(lower),
@@ -582,7 +586,7 @@ probval.Miwa <- function(x, n, df, lower, upper, infin, corr, corrF, delta) {
     if (inherits(sc, "try-error"))
         stop("Miwa algorithm cannot compute probabilities for singular problems")
 
-    p <- .Call("C_miwa", steps = as.integer(x$steps),
+    p <- .Call(C_miwa, steps = as.integer(x$steps),
                          corr = as.double(corr),
                          upper = as.double(upper),
                          lower = as.double(lower),
