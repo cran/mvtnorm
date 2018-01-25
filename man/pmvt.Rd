@@ -182,7 +182,7 @@ round(uniroot(myfct, lower=1, upper=5, alpha=0.95)$root, 3)
 # compare pmvt and pmvnorm for large df:
 
 a <- pmvnorm(lower=-Inf, upper=1, mean=rep(0, 5), corr=diag(5))
-b <- pmvt(lower=-Inf, upper=1, delta=rep(0, 5), df=rep(300,5),
+b <- pmvt(lower=-Inf, upper=1, delta=rep(0, 5), df=300,
           corr=diag(5))
 a
 b

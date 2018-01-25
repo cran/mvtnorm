@@ -157,7 +157,10 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
 
     if (is.null(df))
         stop(sQuote("df"), " not specified")
-    if (df < 0) # MH: was any(..)
+    if (length(df) > 1)
+        warning("length of df is larger than one; using first element only")
+    df <- df[1L]
+    if (any(df < 0)) # correct again; MH: was any(..)
         stop("cannot compute multivariate t distribution with ",
              sQuote("df"), " < 0")
     if(is.finite(df) && (df != as.integer(df))) # MH: was !isTRUE(all.equal(as.integer(df), df))
