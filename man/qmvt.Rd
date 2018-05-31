@@ -5,7 +5,8 @@
 
 Computes the equicoordinate quantile function of the multivariate t
 distribution for arbitrary correlation matrices
-based on inversion of \code{\link{qmvt}}.
+based on inversion of \code{\link{pmvt}}, using a stochastic root
+finding algorithm described in Bornkamp (2018).
 
 }
 \usage{
@@ -64,6 +65,11 @@ qmvt(p, interval = NULL, tail = c("lower.tail",
   A list with two components: \code{quantile} and \code{f.quantile} 
   give the location of the quantile and the difference between the distribution
   function evaluated at the quantile and \code{p}.
+}
+\references{
+Bornkamp, B. (2018). Calculating quantiles of noisy distribution
+functions using local linear regressions. \emph{Computational
+  Statistics}, \bold{33}, 487--501.
 }
 \seealso{\code{\link{pmvnorm}}, \code{\link{qmvnorm}}}
 \examples{

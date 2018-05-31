@@ -1,4 +1,4 @@
-# $Id: mvt.R 334 2017-03-01 14:59:37Z thothorn $
+# $Id: mvt.R 341 2018-05-31 08:29:12Z thothorn $
 
 ##' Do we have a correlation matrix?
 ##' @param x typically a matrix
@@ -166,12 +166,16 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
     if(is.finite(df) && (df != as.integer(df))) # MH: was !isTRUE(all.equal(as.integer(df), df))
         stop(sQuote("df"), " is not an integer")
     if (carg$uni) {
+        if (!is.null(carg$sigma)) {
+            carg$upper <- carg$upper/sqrt(carg$sigma)
+            carg$lower <- carg$lower/sqrt(carg$sigma)
+        }
         if (df > 0) # df = Inf is taken care of by pt()
             RET <- list(value = pt(carg$upper, df=df, ncp=carg$mean) -
                                 pt(carg$lower, df=df, ncp=carg$mean),
                        error = 0, msg="univariate: using pt")
         else
-            RET <- list(value = pnorm(carg$upper, mean = carg$mean) -
+            RET <- list(value = pnorm(carg$upper, mean=carg$mean) -
                                 pnorm(carg$lower, mean=carg$mean),
                        error = 0, msg="univariate: using pnorm")
     } else { # mvt() takes care of df = 0 || df = Inf

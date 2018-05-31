@@ -1,4 +1,11 @@
 
+Changes in version 1.0-8 (2018-05-31)
+
+  o  pmvt(..., sigma = ) was ignored in the univariate case
+     (reported by Alec Stephenson)
+
+  o  documentation updates
+
 Changes in version 1.0-7 (2018-01-25)
 
   o  pmvt(..., df = ) is scalar only
