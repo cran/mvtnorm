@@ -1,7 +1,7 @@
 Package: mvtnorm
 Title: Multivariate Normal and t Distributions
-Version: 1.0-8
-Date: 2018-05-31
+Version: 1.0-9
+Date: 2019-02-28
 Authors@R: c(person("Alan", "Genz", role = "aut"),
              person("Frank", "Bretz", role = "aut"),
              person("Tetsuhisa", "Miwa", role = "aut"),
@@ -15,11 +15,11 @@ Authors@R: c(person("Alan", "Genz", role = "aut"),
 Description: Computes multivariate normal and t probabilities, quantiles,
   random deviates and densities.
 Imports: stats, methods
-Depends: R(>= 1.9.0)
+Depends: R(>= 3.5.0)
 License: GPL-2
 URL: http://mvtnorm.R-forge.R-project.org
 NeedsCompilation: yes
-Packaged: 2018-05-31 08:37:50 UTC; hothorn
+Packaged: 2019-02-28 12:29:46 UTC; hothorn
 Author: Alan Genz [aut],
   Frank Bretz [aut],
   Tetsuhisa Miwa [aut],
@@ -31,4 +31,4 @@ Author: Alan Genz [aut],
   Torsten Hothorn [aut, cre] (<https://orcid.org/0000-0001-8301-0471>)
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Repository: CRAN
-Date/Publication: 2018-05-31 20:38:18 UTC
+Date/Publication: 2019-02-28 15:00:03 UTC
