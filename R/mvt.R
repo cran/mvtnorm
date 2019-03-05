@@ -1,4 +1,4 @@
-# $Id: mvt.R 345 2019-02-28 12:28:59Z thothorn $
+# $Id: mvt.R 349 2019-03-01 10:54:24Z thothorn $
 
 ##' Do we have a correlation matrix?
 ##' @param x typically a matrix
@@ -344,7 +344,7 @@ dmvt <- function(x, delta = rep(0, p), sigma = diag(p), df = 1,
 getInt <- function(p, delta, sigma, tail,
                    type = c("Kshirsagar", "shifted"), df){
   type <- match.arg(type)
-  sds <- sqrt(diag(sigma))
+  sds <- c(sqrt(diag(sigma)))
   if(df == 0 | df == Inf){
     df <- Inf
     cdf <- function(x, ...)
@@ -482,10 +482,11 @@ qmvt <- function(p, interval = NULL,
     if (!is.null(sigma)) dim <- NROW(sigma)
     lower <- upper <- rep.int(0, dim)
     args <- checkmvArgs(lower, upper, delta, corr, sigma)
-    if (is.null(args$sigma)) args$sigma <- 1
     if (args$uni) {
+        if (is.null(args$sigma)) args$sigma <- 1
         if (!identical(args$sigma, 1))
             stop("sigma != 1 not implemented for univariate case")
+        args$sigma <- NULL
         if (tail == "both.tails") p <- ifelse(p < 0.5, p / 2, 1 - (1 - p)/2)
         if (df == 0 || isInf(df)) { # MH: now (also) properly allow df = Inf
             q <- qnorm(p, mean = args$mean, lower.tail = (tail != "upper.tail"))

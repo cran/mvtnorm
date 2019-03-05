@@ -1,7 +1,7 @@
-62ec2d20ce44f657e69ff009ec56a3cb *DESCRIPTION
+69e738612218c0c99b19cb73bbd30104 *DESCRIPTION
 ef6b7629862a1dd93b84bba7205d31f7 *NAMESPACE
 b335df1dee9912cfd40f9cb482d8835e *R/mvnorm.R
-62f543be1130def78caa40b1f1f1584b *R/mvt.R
+9a51571b702ee03441513e802d90de94 *R/mvt.R
 694e9c94bcafc2786a3e8a4597565ffc *R/noisy-root.R
 0b38660f04481db63794d0f580833a39 *R/tvpack.R
 a5763de7ea8b9695b5f647182a7fac2d *build/vignette.rds
@@ -12,10 +12,10 @@ ca4c35956e7a8aa253e2c52cd49f0d99 *inst/C_API_Example/NAMESPACE
 990127bb625b41c7181a653020e3f6a9 *inst/C_API_Example/R/test.R
 5c4bbffc1a0108c090cfa2dbb1918d2d *inst/C_API_Example/src/test.c
 64fd633725dcd93cdd836e3535f19788 *inst/C_API_Example/tests/test.R
-f64893bb99a3619075c426ed1c13fad0 *inst/NEWS
+b723719ea66ddcbce606ea661bbfa9d5 *inst/NEWS
 73e21a346386350ffebe0b09cafa5ad5 *inst/doc/MVT_Rnews.R
 e83251e0ceb0e3a2aec9f3d101e41ea6 *inst/doc/MVT_Rnews.Rnw
-ce793133b81a8e2918328d6f8b3e3867 *inst/doc/MVT_Rnews.pdf
+7cbbc33adaffd24ef311b07364bfa545 *inst/doc/MVT_Rnews.pdf
 80f85e809cd29a8eb856baefe5ba2ffd *inst/include/mvtnorm.h
 2ac853ab98c7223bbca7e418096966fb *inst/include/mvtnormAPI.h
 18d186ba9ace287fe0083853e50afeb9 *man/Mvnorm.Rd
@@ -41,6 +41,6 @@ df4afdafb9fe748677dab641226f1051 *tests/regtest-TVPACK.Rout.save
 c5fb22012e7c88d943bdfb3738713284 *tests/rmvnorm.R
 ffb7fa80edcd873dfca1ad13dd718da0 *tests/test-getInt.R
 8433ca0a135c017df7229030259bc9c1 *tests/test-noisy-root.R
-93383d8cc31462ebc7dcfbba0c749f55 *tests/test-noisy-root.Rout.save
+b9c5f09cb4556e20e5e2a3b3f168c88a *tests/test-noisy-root.Rout.save
 e83251e0ceb0e3a2aec9f3d101e41ea6 *vignettes/MVT_Rnews.Rnw
 06fabcce468ee909da55a1902495b69d *vignettes/litdb.bib

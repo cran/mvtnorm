@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2019-02-27 r76167) -- "Unsuffered Consequences"
+R Under development (unstable) (2019-02-28 r76174) -- "Unsuffered Consequences"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -27,7 +27,6 @@ Type 'q()' to quit R.
 > 
 > ## one-sided, lower tail
 > qu <- qmvt(0.95, df=df, corr=corr)$quantile
-There were 26 warnings (use warnings() to see them)
 > pmvt(lower=rep(-Inf, dim), upper=rep(qu,dim), corr=corr, df=df)
 [1] 0.9499886
 attr(,"error")
@@ -45,7 +44,6 @@ attr(,"msg")
 > 
 > ## two-sided
 > qu <- qmvt(0.95, df=df, corr=corr, tail="both.tails")$quantile
-There were 39 warnings (use warnings() to see them)
 > pmvt(lower=rep(-qu, dim), upper=rep(qu,dim), corr=corr, df=df)
 [1] 0.949925
 attr(,"error")
@@ -63,7 +61,6 @@ attr(,"msg")
 > 
 > ## one-sided, upper tail
 > qu <- qmvt(0.95, df=df, corr=corr, tail="upper.tail")$quantile
-There were 26 warnings (use warnings() to see them)
 > pmvt(lower=rep(qu, dim), upper=rep(Inf,dim), corr=corr, df=df)
 [1] 0.9499528
 attr(,"error")
@@ -82,7 +79,6 @@ attr(,"msg")
 > ## cross-check interval works
 > ## one-sided, lower tail
 > qu <- qmvt(0.95, df=df , corr=corr, interval=c(0,10))$quantile
-There were 24 warnings (use warnings() to see them)
 > pmvt(lower=rep(-Inf, dim), upper=rep(qu,dim), corr=corr, df=df)
 [1] 0.9500624
 attr(,"error")
@@ -100,4 +96,4 @@ attr(,"msg")
 > 
 > proc.time()
    user  system elapsed 
- 14.580   0.040  14.627 
+ 14.736   0.052  14.783 
