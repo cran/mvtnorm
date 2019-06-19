@@ -1152,67 +1152,6 @@
      &     VARPRD, X(NLIM), R(NLIM), VK(NLIM), VALUES(FLIM), FS(FLIM)
       PARAMETER ( ONE = 1 )
       SAVE P, C, SAMPLS, NP, VAREST
-      INFORM = 1
-      INTVLS = 0
-      VARPRD = 0
-      IF ( MINVLS .GE. 0 ) THEN
-         DO K = 1, NF
-            FINEST(K) = 0
-            VAREST(K) = 0
-         END DO
-         SAMPLS = MINSMP 
-         DO I = MIN( NDIM, 10 ), PLIM
-            NP = I
-            IF ( MINVLS .LT. 2*SAMPLS*P(I) ) GO TO 10
-         END DO
-         SAMPLS = MAX( MINSMP, MINVLS/( 2*P(NP) ) )
-      ENDIF
- 10   VK(1) = ONE/P(NP)
-      K = 1
-      DO I = 2, NDIM
-         IF ( I .LE. KLIM ) THEN
-            K = MOD( C(NP, MIN(NDIM-1,KLIM-1))*DBLE(K), DBLE(P(NP)) )
-            VK(I) = K*VK(1)
-         ELSE
-            VK(I) = INT( P(NP)*2**( DBLE(I-KLIM)/(NDIM-KLIM+1) ) )
-            VK(I) = MOD( VK(I)/P(NP), ONE )
-         END IF
-      END DO
-      DO K = 1, NF
-         FINVAL(K) = 0
-         VARSQR(K) = 0
-      END DO
-*
-      DO I = 1, SAMPLS
-         CALL MVKRSV( NDIM,KLIM,VALUES, P(NP),VK, NF,FUNSUB, X,R,PR,FS )
-         DO K = 1, NF
-            DIFINT = ( VALUES(K) - FINVAL(K) )/I
-            FINVAL(K) = FINVAL(K) + DIFINT
-            VARSQR(K) = ( I - 2 )*VARSQR(K)/I + DIFINT**2
-         END DO
-      END DO
-*
-      INTVLS = INTVLS + 2*SAMPLS*P(NP)
-      KMX = 1
-      DO K = 1, NF
-         VARPRD = VAREST(K)*VARSQR(K)
-         FINEST(K) = FINEST(K) + ( FINVAL(K) - FINEST(K) )/( 1+VARPRD )      
-         IF ( VARSQR(K) .GT. 0 ) VAREST(K) = ( 1 + VARPRD )/VARSQR(K)
-         IF ( ABS(FINEST(K)) .GT. ABS(FINEST(KMX)) ) KMX = K
-      END DO
-      ABSERR = 7*SQRT( VARSQR(KMX)/( 1 + VARPRD ) )/2
-      IF ( ABSERR .GT. MAX( ABSEPS, ABS(FINEST(KMX))*RELEPS ) ) THEN
-         IF ( NP .LT. PLIM ) THEN
-            NP = NP + 1
-         ELSE
-            SAMPLS = MIN( 3*SAMPLS/2, ( MAXVLS - INTVLS )/( 2*P(NP) ) ) 
-            SAMPLS = MAX( MINSMP, SAMPLS )
-         ENDIF
-         IF ( INTVLS + 2*SAMPLS*P(NP) .LE. MAXVLS ) GO TO 10
-      ELSE
-         INFORM = 0
-      ENDIF
-      MINVLS = INTVLS
 *
 *    Optimal Parameters for Lattice Rules
 *
@@ -1352,6 +1291,68 @@
      & 144595, 907454, 689648, 4*687580, 978368, 687580, 552742, 105195, 
      & 942843, 768249, 4*307142, 7*880619, 11*117185, 11*60731,  
      & 4*178309, 8*74373, 3*214965/
+*
+      INFORM = 1
+      INTVLS = 0
+      VARPRD = 0
+      IF ( MINVLS .GE. 0 ) THEN
+         DO K = 1, NF
+            FINEST(K) = 0
+            VAREST(K) = 0
+         END DO
+         SAMPLS = MINSMP 
+         DO I = MIN( NDIM, 10 ), PLIM
+            NP = I
+            IF ( MINVLS .LT. 2*SAMPLS*P(I) ) GO TO 10
+         END DO
+         SAMPLS = MAX( MINSMP, MINVLS/( 2*P(NP) ) )
+      ENDIF
+ 10   VK(1) = ONE/P(NP)
+      K = 1
+      DO I = 2, NDIM
+         IF ( I .LE. KLIM ) THEN
+            K = MOD( C(NP, MIN(NDIM-1,KLIM-1))*DBLE(K), DBLE(P(NP)) )
+            VK(I) = K*VK(1)
+         ELSE
+            VK(I) = INT( P(NP)*2**( DBLE(I-KLIM)/(NDIM-KLIM+1) ) )
+            VK(I) = MOD( VK(I)/P(NP), ONE )
+         END IF
+      END DO
+      DO K = 1, NF
+         FINVAL(K) = 0
+         VARSQR(K) = 0
+      END DO
+*
+      DO I = 1, SAMPLS
+         CALL MVKRSV( NDIM,KLIM,VALUES, P(NP),VK, NF,FUNSUB, X,R,PR,FS )
+         DO K = 1, NF
+            DIFINT = ( VALUES(K) - FINVAL(K) )/I
+            FINVAL(K) = FINVAL(K) + DIFINT
+            VARSQR(K) = ( I - 2 )*VARSQR(K)/I + DIFINT**2
+         END DO
+      END DO
+*
+      INTVLS = INTVLS + 2*SAMPLS*P(NP)
+      KMX = 1
+      DO K = 1, NF
+         VARPRD = VAREST(K)*VARSQR(K)
+         FINEST(K) = FINEST(K) + ( FINVAL(K) - FINEST(K) )/( 1+VARPRD )      
+         IF ( VARSQR(K) .GT. 0 ) VAREST(K) = ( 1 + VARPRD )/VARSQR(K)
+         IF ( ABS(FINEST(K)) .GT. ABS(FINEST(KMX)) ) KMX = K
+      END DO
+      ABSERR = 7*SQRT( VARSQR(KMX)/( 1 + VARPRD ) )/2
+      IF ( ABSERR .GT. MAX( ABSEPS, ABS(FINEST(KMX))*RELEPS ) ) THEN
+         IF ( NP .LT. PLIM ) THEN
+            NP = NP + 1
+         ELSE
+            SAMPLS = MIN( 3*SAMPLS/2, ( MAXVLS - INTVLS )/( 2*P(NP) ) ) 
+            SAMPLS = MAX( MINSMP, SAMPLS )
+         ENDIF
+         IF ( INTVLS + 2*SAMPLS*P(NP) .LE. MAXVLS ) GO TO 10
+      ELSE
+         INFORM = 0
+      ENDIF
+      MINVLS = INTVLS
 *
       END
 *

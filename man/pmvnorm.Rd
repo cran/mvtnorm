@@ -16,7 +16,7 @@ pmvnorm(lower=-Inf, upper=Inf, mean=rep(0, length(lower)),
   \item{upper}{ the vector of upper limits of length n.}
   \item{mean}{ the mean vector of length n.}
   \item{corr}{ the correlation matrix of dimension n.}
-  \item{sigma}{ the covariance matrix of dimension n. Either \code{corr} or
+  \item{sigma}{ the covariance matrix of dimension n less than 1000. Either \code{corr} or
                 \code{sigma} can be specified. If \code{sigma} is given, the
                 problem is standardized. If neither \code{corr} nor
                 \code{sigma} is given, the identity matrix is used 

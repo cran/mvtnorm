@@ -72,6 +72,9 @@ get_quant_loclin <- function(func, targ, interval,
   ## first three evaluations
   x[1:3] <- sanitize_x(c(interval, mean(interval)), minx)
   res <- lapply(x[1:3], function(x) func(x, ...))
+  ## check whether covariance matrix is positive semidefinite
+  if(attr(res[[1]], "msg") == "Covariance matrix not positive semidefinite")
+    stop("Covariance matrix not positive semidefinite")
   y[1:3] <- sapply(res, function(x) sanitize_y(x))
   ## check for non-monotone function
   if(y[1] > y[2])

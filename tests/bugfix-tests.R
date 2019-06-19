@@ -542,3 +542,28 @@ qmvnorm(p = .5, tail = "lower", mean = c(6.75044368, 0.04996326),
         sigma = rbind(c(0.10260550, 0.02096418),
           c(0.02096418, 0.16049956)), interval=stint)
 
+### qmvnorm and qmvt should stop if supplied covariance matrix
+### is not positive semidefinite <Shiyang_Ma@URMC.Rochester.edu>
+
+R2=matrix(c(0.7071068, 0.6924398, 0.7054602, 0.7054602, 0.6292745,
+            0.6924398, 0.7071068, 0.6909812, 0.6909712, 0.6128670,
+            0.7054602, 0.6909812, 0.7071068, 0.7071068, 0.6278091,
+            0.7054602, 0.6909712, 0.7071068, 0.7071068, 0.6278091,
+            0.6292745, 0.6128670, 0.6278091, 0.6278091, 0.7071068),ncol=5)
+
+call <- try(qmvnorm(p=1-0.0001726701,
+                    mean=c(-0.8752332, -0.9487915, -0.9719237,
+                           -0.5855204, -0.9046457),
+                    sigma=R2,tail='lower.tail')$quantile,
+            silent=TRUE)
+inherits(call, "try-error")
+grepl("Covariance matrix not positive semidefinite", geterrmessage())
+
+call <- try(qmvt(p=1-0.0001726701,
+                 mean=c(-0.8752332, -0.9487915, -0.9719237,
+                        -0.5855204, -0.9046457),
+                 sigma=R2,tail='lower.tail')$quantile,
+            silent=TRUE)
+inherits(call, "try-error")
+grepl("Covariance matrix not positive semidefinite", geterrmessage())
+
