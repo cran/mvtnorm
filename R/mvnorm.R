@@ -47,7 +47,7 @@ dmvnorm <- function (x, mean = rep(0, p), sigma = diag(p), log = FALSE)
     if(!missing(mean)) {
 	if(!is.null(dim(mean))) dim(mean) <- NULL
 	if (length(mean) != p)
-	    stop("mean and sigma have non-conforming size")
+	    stop("x and mean have non-conforming size")
     }
     if(!missing(sigma)) {
 	if (p != ncol(sigma))

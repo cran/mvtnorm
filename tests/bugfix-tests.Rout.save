@@ -1,5 +1,5 @@
 
-R version 3.6.0 (2019-04-26) -- "Planting of a Tree"
+R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -398,15 +398,8 @@ attr(,"msg")
 > stopifnot(all.equal(round(q1, 4), round(q2, 4)))
 > 
 > ### grrr, still problems in approx_interval
-> qmvnorm(.95, sigma = tcrossprod(c(0.009, 0.75, 0.25)))
-$quantile
+> qmvnorm(.95, sigma = tcrossprod(c(0.009, 0.75, 0.25)))$quantile
 [1] 1.23364
-
-$f.quantile
-[1] 0
-
-attr(,"message")
-[1] "Normal Completion"
 > 
 > ### qmvt(..., df = 0, ...) didn't work
 > ### spotted by Ulrich Halekoh <Ulrich.Halekoh@agrsci.dk>
@@ -663,78 +656,29 @@ attr(,"message")
 > set.seed(29)
 > p <- .95
 > d <- 4
-> qmvnorm(p, sigma = diag(d), tail = "lower")
-$quantile
+> qmvnorm(p, sigma = diag(d), tail = "lower")$quantile
 [1] 2.23395
-
-$f.quantile
-[1] -5.905716e-07
-
-attr(,"message")
-[1] "Normal Completion"
-> qmvnorm(p, sigma = diag(d), tail = "upper")
-$quantile
+> qmvnorm(p, sigma = diag(d), tail = "upper")$quantile
 [1] -2.23395
-
-$f.quantile
-[1] 5.905716e-07
-
-attr(,"message")
-[1] "Normal Completion"
-> qmvnorm(p, sigma = diag(d), tail = "both")
-$quantile
+> qmvnorm(p, sigma = diag(d), tail = "both")$quantile
 [1] 2.490844
-
-$f.quantile
-[1] -6.108329e-07
-
-attr(,"message")
-[1] "Normal Completion"
 > p <- 1 - .95
 > d <- 4
-> qmvnorm(p, sigma = diag(d), tail = "lower")
-$quantile
+> qmvnorm(p, sigma = diag(d), tail = "lower")$quantile
 [1] -0.06784195
-
-$f.quantile
-[1] 4.453866e-05
-
-attr(,"message")
-[1] "Normal Completion"
-> qmvnorm(p, sigma = diag(d), tail = "upper")
-$quantile
+> qmvnorm(p, sigma = diag(d), tail = "upper")$quantile
 [1] 0.06784195
-
-$f.quantile
-[1] -4.453866e-05
-
-attr(,"message")
-[1] "Normal Completion"
 > 
 > ### package schwartz97
 > qmvnorm(p = .5, tail = "lower", mean = c(6.75044368, 0.04996326), 
 +         sigma = rbind(c(0.10260550, 0.02096418),
-+                       c(0.02096418, 0.16049956)))
-$quantile
++                       c(0.02096418, 0.16049956)))$quantile
 [1] 6.750444
-
-$f.quantile
-[1] -5.662137e-15
-
-attr(,"message")
-[1] "Normal Completion"
 > stint <- c(6.75044332319072, 6.75044368) ## with very narrow start interval
 > qmvnorm(p = .5, tail = "lower", mean = c(6.75044368, 0.04996326),
 +         sigma = rbind(c(0.10260550, 0.02096418),
-+           c(0.02096418, 0.16049956)), interval=stint)
-$quantile
++           c(0.02096418, 0.16049956)), interval=stint)$quantile
 [1] 6.750444
-
-$f.quantile
-[1] -1.44329e-15
-
-attr(,"message")
-[1] "Normal Completion"
 > 
 > ### qmvnorm and qmvt should stop if supplied covariance matrix
 > ### is not positive semidefinite <Shiyang_Ma@URMC.Rochester.edu>
@@ -768,4 +712,4 @@ attr(,"message")
 > 
 > proc.time()
    user  system elapsed 
-  5.889   0.032   5.931 
+  6.074   0.048   6.118 

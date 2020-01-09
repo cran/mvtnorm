@@ -1,4 +1,8 @@
 
+Changes in version 1.0-12 (2020-01-06)
+
+  o  fix Rdiff issues
+
 Changes in version 1.0-11 (2019-06-19)
 
   o  improve documentation and error messages

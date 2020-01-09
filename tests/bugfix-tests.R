@@ -278,7 +278,7 @@ q2 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var,
 stopifnot(all.equal(round(q1, 4), round(q2, 4)))
 
 ### grrr, still problems in approx_interval
-qmvnorm(.95, sigma = tcrossprod(c(0.009, 0.75, 0.25)))
+qmvnorm(.95, sigma = tcrossprod(c(0.009, 0.75, 0.25)))$quantile
 
 ### qmvt(..., df = 0, ...) didn't work
 ### spotted by Ulrich Halekoh <Ulrich.Halekoh@agrsci.dk>
@@ -525,22 +525,22 @@ stopifnot(identical(round(qmvnorm(p, sigma = diag(3), tail = "lower")$quantile, 
 set.seed(29)
 p <- .95
 d <- 4
-qmvnorm(p, sigma = diag(d), tail = "lower")
-qmvnorm(p, sigma = diag(d), tail = "upper")
-qmvnorm(p, sigma = diag(d), tail = "both")
+qmvnorm(p, sigma = diag(d), tail = "lower")$quantile
+qmvnorm(p, sigma = diag(d), tail = "upper")$quantile
+qmvnorm(p, sigma = diag(d), tail = "both")$quantile
 p <- 1 - .95
 d <- 4
-qmvnorm(p, sigma = diag(d), tail = "lower")
-qmvnorm(p, sigma = diag(d), tail = "upper")
+qmvnorm(p, sigma = diag(d), tail = "lower")$quantile
+qmvnorm(p, sigma = diag(d), tail = "upper")$quantile
 
 ### package schwartz97
 qmvnorm(p = .5, tail = "lower", mean = c(6.75044368, 0.04996326), 
         sigma = rbind(c(0.10260550, 0.02096418),
-                      c(0.02096418, 0.16049956)))
+                      c(0.02096418, 0.16049956)))$quantile
 stint <- c(6.75044332319072, 6.75044368) ## with very narrow start interval
 qmvnorm(p = .5, tail = "lower", mean = c(6.75044368, 0.04996326),
         sigma = rbind(c(0.10260550, 0.02096418),
-          c(0.02096418, 0.16049956)), interval=stint)
+          c(0.02096418, 0.16049956)), interval=stint)$quantile
 
 ### qmvnorm and qmvt should stop if supplied covariance matrix
 ### is not positive semidefinite <Shiyang_Ma@URMC.Rochester.edu>
