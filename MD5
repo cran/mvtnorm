@@ -1,6 +1,6 @@
-3f4ea036be6c0c7aeefa49ef2ed702ba *DESCRIPTION
+6bdfc2ae9bd0923cf879a84ad3e9baf7 *DESCRIPTION
 ef6b7629862a1dd93b84bba7205d31f7 *NAMESPACE
-5a77f801cdd735a5504abd276998c84e *R/mvnorm.R
+9d668eac0c7e64820e822c7369da2349 *R/mvnorm.R
 1b2fb88abe10e6c8b5ef49c77cfc8a41 *R/mvt.R
 ccd0495f9e9ad30e9f136c5c41cc3a03 *R/noisy-root.R
 0b38660f04481db63794d0f580833a39 *R/tvpack.R
@@ -12,10 +12,10 @@ ca4c35956e7a8aa253e2c52cd49f0d99 *inst/C_API_Example/NAMESPACE
 990127bb625b41c7181a653020e3f6a9 *inst/C_API_Example/R/test.R
 5c4bbffc1a0108c090cfa2dbb1918d2d *inst/C_API_Example/src/test.c
 64fd633725dcd93cdd836e3535f19788 *inst/C_API_Example/tests/test.R
-a05ace1b2e9185cb71dbeacb308e5b3c *inst/NEWS
+bcf0ba60d258e66f1951e7784dbd55ec *inst/NEWS
 73e21a346386350ffebe0b09cafa5ad5 *inst/doc/MVT_Rnews.R
 e83251e0ceb0e3a2aec9f3d101e41ea6 *inst/doc/MVT_Rnews.Rnw
-0440dc166c8e9c5ec834d3044dc45cc2 *inst/doc/MVT_Rnews.pdf
+e36c9b03f5367f2b33c9a936b094c3a3 *inst/doc/MVT_Rnews.pdf
 80f85e809cd29a8eb856baefe5ba2ffd *inst/include/mvtnorm.h
 2ac853ab98c7223bbca7e418096966fb *inst/include/mvtnormAPI.h
 18d186ba9ace287fe0083853e50afeb9 *man/Mvnorm.Rd
@@ -25,10 +25,10 @@ b55e54d3b1d347f6cb3499bb12d196a2 *man/pmvnorm.Rd
 5e66e70be01030da19a28a3312344a16 *man/pmvt.Rd
 0367b84fcc86c94729f08a4fc731ecfc *man/qmvnorm.Rd
 15a04b4f254170c996ebbb5eaafc2753 *man/qmvt.Rd
-169ca65cc84de5ebebec93674b9b6cf5 *src/C_FORTRAN_interface.c
+bca5c4987a057c2a6bab0cd6bbebed5b *src/C_FORTRAN_interface.c
 e2f50e29216c0b256c7b1fdf869914a1 *src/miwa.c
 ffacc460580675e24f12d2f262e18ee4 *src/miwa.h
-98efda8ed97a46636cb0f8f43e58d21d *src/mvt.f
+01bdf5c7a2d8ce863806a03f752157a1 *src/mvt.f
 b661305ed641e7c6dd4680b4daf4df6b *src/mvtnorm-init.c
 80f85e809cd29a8eb856baefe5ba2ffd *src/mvtnorm.h
 2ac853ab98c7223bbca7e418096966fb *src/mvtnormAPI.h
