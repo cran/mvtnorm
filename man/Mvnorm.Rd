@@ -9,9 +9,9 @@
   \code{sigma}.
 }
 \usage{
-dmvnorm(x, mean = rep(0, p), sigma = diag(p), log = FALSE)
+dmvnorm(x, mean = rep(0, p), sigma = diag(p), log = FALSE, checkSymmetry = TRUE)
 rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
-        method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE)
+        method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE, checkSymmetry = TRUE)
 }
 \arguments{
  \item{x}{vector or matrix of quantiles. If \code{x} is a matrix, each
@@ -31,6 +31,10 @@ rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
                     output is organized such that \code{rmvnorm(10,...)} has the
                     same first ten rows as \code{rmvnorm(100, ...)} when called
                     with the same seed.}
+ \item{checkSymmetry}{logical; if \code{FALSE}, skip checking whether the
+   covariance matrix is symmetric or not. This will speed up the
+   computation but may cause unexpected outputs when ill-behaved
+   \code{sigma} is provided. The default value is \code{TRUE}.}
 }
 \author{Friedrich Leisch and Fabian Scheipl}
 \seealso{\code{\link{pmvnorm}}, \code{\link{rnorm}}, \code{\link{qmvnorm}}}

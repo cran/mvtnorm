@@ -1,8 +1,13 @@
 
+Changes in version 1.1-1 (2020-06-09)
+
+  o  allow to turn-off symmetry checks (patch contributed by Feng Li <feng.li_at_cufe.edu.cn>
+
 Changes in version 1.1-0 (2020-02-24)
 
-  o  replace MVPHI and MVPHNV by calls to R's pnorm5, following
+  o  replace MVPHI and MVPHNV by calls to R's {p,q}norm5, following
      a suggestion by Benjamin Christoffersen <boennecd_at_gmail.com>
+
 
 Changes in version 1.0-12 (2020-01-06)
 

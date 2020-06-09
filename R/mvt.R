@@ -1,4 +1,4 @@
-# $Id: mvt.R 353 2019-06-07 12:36:01Z thothorn $
+# $Id: mvt.R 360 2020-06-09 13:12:57Z thothorn $
 
 ##' Do we have a correlation matrix?
 ##' @param x typically a matrix
@@ -303,7 +303,7 @@ rmvt <- function(n, sigma = diag(2), df = 1,
 }
 
 dmvt <- function(x, delta = rep(0, p), sigma = diag(p), df = 1,
-                 log = TRUE, type = "shifted")
+                 log = TRUE, type = "shifted", checkSymmetry = TRUE)
 {
     if (is.vector(x))
         x <- matrix(x, ncol = length(x))
@@ -318,8 +318,8 @@ dmvt <- function(x, delta = rep(0, p), sigma = diag(p), df = 1,
     if(!missing(sigma)) {
 	if (p != ncol(sigma))
 	    stop("x and sigma have non-conforming size")
-	if (!isSymmetric(sigma, tol = sqrt(.Machine$double.eps),
-			 check.attributes = FALSE))
+	if (checkSymmetry && !isSymmetric(sigma, tol = sqrt(.Machine$double.eps),
+                                          check.attributes = FALSE))
 	    stop("sigma must be a symmetric matrix")
     }
     type <- match.arg(type)
@@ -447,7 +447,7 @@ qmvnorm <- function(p, interval = NULL,
                          tail=tail, df=Inf)
       dif <- diff(interval)
       interval <- interval+c(-1,1)*0.2*max(dif,0.1) ## extend range slightly
-    } 
+    }
     if(tail == "upper.tail") ## get_quant_loclin assumes an increasing function
       p <- 1-p
     minx <- ifelse(tail == "both.tails", 0, -Inf)
@@ -533,7 +533,7 @@ qmvt <- function(p, interval = NULL,
                          tail=tail, type=type, df=df)
       dif <- diff(interval)
       interval <- interval+c(-1,1)*0.2*max(dif,0.1) ## extend range slightly
-    } 
+    }
     if(tail == "upper.tail") ## get_quant_loclin assumes an increasing function
       p <- 1-p
     minx <- ifelse(tail == "both.tails", 0, -Inf)

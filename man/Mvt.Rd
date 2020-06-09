@@ -13,7 +13,7 @@
 rmvt(n, sigma = diag(2), df = 1, delta = rep(0, nrow(sigma)),
      type = c("shifted", "Kshirsagar"), ...)
 dmvt(x, delta = rep(0, p), sigma = diag(p), df = 1, log = TRUE,
-     type = "shifted")
+     type = "shifted", checkSymmetry = TRUE)
 }
 \arguments{
   \item{x}{vector or matrix of quantiles. If \code{x} is a matrix, each
@@ -44,6 +44,10 @@ dmvt(x, delta = rep(0, p), sigma = diag(p), df = 1, log = TRUE,
     Note that the defaults differ from the default
     in \code{\link{pmvt}()} (for reasons of backward
     compatibility).}
+  \item{checkSymmetry}{logical; if \code{FALSE}, skip checking whether the
+   covariance matrix is symmetric or not. This will speed up the
+   computation but may cause unexpected outputs when ill-behaved
+   \code{sigma} is provided. The default value is \code{TRUE}.}
   \item{\dots}{additional arguments to \code{\link{rmvnorm}()},
     for example \code{method}.}
 }
