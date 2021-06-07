@@ -1,6 +1,6 @@
 
-R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
-Copyright (C) 2015 The R Foundation for Statistical Computing
+R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
+Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -16,6 +16,45 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library("mvtnorm")
+> 
+> ## Showing the TVPACK() gives *NON*-random results:
+> (cor1 <- toeplitz(c(1, 1/4, -1/8)))
+       [,1] [,2]   [,3]
+[1,]  1.000 0.25 -0.125
+[2,]  0.250 1.00  0.250
+[3,] -0.125 0.25  1.000
+> (up1  <- c(1/4, 7/4, 5/8))
+[1] 0.250 1.750 0.625
+> d <- length(up1) # = 3
+> pmvt.. <- function(df, algorithm)
++     vapply(df, function(df) pmvt(upper=up1, corr=cor1, df=df, algorithm=algorithm),
++            numeric(1))
+> 
+> dfs <- 1:9
+> pmvt_TV.7 <- replicate(7, pmvt..(dfs, TVPACK()))
+> 
+> stopifnot(pmvt_TV.7 == pmvt_TV.7[,1])
+> (pmvt.TV. <- pmvt_TV.7[,1])
+[1] 0.3554119 0.3817313 0.3923546 0.3980570 0.4016042 0.4040204 0.4057708
+[8] 0.4070968 0.4081358
+> (pmvt.TV  <- pmvt..(dfs, TVPACK(1e-14)))# has no effect here
+[1] 0.3554119 0.3817313 0.3923546 0.3980570 0.4016042 0.4040204 0.4057708
+[8] 0.4070968 0.4081358
+> pmvt.TV - pmvt.TV. ## all 0 {unexpectedly ??}
+[1] 0 0 0 0 0 0 0 0 0
+> 
+> 
+> set.seed(47) ## and default algorithm: -> *random* result
+> pmvt_7 <- replicate(7, vapply(dfs, function(df) pmvt(df=df, upper=up1, corr=cor1), numeric(1)))
+> ## relative errors
+> relE <- 1 - pmvt_7 / pmvt.TV
+> rng.rE <- range(abs(relE))
+> stopifnot(1e-6 < rng.rE[1], rng.rE[2] < 7e-4)
+> stopifnot(all.equal(
++     colMeans(abs(relE)),
++     c(88, 64, 105, 73, 52, 90, 87)*1e-6, tol= 1e-3))
+> 
+> 
 > set.seed(29)
 > 
 > ########################################################################
@@ -199,6 +238,35 @@ attr(,"error")
 attr(,"msg")
 [1] "Normal Completion"
 > 
+> ##==== Cases where some  (lower[j], upper[j]) == (-Inf, Inf) :
+> S <- toeplitz(c(1, 1/2, 1/4))
+> 
+> set.seed(11)
+> P0 <- pmvnorm(lower=c(-Inf, 0, 0), upper=Inf, corr=S)
+> P1 <- pmvnorm(lower=c(-Inf, 0, 0), upper=Inf, corr=S, algorithm = TVPACK()) # had failed
+> P2 <- pmvnorm(lower=c(-Inf, 0, 0), upper=Inf, corr=S, algorithm = Miwa())
+> P2a<- pmvnorm(lower=c(-Inf, 0, 0), upper=Inf, corr=S, algorithm = Miwa(512))
+> P2.<- pmvnorm(lower=c(-Inf, 0, 0), upper=Inf, corr=S, algorithm = Miwa(2048))
+> 
+> stopifnot(all.equal(1/3, c(P0), tol=1e-14)
++         , all.equal(1/3, c(P1), tol=1e-14)
++         , all.equal(1/3, c(P2), tol=1e-9 ) # 3.765e-10
++         , all.equal(1/3, c(P2a),tol=4e-12) # 8.32 e-13
++         , all.equal(1/3, c(P2.),tol=2e-12) # 5.28 e-13
++ )
+> 
+> ## t-dist [TVPACK() had failed] :
+> set.seed(11)
+> Ptdef <- replicate(20, c(pmvt(lower=c(-Inf, 1, 2), upper=Inf, df=2, corr=S)))
+> unique(Ptdef)# see length 1; i.e., same result [even though default is Monte-Carlo ??]
+[1] 0.0570404
+> Pt1 <- pmvt(lower=c(-Inf, 1, 2), upper=Inf, df=2, corr=S, algorithm = TVPACK())
+> P. <- 0.0570404044526986
+> stopifnot(exprs = {
++     all.equal(P., c(Pt1), tol = 1e-14)# seen 3.65 e-16
++     abs(P. - Ptdef) < 1e-15 # seen 1.39 e-17
++ })
+> 
 > proc.time()
    user  system elapsed 
-  5.132   0.028   5.156 
+  3.497   0.079   4.910 

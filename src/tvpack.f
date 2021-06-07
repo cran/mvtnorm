@@ -1,8 +1,8 @@
 *
-* This file contains a test program and functions TVTL (trivariate normal 
+* This file contains a test program and functions TVTL (trivariate normal
 * and t), BVTL (bivariate t), BVND (bivariate normal), STUDNT (univariate
 * t), PHID (univariate normal), plus some support functions.
-* The file is self contained and should compile without errors on (77) 
+* The file is self contained and should compile without errors on (77)
 * standard Fortran compilers. The test program demonstrates the use of
 * TVTL for computing trivariate distribution values 20 test problems
 * with NU = 0 (normal case), 3, 6, 9, and 12.
@@ -21,34 +21,29 @@
 *       Original source available from
 *       http://www.math.wsu.edu/faculty/genz/software/fort77/tvpack.f
 *
-*
-* For 64bit machines, wrapping the FUNCTIONS by SUBROUTINEs
-* to be called from R didn't work (don't ask me why).
-* Therefore, I defined TVTL and BVTL as SUBROUTINEs
-*
 * I also replaced the univariates pdfs with the corresponding
 * R functions
 *
 * <TH>
 *
       SUBROUTINE TVTLRCALL( NU, H, R, EPSI, TVTL )
-*    
+*
 *     A function for computing trivariate normal and t-probabilities.
-*     This function uses algorithms developed from the ideas 
+*     This function uses algorithms developed from the ideas
 *     described in the papers:
 *       R.L. Plackett, Biometrika 41(1954), pp. 351-360.
 *       Z. Drezner, Math. Comp. 62(1994), pp. 289-294.
-*     with adaptive integration from (0,0,1) to (0,0,r23) to R. 
+*     with adaptive integration from (0,0,1) to (0,0,r23) to R.
 *
-*      Calculate the probability that X(I) < H(I), for I = 1,2,3     
+*      Calculate the probability that X(I) < H(I), for I = 1,2,3
 *    NU   INTEGER degrees of freedom; use NU = 0 for normal cases.
-*    H    REAL array of uppoer limits for probability distribution 
-*    R    REAL array of three correlation coefficients, R should 
-*         contain the lower left portion of the correlation matrix r. 
+*    H    REAL array of uppoer limits for probability distribution
+*    R    REAL array of three correlation coefficients, R should
+*         contain the lower left portion of the correlation matrix r.
 *         R should contains the values r21, r31, r23 in that order.
 *   EPSI  REAL required absolute accuracy; maximum accuracy for most
 *          computations is approximately 1D-14
-* 
+*
 *    The software is based on work described in the paper
 *     "Numerical Computation of Rectangular Bivariate and Trivariate
 *      Normal and t Probabilities", by the code author:
@@ -59,7 +54,7 @@
 *       Pullman, WA 99164-3113
 *       Email : alangenz@wsu.edu
 *
-      EXTERNAL TVTMFN
+      EXTERNAL TVTMFN, ADONET, BVTL
       INTEGER NU, NUC
       DOUBLE PRECISION H(3), H1, H2, H3, R(3), R12, R13, R23, EPSI
       DOUBLE PRECISION ONE, ZRO, EPS, ZROS(3), HS(3), TVT, TVTL
@@ -91,18 +86,18 @@
          R13 = R(3)
       END IF
       TVT = 0
-      IF ( ABS(H1) + ABS(H2) + ABS(H3) .LT. EPS ) THEN 
+      IF ( ABS(H1) + ABS(H2) + ABS(H3) .LT. EPS ) THEN
          TVT = ( 1 + ( ASIN(R12) + ASIN(R13) + ASIN(R23) )/PT )/8
-      ELSE IF ( NU .LT. 1 .AND. ABS(R12) + ABS(R13) .LT. EPS ) THEN 
+      ELSE IF ( NU .LT. 1 .AND. ABS(R12) + ABS(R13) .LT. EPS ) THEN
          TVT = PHID(H1)*BVTL( NU, H2, H3, R23 )
-      ELSE IF ( NU .LT. 1 .AND. ABS(R13) + ABS(R23) .LT. EPS ) THEN 
+      ELSE IF ( NU .LT. 1 .AND. ABS(R13) + ABS(R23) .LT. EPS ) THEN
          TVT = PHID(H3)*BVTL( NU, H1, H2, R12 )
-      ELSE IF ( NU .LT. 1 .AND. ABS(R12) + ABS(R23) .LT. EPS ) THEN 
+      ELSE IF ( NU .LT. 1 .AND. ABS(R12) + ABS(R23) .LT. EPS ) THEN
          TVT = PHID(H2)*BVTL( NU, H1, H3, R13 )
       ELSE IF ( 1 - R23 .LT. EPS ) THEN
          TVT = BVTL( NU, H1, MIN( H2, H3 ), R12 )
       ELSE IF ( R23 + 1 .LT. EPS ) THEN
-         IF  ( H2 .GT. -H3 ) 
+         IF  ( H2 .GT. -H3 )
      &        TVT = BVTL( NU, H1, H2, R12 ) - BVTL( NU, H1, -H3, R12 )
       ELSE
 *
@@ -112,7 +107,7 @@
             TVT = BVTL( NU, H2, H3, R23 )*PHID(H1)
          ELSE IF ( R23 .GE. 0 ) THEN
             TVT = BVTL( NU, H1, MIN( H2, H3 ), ZRO )
-         ELSE IF ( H2 .GT. -H3 ) THEN 
+         ELSE IF ( H2 .GT. -H3 ) THEN
             TVT = BVTL( NU, H1, H2, ZRO ) - BVTL( NU, H1, -H3, ZRO )
          END IF
 *
@@ -125,7 +120,7 @@
          RUC = SIGN( PT, AR ) - AR
          TVT = TVT + ADONET( TVTMFN, ZRO, ONE, EPS )/( 4*PT )
       END IF
-      TVTL = MAX( ZRO, MIN( TVT, ONE ) ) 
+      TVTL = MAX( ZRO, MIN( TVT, ONE ) )
       END
 *
       DOUBLE PRECISION FUNCTION TVTMFN( X )
@@ -135,12 +130,12 @@
       INTEGER NU
       DOUBLE PRECISION X, H1, H2, H3, R23, RUA, RUB, AR, RUC
       DOUBLE PRECISION R12, RR2, R13, RR3, R, RR, ZRO, PNTGND
-      PARAMETER ( ZRO = 0 )    
+      PARAMETER ( ZRO = 0 )
       COMMON /TVTMBK/ H1, H2, H3, R23, RUA, RUB, AR, RUC, NU
       TVTMFN = 0
       CALL SINCS( RUA*X, R12, RR2 )
       CALL SINCS( RUB*X, R13, RR3 )
-      IF ( ABS(RUA) .GT. 0 ) 
+      IF ( ABS(RUA) .GT. 0 )
      &     TVTMFN = TVTMFN + RUA*PNTGND( NU, H1,H2,H3, R13,R23,R12,RR2 )
       IF ( ABS(RUB) .GT. 0 )
      &     TVTMFN = TVTMFN + RUB*PNTGND( NU, H1,H3,H2, R12,R23,R13,RR3 )
@@ -148,7 +143,7 @@
          CALL SINCS( AR + RUC*X, R, RR )
          TVTMFN = TVTMFN - RUC*PNTGND( NU, H2, H3, H1, ZRO, ZRO, R, RR )
       END IF
-      END      
+      END
 *
       SUBROUTINE SINCS( X, SX, CS )
 *
@@ -176,7 +171,7 @@
       PNTGND = 0
       DT = RR*( RR - ( RA - RB )**2 - 2*RA*RB*( 1 - R ) )
       IF ( DT .GT. 0 ) THEN
-         BT = ( BC*RR + BA*( R*RB - RA ) + BB*( R*RA -RB ) )/SQRT(DT) 
+         BT = ( BC*RR + BA*( R*RB - RA ) + BB*( R*RA -RB ) )/SQRT(DT)
          FT = ( BA - R*BB )**2/RR + BB*BB
          IF ( NU .LT. 1 ) THEN
             IF ( BT .GT. -10 .AND. FT .LT. 100 ) THEN
@@ -188,24 +183,24 @@
             PNTGND = STUDNT( NU, BT/FT )/FT**NU
          END IF
       END IF
-      END 
+      END
 *
       DOUBLE PRECISION FUNCTION ADONET( F, A, B, TOL )
 *
 *     One Dimensional Globally Adaptive Integration Function
 *
-      EXTERNAL F
+      EXTERNAL F, KRNRDT
       DOUBLE PRECISION F, A, B, TOL
       INTEGER NL, I, IM, IP
       PARAMETER ( NL = 100 )
       DOUBLE PRECISION EI(NL), AI(NL), BI(NL), FI(NL), FIN, ERR, KRNRDT
-      COMMON /ABLK/ ERR, IM
+
       AI(1) = A
       BI(1) = B
       ERR = 1
       IP = 1
       IM = 1
-      DO WHILE ( 4*ERR .GT. TOL .AND. IM .LT. NL ) 
+      DO WHILE ( 4*ERR .GT. TOL .AND. IM .LT. NL )
          IM = IM + 1
          BI(IM) = BI(IP)
          AI(IM) = ( AI(IP) + BI(IP) )/2
@@ -228,20 +223,21 @@
 *
 *     Kronrod Rule
 *
+      EXTERNAL F
       DOUBLE PRECISION A, B, ERR, T, CEN, F, FC, WID, RESG, RESK
 *
 *        The abscissae and weights are given for the interval (-1,1);
 *        only positive abscissae and corresponding weights are given.
 *
-*        XGK    - abscissae of the 2N+1-point Kronrod rule: 
-*                 XGK(2), XGK(4), ...  N-point Gauss rule abscissae; 
+*        XGK    - abscissae of the 2N+1-point Kronrod rule:
+*                 XGK(2), XGK(4), ...  N-point Gauss rule abscissae;
 *                 XGK(1), XGK(3), ...  optimally added abscissae.
 *        WGK    - weights of the 2N+1-point Kronrod rule.
 *        WG     - weights of the N-point Gauss rule.
 *
       INTEGER J, N
       PARAMETER ( N = 11 )
-      DOUBLE PRECISION WG(0:(N+1)/2), WGK(0:N), XGK(0:N) 
+      DOUBLE PRECISION WG(0:(N+1)/2), WGK(0:N), XGK(0:N)
       SAVE WG, WGK, XGK
       DATA WG( 0)/ 0.2729250867779007D+00/
       DATA WG( 1)/ 0.5566856711617449D-01/
@@ -292,7 +288,7 @@
       RESG = FC*WG(0)
       RESK = FC*WGK(0)
       DO J = 1, N
-         T = WID*XGK(J) 
+         T = WID*XGK(J)
          FC = F( CEN - T ) + F( CEN + T )
          RESK = RESK + WGK(J)*FC
          IF( MOD( J, 2 ) .EQ. 0 ) RESG = RESG + WG(J/2)*FC
@@ -320,7 +316,7 @@
 *         STUDNT = ( 1 + 2*ATAN(T)/PI )/2
 *      ELSE IF ( NU .EQ. 2 ) THEN
 *         STUDNT = ( 1 + T/SQRT( 2 + T*T ))/2
-*      ELSE 
+*      ELSE
 *         TT = T*T
 *         CSSTHE = 1/( 1 + TT/NU )
 *         POLYN = 1
@@ -339,11 +335,6 @@
 *      ENDIF
 *      END
 *
-* For 64bit machines, wrapping the FUNCTIONS by SUBROUTINEs
-* to be called from R didn't work (don't ask me why).
-* Therefore, I defined TVTL and BVTL as SUBROUTINEs
-*
-* However, FUNCTION BVTL is still called from TVTL!
 *
       DOUBLE PRECISION FUNCTION BVTL( NU, DH, DK, R )
 *
@@ -355,13 +346,13 @@
 *       Pullman, WA 99164-3113
 *       Email : alangenz@wsu.edu
 *
-*    This function is based on the method described by 
+*    This function is based on the method described by
 *        Dunnett, C.W. and M. Sobel, (1954),
 *        A bivariate generalization of Student's t-distribution
 *        with tables for certain special cases,
 *        Biometrika 41, pp. 153-169.
 *
-* BVTL - calculate the probability that X < DH and Y < DK. 
+* BVTL - calculate the probability that X < DH and Y < DK.
 *
 * parameters
 *
@@ -376,10 +367,10 @@
       DOUBLE PRECISION GMPH, GMPK, XNKH, XNHK, QHRK, HKN, HPK, HKRN
       DOUBLE PRECISION BTNCKH, BTNCHK, BTPDKH, BTPDHK, ONE, EPS
       PARAMETER ( ONE = 1, EPS = 1D-15 )
-      IF ( NU .LT. 1 ) THEN
+      IF ( NU .LE. 0 ) THEN ! NU == 0  (<==>  nu = Inf  <==> normal distrib
          BVTL = BVND( -DH, -DK, R )
       ELSE IF ( 1 - R .LE. EPS ) THEN
-            BVTL = STUDNT( NU, MIN( DH, DK ) )
+         BVTL = STUDNT( NU, MIN( DH, DK ) )
       ELSE IF ( R + 1  .LE. EPS ) THEN
          IF ( DH .GT. -DK )  THEN
             BVTL = STUDNT( NU, DH ) - STUDNT( NU, -DK )
@@ -391,89 +382,71 @@
          TPI = 2*PI
          SNU = NU
          SNU = SQRT(SNU)
-         ORS = 1 - R*R  
-         HRK = DH - R*DK  
-         KRH = DK - R*DH  
+         ORS = 1 - R*R
+         HRK = DH - R*DK
+         KRH = DK - R*DH
          IF ( ABS(HRK) + ORS .GT. 0 ) THEN
-            XNHK = HRK**2/( HRK**2 + ORS*( NU + DK**2 ) ) 
-            XNKH = KRH**2/( KRH**2 + ORS*( NU + DH**2 ) ) 
+            XNHK = HRK**2/( HRK**2 + ORS*( NU + DK**2 ) )
+            XNKH = KRH**2/( KRH**2 + ORS*( NU + DH**2 ) )
          ELSE
-            XNHK = 0  
-            XNKH = 0  
+            XNHK = 0
+            XNKH = 0
          END IF
-         HS = SIGN( ONE, DH - R*DK )  
-         KS = SIGN( ONE, DK - R*DH ) 
-         IF ( MOD( NU, 2 ) .EQ. 0 ) THEN
-            BVT = ATAN2( SQRT(ORS), -R )/TPI 
-            GMPH = DH/SQRT( 16*( NU + DH**2 ) )  
-            GMPK = DK/SQRT( 16*( NU + DK**2 ) )  
-            BTNCKH = 2*ATAN2( SQRT( XNKH ), SQRT( 1 - XNKH ) )/PI  
-            BTPDKH = 2*SQRT( XNKH*( 1 - XNKH ) )/PI 
-            BTNCHK = 2*ATAN2( SQRT( XNHK ), SQRT( 1 - XNHK ) )/PI  
-            BTPDHK = 2*SQRT( XNHK*( 1 - XNHK ) )/PI 
+         HS = SIGN( ONE, DH - R*DK )
+         KS = SIGN( ONE, DK - R*DH )
+         IF ( MOD( NU, 2 ) .EQ. 0 ) THEN ! nu is even
+            BVT = ATAN2( SQRT(ORS), -R )/TPI
+            GMPH = DH/SQRT( 16*( NU + DH**2 ) )
+            GMPK = DK/SQRT( 16*( NU + DK**2 ) )
+            BTNCKH = 2*ATAN2( SQRT( XNKH ), SQRT( 1 - XNKH ) )/PI
+            BTPDKH = 2*SQRT( XNKH*( 1 - XNKH ) )/PI
+            BTNCHK = 2*ATAN2( SQRT( XNHK ), SQRT( 1 - XNHK ) )/PI
+            BTPDHK = 2*SQRT( XNHK*( 1 - XNHK ) )/PI
             DO J = 1, NU/2
-               BVT = BVT + GMPH*( 1 + KS*BTNCKH ) 
-               BVT = BVT + GMPK*( 1 + HS*BTNCHK ) 
-               BTNCKH = BTNCKH + BTPDKH  
-               BTPDKH = 2*J*BTPDKH*( 1 - XNKH )/( 2*J + 1 )  
-               BTNCHK = BTNCHK + BTPDHK  
-               BTPDHK = 2*J*BTPDHK*( 1 - XNHK )/( 2*J + 1 )  
-               GMPH = GMPH*( 2*J - 1 )/( 2*J*( 1 + DH**2/NU ) ) 
-               GMPK = GMPK*( 2*J - 1 )/( 2*J*( 1 + DK**2/NU ) ) 
+               BVT = BVT + GMPH*( 1 + KS*BTNCKH )
+               BVT = BVT + GMPK*( 1 + HS*BTNCHK )
+               BTNCKH = BTNCKH + BTPDKH
+               BTPDKH = 2*J*BTPDKH*( 1 - XNKH )/( 2*J + 1 )
+               BTNCHK = BTNCHK + BTPDHK
+               BTPDHK = 2*J*BTPDHK*( 1 - XNHK )/( 2*J + 1 )
+               GMPH = GMPH*( 2*J - 1 )/( 2*J*( 1 + DH**2/NU ) )
+               GMPK = GMPK*( 2*J - 1 )/( 2*J*( 1 + DK**2/NU ) )
             END DO
-         ELSE
-            QHRK = SQRT( DH**2 + DK**2 - 2*R*DH*DK + NU*ORS )  
-            HKRN = DH*DK + R*NU  
-            HKN = DH*DK - NU  
-            HPK = DH + DK 
+         ELSE ! nu is odd
+            QHRK = SQRT( DH**2 + DK**2 - 2*R*DH*DK + NU*ORS )
+            HKRN = DH*DK + R*NU
+            HKN = DH*DK - NU
+            HPK = DH + DK
             BVT = ATAN2( -SNU*( HKN*QHRK + HPK*HKRN ),
      &                          HKN*HKRN-NU*HPK*QHRK )/TPI
             IF ( BVT .LT. -EPS ) BVT = BVT + 1
-            GMPH = DH/( TPI*SNU*( 1 + DH**2/NU ) )  
-            GMPK = DK/( TPI*SNU*( 1 + DK**2/NU ) )  
-            BTNCKH = SQRT( XNKH )  
-            BTPDKH = BTNCKH 
-            BTNCHK = SQRT( XNHK )  
-            BTPDHK = BTNCHK  
+            GMPH = DH/( TPI*SNU*( 1 + DH**2/NU ) )
+            GMPK = DK/( TPI*SNU*( 1 + DK**2/NU ) )
+            BTNCKH = SQRT( XNKH )
+            BTPDKH = BTNCKH
+            BTNCHK = SQRT( XNHK )
+            BTPDHK = BTNCHK
             DO J = 1, ( NU - 1 )/2
-               BVT = BVT + GMPH*( 1 + KS*BTNCKH ) 
-               BVT = BVT + GMPK*( 1 + HS*BTNCHK ) 
-               BTPDKH = ( 2*J - 1 )*BTPDKH*( 1 - XNKH )/( 2*J )  
-               BTNCKH = BTNCKH + BTPDKH  
-               BTPDHK = ( 2*J - 1 )*BTPDHK*( 1 - XNHK )/( 2*J )  
-               BTNCHK = BTNCHK + BTPDHK  
-               GMPH = 2*J*GMPH/( ( 2*J + 1 )*( 1 + DH**2/NU ) ) 
-               GMPK = 2*J*GMPK/( ( 2*J + 1 )*( 1 + DK**2/NU ) ) 
+               BVT = BVT + GMPH*( 1 + KS*BTNCKH )
+               BVT = BVT + GMPK*( 1 + HS*BTNCHK )
+               BTPDKH = ( 2*J - 1 )*BTPDKH*( 1 - XNKH )/( 2*J )
+               BTNCKH = BTNCKH + BTPDKH
+               BTPDHK = ( 2*J - 1 )*BTPDHK*( 1 - XNHK )/( 2*J )
+               BTNCHK = BTNCHK + BTPDHK
+               GMPH = 2*J*GMPH/( ( 2*J + 1 )*( 1 + DH**2/NU ) )
+               GMPK = 2*J*GMPK/( ( 2*J + 1 )*( 1 + DK**2/NU ) )
             END DO
          END IF
-         BVTL = BVT 
+         BVTL = BVT
       END IF
 *     END BVTL
       END
+
+      SUBROUTINE BVTLRCALL( NU, DH, DK, R, BVTLval )
 *
-* For 64bit machines, wrapping the FUNCTIONS by SUBROUTINEs
-* to be called from R didn't work (don't ask me why).
-* Therefore, I defined TVTL and BVTL as SUBROUTINEs
+* BVTL - calculate the probability that X < DH and Y < DK.
 *
-* This is just a copy of BVTL (ugly, but I can't help it)
-*
-      SUBROUTINE BVTLRCALL( NU, DH, DK, R, BVTL )
-*
-*     A function for computing bivariate t probabilities.
-*
-*       Alan Genz
-*       Department of Mathematics
-*       Washington State University
-*       Pullman, WA 99164-3113
-*       Email : alangenz@wsu.edu
-*
-*    This function is based on the method described by 
-*        Dunnett, C.W. and M. Sobel, (1954),
-*        A bivariate generalization of Student's t-distribution
-*        with tables for certain special cases,
-*        Biometrika 41, pp. 153-169.
-*
-* BVTL - calculate the probability that X < DH and Y < DK. 
+      DOUBLE PRECISION BVTL ! the function
 *
 * parameters
 *
@@ -482,92 +455,17 @@
 *   DK 2nd lower integration limit
 *   R   correlation coefficient
 *
-      INTEGER NU, J, HS, KS
-      DOUBLE PRECISION DH, DK, R, BVTL
-      DOUBLE PRECISION TPI, PI, ORS, HRK, KRH, BVT, SNU, BVND, STUDNT
-      DOUBLE PRECISION GMPH, GMPK, XNKH, XNHK, QHRK, HKN, HPK, HKRN
-      DOUBLE PRECISION BTNCKH, BTNCHK, BTPDKH, BTPDHK, ONE, EPS
-      PARAMETER ( ONE = 1, EPS = 1D-15 )
-      IF ( NU .LT. 1 ) THEN
-         BVTL = BVND( -DH, -DK, R )
-      ELSE IF ( 1 - R .LE. EPS ) THEN
-            BVTL = STUDNT( NU, MIN( DH, DK ) )
-      ELSE IF ( R + 1  .LE. EPS ) THEN
-         IF ( DH .GT. -DK )  THEN
-            BVTL = STUDNT( NU, DH ) - STUDNT( NU, -DK )
-         ELSE
-            BVTL = 0
-         END IF
-      ELSE
-         PI = ACOS(-ONE)
-         TPI = 2*PI
-         SNU = NU
-         SNU = SQRT(SNU)
-         ORS = 1 - R*R  
-         HRK = DH - R*DK  
-         KRH = DK - R*DH  
-         IF ( ABS(HRK) + ORS .GT. 0 ) THEN
-            XNHK = HRK**2/( HRK**2 + ORS*( NU + DK**2 ) ) 
-            XNKH = KRH**2/( KRH**2 + ORS*( NU + DH**2 ) ) 
-         ELSE
-            XNHK = 0  
-            XNKH = 0  
-         END IF
-         HS = SIGN( ONE, DH - R*DK )  
-         KS = SIGN( ONE, DK - R*DH ) 
-         IF ( MOD( NU, 2 ) .EQ. 0 ) THEN ! nu is even
-            BVT = ATAN2( SQRT(ORS), -R )/TPI 
-            GMPH = DH/SQRT( 16*( NU + DH**2 ) )  
-            GMPK = DK/SQRT( 16*( NU + DK**2 ) )  
-            BTNCKH = 2*ATAN2( SQRT( XNKH ), SQRT( 1 - XNKH ) )/PI  
-            BTPDKH = 2*SQRT( XNKH*( 1 - XNKH ) )/PI 
-            BTNCHK = 2*ATAN2( SQRT( XNHK ), SQRT( 1 - XNHK ) )/PI  
-            BTPDHK = 2*SQRT( XNHK*( 1 - XNHK ) )/PI 
-            DO J = 1, NU/2
-               BVT = BVT + GMPH*( 1 + KS*BTNCKH ) 
-               BVT = BVT + GMPK*( 1 + HS*BTNCHK ) 
-               BTNCKH = BTNCKH + BTPDKH  
-               BTPDKH = 2*J*BTPDKH*( 1 - XNKH )/( 2*J + 1 )  
-               BTNCHK = BTNCHK + BTPDHK  
-               BTPDHK = 2*J*BTPDHK*( 1 - XNHK )/( 2*J + 1 )  
-               GMPH = GMPH*( 2*J - 1 )/( 2*J*( 1 + DH**2/NU ) ) 
-               GMPK = GMPK*( 2*J - 1 )/( 2*J*( 1 + DK**2/NU ) ) 
-            END DO
-         ELSE ! nu is odd
-            QHRK = SQRT( DH**2 + DK**2 - 2*R*DH*DK + NU*ORS )  
-            HKRN = DH*DK + R*NU  
-            HKN = DH*DK - NU  
-            HPK = DH + DK 
-            BVT = ATAN2( -SNU*( HKN*QHRK + HPK*HKRN ),
-     &                          HKN*HKRN-NU*HPK*QHRK )/TPI
-            IF ( BVT .LT. -EPS ) BVT = BVT + 1
-            GMPH = DH/( TPI*SNU*( 1 + DH**2/NU ) )  
-            GMPK = DK/( TPI*SNU*( 1 + DK**2/NU ) )  
-            BTNCKH = SQRT( XNKH )  
-            BTPDKH = BTNCKH 
-            BTNCHK = SQRT( XNHK )  
-            BTPDHK = BTNCHK  
-            DO J = 1, ( NU - 1 )/2
-               BVT = BVT + GMPH*( 1 + KS*BTNCKH ) 
-               BVT = BVT + GMPK*( 1 + HS*BTNCHK ) 
-               BTPDKH = ( 2*J - 1 )*BTPDKH*( 1 - XNKH )/( 2*J )  
-               BTNCKH = BTNCKH + BTPDKH  
-               BTPDHK = ( 2*J - 1 )*BTPDHK*( 1 - XNHK )/( 2*J )  
-               BTNCHK = BTNCHK + BTPDHK  
-               GMPH = 2*J*GMPH/( ( 2*J + 1 )*( 1 + DH**2/NU ) ) 
-               GMPK = 2*J*GMPK/( ( 2*J + 1 )*( 1 + DK**2/NU ) ) 
-            END DO
-         END IF
-         BVTL = BVT 
-      END IF
-*     END BVTL
+      INTEGER NU
+      DOUBLE PRECISION DH, DK, R, BVTLval
+      BVTLval = BVTL(NU, DH, DK, R)
       END
-*
+
+
 *     DOUBLE PRECISION FUNCTION PHID(Z) --- now using R's  pnorm(.) --> ./C_FORTRAN_interface.c
-*     
+*
 *     Normal distribution probabilities accurate to 1d-15.
-*     Reference: J.L. Schonfelder, Math Comp 32(1978), pp 1232-1240. 
-*     
+*     Reference: J.L. Schonfelder, Math Comp 32(1978), pp 1232-1240.
+*
 *      INTEGER I, IM
 *      DOUBLE PRECISION A(0:43), BM, B, BP, P, RTWO, T, XA, Z
 *      PARAMETER( RTWO = 1.414213562373095048801688724209D0, IM = 24 )
@@ -578,23 +476,23 @@
 *     &    1.76351193643605501125840298123D-1,
 *     &   -6.0710795609249414860051215825D-2,
 *     &    1.7712068995694114486147141191D-2,
-*     &   -4.321119385567293818599864968D-3, 
-*     &    8.54216676887098678819832055D-4, 
+*     &   -4.321119385567293818599864968D-3,
+*     &    8.54216676887098678819832055D-4,
 *     &   -1.27155090609162742628893940D-4,
-*     &    1.1248167243671189468847072D-5, 3.13063885421820972630152D-7,      
+*     &    1.1248167243671189468847072D-5, 3.13063885421820972630152D-7,
 *     &   -2.70988068537762022009086D-7, 3.0737622701407688440959D-8,
 *     &    2.515620384817622937314D-9, -1.028929921320319127590D-9,
 *     &    2.9944052119949939363D-11, 2.6051789687266936290D-11,
 *     &   -2.634839924171969386D-12, -6.43404509890636443D-13,
-*     &    1.12457401801663447D-13, 1.7281533389986098D-14, 
+*     &    1.12457401801663447D-13, 1.7281533389986098D-14,
 *     &   -4.264101694942375D-15, -5.45371977880191D-16,
-*     &    1.58697607761671D-16, 2.0899837844334D-17, 
-*     &   -5.900526869409D-18, -9.41893387554D-19, 2.14977356470D-19, 
-*     &    4.6660985008D-20, -7.243011862D-21, -2.387966824D-21, 
+*     &    1.58697607761671D-16, 2.0899837844334D-17,
+*     &   -5.900526869409D-18, -9.41893387554D-19, 2.14977356470D-19,
+*     &    4.6660985008D-20, -7.243011862D-21, -2.387966824D-21,
 *     &    1.91177535D-22, 1.20482568D-22, -6.72377D-25, -5.747997D-24,
-*     &   -4.28493D-25, 2.44856D-25, 4.3793D-26, -8.151D-27, -3.089D-27, 
-*     &    9.3D-29, 1.74D-28, 1.6D-29, -8.0D-30, -2.0D-30 /       
-*     
+*     &   -4.28493D-25, 2.44856D-25, 4.3793D-26, -8.151D-27, -3.089D-27,
+*     &    9.3D-29, 1.74D-28, 1.6D-29, -8.0D-30, -2.0D-30 /
+*
 *      XA = ABS(Z)/RTWO
 *      IF ( XA .GT. 100 ) THEN
 *         P = 0
@@ -602,7 +500,7 @@
 *         T = ( 8*XA - 30 ) / ( 4*XA + 15 )
 *         BM = 0
 *         B  = 0
-*         DO I = IM, 0, -1 
+*         DO I = IM, 0, -1
 *            BP = B
 *            B  = BM
 *            BM = T*B - BP  + A(I)
@@ -623,7 +521,7 @@
 *       Pullman, WA 99164-3113
 *       Email : alangenz@wsu.edu
 *
-*    This function is based on the method described by 
+*    This function is based on the method described by
 *        Drezner, Z and G.O. Wesolowsky, (1989),
 *        On the computation of the bivariate normal integral,
 *        Journal of Statist. Comput. Simul. 35, pp. 101-107,
@@ -638,10 +536,10 @@
 *   DK  DOUBLE PRECISION, integration limit
 *   R   DOUBLE PRECISION, correlation coefficient
 *
-      DOUBLE PRECISION DH, DK, R, TWOPI 
+      DOUBLE PRECISION DH, DK, R, TWOPI
       INTEGER I, IS, LG, NG
-      PARAMETER ( TWOPI = 6.283185307179586D0 ) 
-      DOUBLE PRECISION X(10,3), W(10,3), AS, A, B, C, D, RS, XS, BVN 
+      PARAMETER ( TWOPI = 6.283185307179586D0 )
+      DOUBLE PRECISION X(10,3), W(10,3), AS, A, B, C, D, RS, XS, BVN
       DOUBLE PRECISION PHID, SN, ASR, H, K, BS, HS, HK
 *     Gauss Legendre Points and Weights, N =  6
       DATA ( W(I,1), X(I,1), I = 1,3) /
@@ -675,16 +573,16 @@
       ELSE IF ( ABS(R) .LT. 0.75 ) THEN
          NG = 2
          LG = 6
-      ELSE 
+      ELSE
          NG = 3
          LG = 10
       ENDIF
       H = DH
-      K = DK 
+      K = DK
       HK = H*K
       BVN = 0
       IF ( ABS(R) .LT. 0.925 ) THEN
-         IF ( ABS(R) .GT. 0 ) THEN 
+         IF ( ABS(R) .GT. 0 ) THEN
             HS = ( H*H + K*K )/2
             ASR = ASIN(R)
             DO I = 1, LG
@@ -705,7 +603,7 @@
             AS = ( 1 - R )*( 1 + R )
             A = SQRT(AS)
             BS = ( H - K )**2
-            C = ( 4 - HK )/8 
+            C = ( 4 - HK )/8
             D = ( 12 - HK )/16
             ASR = -( BS/AS + HK )/2
             IF ( ASR .GT. -100 ) BVN = A*EXP(ASR)
@@ -713,7 +611,7 @@
             IF ( -HK .LT. 100 ) THEN
                B = SQRT(BS)
                BVN = BVN - EXP( -HK/2 )*SQRT(TWOPI)*PHID(-B/A)*B
-     &                    *( 1 - C*BS*( 1 - D*BS/5 )/3 ) 
+     &                    *( 1 - C*BS*( 1 - D*BS/5 )/3 )
             ENDIF
             A = A/2
             DO I = 1, LG
@@ -723,7 +621,7 @@
                   ASR = -( BS/XS + HK )/2
                   IF ( ASR .GT. -100 ) THEN
                      BVN = BVN + A*W(I,NG)*EXP( ASR )
-     &                    *( EXP( -HK*( 1 - RS )/( 2*( 1 + RS ) ) )/RS        
+     &                    *( EXP( -HK*( 1 - RS )/( 2*( 1 + RS ) ) )/RS
      &                    - ( 1 + C*XS*( 1 + D*XS ) ) )
                   END IF
                END DO
@@ -733,8 +631,8 @@
          IF ( R .GT. 0 ) THEN
             BVN =  BVN + PHID( -MAX( H, K ) )
          ELSE
-            BVN = -BVN 
-            IF ( K .GT. H ) BVN = BVN + PHID(K) - PHID(H) 
+            BVN = -BVN
+            IF ( K .GT. H ) BVN = BVN + PHID(K) - PHID(H)
          ENDIF
       ENDIF
       BVND = BVN

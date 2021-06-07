@@ -11,7 +11,7 @@
 \usage{
 pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
      df=1, corr=NULL, sigma=NULL, algorithm = GenzBretz(),
-     type = c("Kshirsagar", "shifted"), ...)
+     type = c("Kshirsagar", "shifted"), keepAttr=TRUE, ...)
 }
 \arguments{
   \item{lower}{ the vector of lower limits of length n.}
@@ -42,6 +42,9 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
 	      for the regression coefficients in a linear regression.
  	      In the central case both types coincide.
 	    }
+  \item{keepAttr}{\code{\link{logical}} indicating if
+    \code{\link{attributes}} such as \code{error} and \code{msg} should be
+    attached to the return value.  The default, \code{TRUE} is back compatible.}
   \item{...}{additional parameters (currently given to \code{GenzBretz} for
               backward compatibility issues). }
 }
@@ -103,9 +106,10 @@ If \code{df = 0}, normal probabilities are returned.
 }
 
 \value{
-The evaluated distribution function is returned with attributes
+  The evaluated distribution function is returned, if \code{keepAttr} is true, with attributes
   \item{error}{estimated absolute error and}
   \item{msg}{status message (a \code{\link{character}} string).}
+  \item{algorithm}{a \code{\link{character}} string with \code{class(algorithm)}.}
 }
 
 \references{

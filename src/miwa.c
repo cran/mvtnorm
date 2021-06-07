@@ -24,13 +24,13 @@
 #define REPS    (1.0e-6)  /* rho < REPS means rho=0 */
 
 /* coefficients b[] for cubic polynomial */
-static void b_calc(int j, struct GRID *g, double *f, double *df,
+static void b_calc(int j, struct GRID *g, const double f[], const double df[],
                    double *b)
 {
   b[0] = f[j-1];
   b[1] = df[j-1];
-  b[2] = 3.0*(-f[j-1]+f[j])/g->w2[j] - (2.0*df[j-1]+df[j])/g->w[j];
-  b[3] = 2.0*(f[j-1]-f[j])/g->w3[j] + (df[j-1]+df[j])/g->w2[j];
+  b[2] = 3.0*(-f[j-1]+f[j])/g->w2[j] - (2.0*df[j-1]+df[j])/g->w [j];
+  b[3] = 2.0*( f[j-1]-f[j])/g->w3[j] + (    df[j-1]+df[j])/g->w2[j];
 }
 
 
@@ -173,7 +173,6 @@ static double orthant(int m, double r[][MAXM][MAXM], double h[][MAXM],
   stg = 0;      /* stage pointer: 0 <= stg <= m-2 */
   srch = 1;     /* swich for searching non-zero coefficients */
   dlt[0] = 1;   /* plus or minus contribution of each cone */
-  *ncone = 0;   /* number of sub-cones */
 
   /* rvec[]: sub-diagonal cor coef for orthoscheme prob
    * hvec[]: upper bound vecter for orthoscheme prob
@@ -393,18 +392,15 @@ static void gridcalc(struct GRID *g)
   return;
 }
 
-static int checkall(int *vector,int length,int value)
- {
-       int returnvalue=1, i = 0;
-       for (i=0; i< length ; i++)
-       {
-           if (vector[i]!=value)
-           {
-             returnvalue=0;
-           }
-       }
-      return(returnvalue);
- }
+static int checkall(int *vector, int length, int value)
+{
+    for (int i=0; i < length; i++) {
+	if (vector[i] != value) {
+	    return 0;
+	}
+    }
+    return 1;
+}
 
 
 /*
@@ -414,225 +410,158 @@ static int checkall(int *vector,int length,int value)
  *
  */
 
-SEXP C_miwa(SEXP steps, SEXP corr, SEXP upper, SEXP lower, SEXP infin) {
+SEXP C_miwa(SEXP steps, SEXP corr, SEXP upper, SEXP lower, SEXP infin)
+{
+    double r[MAXM][MAXM][MAXM], hv[MAXM][MAXM], d[MAXM][MAXM];
+    struct GRID grid;
+    double
+	*dupper = REAL(upper),
+	*dcorr  = REAL(corr),
+	*dlower = REAL(lower);
+    /*
+      infinvalue is used to take the value of infin.
+    */
+    int dim = LENGTH(upper),
+	*infinvalue = INTEGER(infin),
+	infinlength = LENGTH(infin),
+	ncone = 0, /* number of sub-cones */
+	i, ii, j,k,l;
 
-    SEXP answer;
-    int dim;
-    /* int diml; ### was not used */
-    int i,ii, j,k,l,i5,i6,i7,i8, ncone;
-    int infinlength;
-
-/*
-infinvalue is used to take the value of infin.
-*/
-
-
-    double *dupper,*dlower, *dcorr, output,*f, r[MAXM][MAXM][MAXM], hv[MAXM][MAXM], d[MAXM][MAXM];
-    int *infinvalue;
-    struct GRID   grid;
-
-    dim = LENGTH(upper);
-    dupper = REAL(upper);
-    dcorr = REAL(corr);
-    /* diml = LENGTH(lower); ### was not used */
-    dlower = REAL(lower);
-    infinvalue = INTEGER(infin);
-    infinlength = LENGTH(infin);
-
-
-  for (i = 0; i < dim - 1; i++) {
+    for (i = 0; i < dim - 1; i++) {
         for(j = i + 1; j < dim; j++) {
             r[0][i][j] = dcorr[i * dim + j];
 
-          /* debug checking for correlation matrix
-            Rprintf("r %f\n", r[0][i][j]);
-          */
+	    /* debug checking for correlation matrix
+	       Rprintf("r %f\n", r[0][i][j]);
+	    */
         }
     }
 
     grid.n = INTEGER(steps)[0];
     gridcalc(&grid);
 
-
- PROTECT(answer = allocVector(REALSXP, 1));
-
+    SEXP answer = PROTECT(allocVector(REALSXP, 1));
 
 
 /*
- branch happens here. if only one sided, then just call orthant function once
+  branch happens here. if only one sided, then just call orthant function once
 
 */
- if (checkall(infinvalue,infinlength,-1)==1 )
- {
-  REAL(answer)[0]=1;
- }else if (checkall(infinvalue,infinlength,0)==1 )
- {
-    for (i = 0; i < dim; i++)
-    {
-        hv[0][i] = dupper[i];
-    }
-    REAL(answer)[0] = orthant(dim, r, hv, &ncone, &grid);
+    if (checkall(infinvalue,infinlength, -1)) {
+	REAL(answer)[0]=1;
+    } else if (checkall(infinvalue,infinlength, 0)) {
+	for (i = 0; i < dim; i++)
+	    hv[0][i] = dupper[i];
+	REAL(answer)[0] = orthant(dim, r, hv, &ncone, &grid);
 
+    } else if (checkall(infinvalue,infinlength, 1)) {
+	for (i = 0; i < dim; i++)
+	    hv[0][i] = -dlower[i];
+	REAL(answer)[0] = orthant(dim, r, hv, &ncone, &grid);
+    } else {
+	for (i = 0; i < dim; i++)
+	    hv[0][i] = dupper[i];
 
- }else if (checkall(infinvalue,infinlength,1)==1 )
- {
-    for (i = 0; i < dim; i++)
-    {
-        hv[0][i] = -dlower[i];
-    }
-    REAL(answer)[0] = orthant(dim, r, hv, &ncone, &grid);
+	double *f = dlower;
+	/*
+	  # circle number 0
+	*/
+	double sum = orthant(dim, r, hv, &ncone, &grid);
+	/*
+	  # circle number 1
+	*/
+	for (i = 0; i < dim; i++) {
+	    for (ii = 0; ii < dim; ii++)
+		d[0][ii] = dupper[ii];
+	    d[0][i]=f[i];
+	    sum -= orthant(dim, r, d, &ncone, &grid);
+	}
+	/*
+	  # circle number 2
+	*/
+	for (i = 0; i < (dim-1) ; i++) {
+	    for (j=(i+1); j < dim; j++) {
+		for (ii = 0; ii < dim; ii++)
+		    d[0][ii] = dupper[ii];
+		d[0][i]=f[i];
+		d[0][j]=f[j];
+		sum += orthant(dim, r, d, &ncone, &grid);
+	    }
+	}
+	/* Rprintf("sum: %f\n", sum); */
 
+	/*
+	  # circle number 3
+	*/
+	if (dim > 2) {
+	    for (i = 0; i < (dim-2) ; i++ ) {
+		for (j=(i+1); j < (dim-1); j++ ) {
+		    for (k=(j+1); k < dim; k++) {
+			for (ii = 0; ii < dim; ii++)
+			    d[0][ii] = dupper[ii];
 
- } else
- {
-    for (i = 0; i < dim; i++)
-    {
-        hv[0][i] = dupper[i];
-    }
-    f=dlower;
+			d[0][i]=f[i];
+			d[0][j]=f[j];
+			d[0][k]=f[k];
+			sum -= orthant(dim, r, d, &ncone, &grid);
+		    }
+		}
+	    }
+	}
 
-  /*
-                   # circle number 0
-  */
-                   output= orthant(dim, r, hv, &ncone, &grid);
-  /*
-                   # circle number 1
-  */
-                   for (i = 0; i < dim; i++)
-                   {
-                     for (ii = 0; ii < dim; ii++)
-                          {
-                             d[0][ii] = dupper[ii];
-                           }
-                     d[0][i]=f[i];
-                    output=output-orthant(dim, r, d, &ncone, &grid);
-                   }
-  /*
-                   # circle number 2
-  */
-                   for (i = 0; i < (dim-1) ; i++)
-                   {
-                     for (j=(i+1); j < dim; j++ )
-                     {
-                         for (ii = 0; ii < dim; ii++)
-                               {
-                                  d[0][ii] = dupper[ii];
-                               }
-                    d[0][i]=f[i];
-                    d[0][j]=f[j];
-                    output=output + orthant(dim, r, d, &ncone, &grid);
-                    }
-                   }
-/* Rprintf("output: %f\n", output); */
+	if (dim > 3) {
+	    for (i = 0; i < (dim-3) ; i++) {
+		for (j=(i+1); j < (dim-2); j++) {
+		    for (k=(j+1); k < (dim-1); k++) {
+			for (l=(k+1); l < (dim); l++) {
+			    for (ii = 0; ii < dim; ii++)
+				d[0][ii] = dupper[ii];
 
+			    d[0][i]=f[i];
+			    d[0][j]=f[j];
+			    d[0][k]=f[k];
+			    d[0][l]=f[l];
 
-  /*
-                   # circle number 3
-  */
-                     if (dim>2)
-                     {
-                      for (i = 0; i < (dim-2) ; i++ )
-                      {
-                       for (j=(i+1); j < (dim-1); j++ )
-                       {
-                         for (k=(j+1); k < dim; k++)
-                           {
+			    sum += orthant(dim, r, d, &ncone, &grid);
+			}
+		    }
+		}
+	    }
+	}
 
-                           for (ii = 0; ii < dim; ii++)
-                               {
-                                  d[0][ii] = dupper[ii];
-                               }
-                              d[0][i]=f[i];
-                              d[0][j]=f[j];
-                              d[0][k]=f[k];
-                             output=output - orthant(dim, r, d, &ncone, &grid);
-                           }
-                        }
-                       }
-                     }
+	if (dim > 4) {
+	    for (int i5 = 0; i5 < (dim-4) ; i5++) {
+		for (i =(i5+1); i < (dim-3) ; i++) {
+		    for (j=(i+1); j < (dim-2); j++ ) {
+			for (k=(j+1); k < (dim-1); k++) {
+                            for (l=(k+1); l < (dim); l++) {
+				for (ii = 0; ii < dim; ii++)
+				    d[0][ii] = dupper[ii];
 
-                     if (dim>3)
-                     {
-                      for (i = 0; i < (dim-3) ; i++)
-                      {
-                        for (j=(i+1); j < (dim-2); j++ )
-                       {
-                         for (k=(j+1); k < (dim-1); k++)
-                           {
-                            for (l=(k+1); l < (dim); l++)
-                             {
+				d[0][i5]=f[i5];
+				d[0][i]=f[i];
+				d[0][j]=f[j];
+				d[0][k]=f[k];
+				d[0][l]=f[l];
 
+				sum -= orthant(dim, r, d, &ncone, &grid);
+			    }
+			}
+		    }
+		}
+	    }
+	}
 
-                                 for (ii = 0; ii < dim; ii++)
-                                     {
+	if (dim > 5) {
+	    for (int i6 = 0; i6 < (dim-5) ; i6++) {
+		for (int i5 = (i6+1); i5 < (dim-4) ; i5++) {
+		    for (i =(i5+1); i < (dim-3) ; i++) {
+			for (j=(i+1); j < (dim-2); j++ ) {
+			    for (k=(j+1); k < (dim-1); k++) {
+				for (l=(k+1); l < (dim); l++) {
+				    for (ii = 0; ii < dim; ii++)
                                         d[0][ii] = dupper[ii];
-                                     }
-                                    d[0][i]=f[i];
-                                    d[0][j]=f[j];
-                                    d[0][k]=f[k];
-                                    d[0][l]=f[l];
 
-                                  output=output+orthant(dim, r, d, &ncone, &grid);
-                              }
-                           }
-                        }
-                       }
-                     }
-
-                    if (dim>4)
-                     {
-
-                         for (i5 = 0; i5 < (dim-4) ; i5++)
-                      {
-                          for (i =(i5+1); i < (dim-3) ; i++)
-                      {
-                        for (j=(i+1); j < (dim-2); j++ )
-                       {
-                         for (k=(j+1); k < (dim-1); k++)
-                           {
-                            for (l=(k+1); l < (dim); l++)
-                             {
-
-
-                                 for (ii = 0; ii < dim; ii++)
-                                     {
-                                        d[0][ii] = dupper[ii];
-                                     }
-                                    d[0][i5]=f[i5];
-                                    d[0][i]=f[i];
-                                    d[0][j]=f[j];
-                                    d[0][k]=f[k];
-                                    d[0][l]=f[l];
-
-                            output=output-orthant(dim, r, d, &ncone, &grid);
-                             }
-                           }
-                        }
-                       }
-                       }
-                     }
-
-
-                    if (dim>5)
-                     {
-
-                          for (i6 = 0; i6 < (dim-5) ; i6++)
-                      {
-                          for (i5 = (i6+1); i5 < (dim-4) ; i5++)
-                      {
-                          for (i =(i5+1); i < (dim-3) ; i++)
-                      {
-                          for (j=(i+1); j < (dim-2); j++ )
-                       {
-                          for (k=(j+1); k < (dim-1); k++)
-                           {
-                            for (l=(k+1); l < (dim); l++)
-                             {
-
-                             for (ii = 0; ii < dim; ii++)
-                                     {
-                                        d[0][ii] = dupper[ii];
-                                     }
                                     d[0][i6]=f[i6];
                                     d[0][i5]=f[i5];
                                     d[0][i]=f[i];
@@ -640,117 +569,78 @@ infinvalue is used to take the value of infin.
                                     d[0][k]=f[k];
                                     d[0][l]=f[l];
 
-                            output=output+orthant(dim, r, d, &ncone, &grid);
-
-
-                             }
-                           }
+				    sum += orthant(dim, r, d, &ncone, &grid);
+				}
+			    }
                         }
-                       }
-                       }
-                     }
-                     }
+		    }
+		}
+	    }
+	}
 
+	if (dim > 6) {
+	    for (int i7 = 0; i7 < (dim-6) ; i7++) {
+		for (int i6 = (i7+1); i6 < (dim-5) ; i6++) {
+		    for (int i5 = (i6+1); i5 < (dim-4) ; i5++) {
+			for (i =(i5+1); i < (dim-3) ; i++) {
+			    for (j=(i+1); j < (dim-2); j++) {
+				for (k=(j+1); k < (dim-1); k++) {
+				    for (l=(k+1); l < (dim); l++) {
+					for (ii = 0; ii < dim; ii++)
+					    d[0][ii] = dupper[ii];
 
-                    if (dim>6)
-                     {
+					d[0][i7]=f[i7];
+					d[0][i6]=f[i6];
+					d[0][i5]=f[i5];
+					d[0][i]=f[i];
+					d[0][j]=f[j];
+					d[0][k]=f[k];
+					d[0][l]=f[l];
 
-                          for (i7 = 0; i7 < (dim-6) ; i7++)
-                      {
-                          for (i6 = (i7+1); i6 < (dim-5) ; i6++)
-                      {
-                          for (i5 = (i6+1); i5 < (dim-4) ; i5++)
-                      {
-                          for (i =(i5+1); i < (dim-3) ; i++)
-                      {
-                          for (j=(i+1); j < (dim-2); j++ )
-                       {
-                          for (k=(j+1); k < (dim-1); k++)
-                           {
-                            for (l=(k+1); l < (dim); l++)
-                             {
+					sum -= orthant(dim, r, d, &ncone, &grid);
+				    }
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
 
+	if (dim > 7) {
+	    for (int i8 = 0; i8 < (dim-7) ; i8++) {
+		for (int i7 = (i8+1); i7 < (dim-6) ; i7++) {
+		    for (int i6 = (i7+1); i6 < (dim-5) ; i6++) {
+			for (int i5 = (i6+1); i5 < (dim-4) ; i5++) {
+			    for (i =(i5+1); i < (dim-3) ; i++) {
+				for (j=(i+1); j < (dim-2); j++ ) {
+				    for (k=(j+1); k < (dim-1); k++) {
+					for (l=(k+1); l < (dim); l++) {
+					    for (ii = 0; ii < dim; ii++)
+						d[0][ii] = dupper[ii];
 
-                             for (ii = 0; ii < dim; ii++)
-                                     {
-                                        d[0][ii] = dupper[ii];
-                                     }
-                                    d[0][i7]=f[i7];
-                                    d[0][i6]=f[i6];
-                                    d[0][i5]=f[i5];
-                                    d[0][i]=f[i];
-                                    d[0][j]=f[j];
-                                    d[0][k]=f[k];
-                                    d[0][l]=f[l];
+					    d[0][i8]=f[i8];
+					    d[0][i7]=f[i7];
+					    d[0][i6]=f[i6];
+					    d[0][i5]=f[i5];
+					    d[0][i]=f[i];
+					    d[0][j]=f[j];
+					    d[0][k]=f[k];
+					    d[0][l]=f[l];
 
-                            output=output-orthant(dim, r, d, &ncone, &grid);
-
-                             }
-                           }
-                        }
-                       }
-                       }
-                     }
-                     }
-                     }
-
-                     if (dim>7)
-                     {
-
-                          for (i8 = 0; i8 < (dim-7) ; i8++)
-                      {
-                          for (i7 = (i8+1); i7 < (dim-6) ; i7++)
-                      {
-                          for (i6 = (i7+1); i6 < (dim-5) ; i6++)
-                      {
-                          for (i5 = (i6+1); i5 < (dim-4) ; i5++)
-                      {
-                          for (i =(i5+1); i < (dim-3) ; i++)
-                      {
-                          for (j=(i+1); j < (dim-2); j++ )
-                       {
-                          for (k=(j+1); k < (dim-1); k++)
-                           {
-                            for (l=(k+1); l < (dim); l++)
-                             {
-
-                             for (ii = 0; ii < dim; ii++)
-                                     {
-                                        d[0][ii] = dupper[ii];
-                                     }
-                                    d[0][i8]=f[i8];
-                                    d[0][i7]=f[i7];
-                                    d[0][i6]=f[i6];
-                                    d[0][i5]=f[i5];
-                                    d[0][i]=f[i];
-                                    d[0][j]=f[j];
-                                    d[0][k]=f[k];
-                                    d[0][l]=f[l];
-
-                            output=output+orthant(dim, r, d, &ncone, &grid);
-
-                             }
-                           }
-                        }
-                       }
-                       }
-                     }
-                     }
-                     }
-                     }
-
-
-
-
-
-
-
-
-
-     REAL(answer)[0]=output;
- }
+					    sum += orthant(dim, r, d, &ncone, &grid);
+					}
+				    }
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	REAL(answer)[0] = sum;
+    }
     UNPROTECT(1);
-
 
     return(answer);
 }

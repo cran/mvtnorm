@@ -1,4 +1,4 @@
-# $Id: mvt.R 360 2020-06-09 13:12:57Z thothorn $
+# $Id: mvt.R 368 2021-06-07 08:52:19Z thothorn $
 
 ##' Do we have a correlation matrix?
 ##' @param x typically a matrix
@@ -100,7 +100,7 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
 
 
 pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL, sigma=NULL,
-                    algorithm = GenzBretz(), ...)
+                    algorithm = GenzBretz(), keepAttr=TRUE, ...)
 {
     carg <- checkmvArgs(lower=lower, upper=upper, mean=mean, corr=corr,
                         sigma=sigma)
@@ -130,13 +130,16 @@ pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL
       }
     }
     ## return
-    structure(RET$value, "error" = RET$error, "msg" = RET$msg)
+    if(keepAttr)
+        structure(RET$value, error = RET$error, msg = RET$msg,
+                  algorithm = RET$algorithm)
+    else RET$value
 }
 
 pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
                  df=1, corr=NULL, sigma=NULL,
                  algorithm = GenzBretz(),
-                 type = c("Kshirsagar", "shifted"), ...)
+                 type = c("Kshirsagar", "shifted"), keepAttr=TRUE, ...)
 {
     type <- match.arg(type)
     carg <- checkmvArgs(lower=lower, upper=upper, mean=delta, corr=corr,
@@ -191,28 +194,28 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
                        delta=carg$mean/d, algorithm = algorithm, ...)
         }
     }
-    attr(RET$value, "error") <- RET$error
-    attr(RET$value, "msg") <- RET$msg
-    return(RET$value)
+    ## return
+    if(keepAttr)
+        structure(RET$value, error = RET$error, msg = RET$msg,
+                  algorithm = RET$algorithm)
+    else RET$value
 }
 
 ## identical(., Inf) would be faster but not vectorized
-isInf <- function(x) x > 0 & is.infinite(x) # check for  Inf
+isInf  <- function(x) x > 0 & is.infinite(x) # check for  Inf
 isNInf <- function(x) x < 0 & is.infinite(x) # check for -Inf
 
 mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
 {
-
     ### only for compatibility with older versions
-    addargs <- list(...)
-    if (length(addargs) > 0)
+    if (...length() > 0)
         algorithm <- GenzBretz(...)
     else if (is.function(algorithm) || is.character(algorithm))
         algorithm <- do.call(algorithm, list())
 
     ### handle cases where the support is the empty set
     ##  Note: checkmvArgs() has been called ==> lower, upper are *not* NA
-    if (any(abs(d <- lower - upper) < sqrt(.Machine$double.eps)*(abs(lower)+abs(upper)) |
+    if (any(abs(lower - upper) < sqrt(.Machine$double.eps)*(abs(lower)+abs(upper)) |
             lower == upper)) ## e.g. Inf == Inf
 	return(list(value = 0, error = 0, msg = "lower == upper"))
 
@@ -229,21 +232,22 @@ mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
     infin[isNInf(lower)] <- 0
     infin[isNInf(lower) & isInf(upper)] <- -1
 
-    ### fix for Miwa algo:
+    ### fix for Miwa (and TVPACK) algo:
     ### pmvnorm(lower=c(-Inf, 0, 0), upper=c(0, Inf, Inf),
-    ###         mean=c(0, 0, 0), sigma=S, algorithm = Miwa())
-    ###         returned NA
-
-    if (inherits(algorithm, "Miwa")) {
-        if (n >= 3 && any(infin == -1)) {
+    ###         mean=c(0, 0, 0), sigma=S, algorithm = Miwa()) # returned NA
+    if((isMiwa <- inherits(algorithm, "Miwa")) || inherits(algorithm, "TVPACK")) {
+        if (n >= 3 && any(infin == -1)) { # Int(-Inf, +Inf;..) --> reduce dimension
             WhereBothInfIs <- which(infin == -1)
             n <- n - length(WhereBothInfIs)
             corr <- corr[-WhereBothInfIs, -WhereBothInfIs]
             upper <- upper[-WhereBothInfIs]
             lower <- lower[-WhereBothInfIs]
+            if(!missing(delta))
+                delta <- delta[-WhereBothInfIs]
+            infin <- infin[-WhereBothInfIs]
         }
 
-        if (n >= 2 && any(infin == 0)) {
+        if (isMiwa && n >= 2 && any(infin == 0)) {
             WhereNegativInfIs <- which(infin==0)
             inversecorr <- rep(1, n)
             inversecorr[WhereNegativInfIs] <- -1
@@ -260,13 +264,12 @@ mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
     if (all(infin < 0))
         return(list(value = 1, error = 0, msg = "Normal Completion"))
 
-    if (n > 1) {
-        corrF <- matrix(as.vector(corr), ncol=n, byrow=TRUE)
-        corrF <- corrF[upper.tri(corrF)]
-    } else corrF <- corr
+    if(inherits(algorithm, "GenzBretz") && n > 1) {
+        corr <- matrix(as.vector(corr), ncol=n, byrow=TRUE)
+        corr <- corr[upper.tri(corr)]
+    }
 
-
-    ret <- probval(algorithm, n, df, lower, upper, infin, corr, corrF, delta)
+    ret <- probval(algorithm, n, df, lower, upper, infin, corr, delta)
     inform <- ret$inform
     msg <-
         if (inform == 0) "Normal Completion"
@@ -276,7 +279,7 @@ mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
     else inform
 
     ## return including error est. and msg:
-    list(value = ret$value, error = ret$error, msg = msg)
+    list(value = ret$value, error = ret$error, msg = msg, algo = class(algorithm))
 }
 
 rmvt <- function(n, sigma = diag(2), df = 1,
@@ -552,16 +555,17 @@ GenzBretz <- function(maxpts = 25000, abseps = 0.001, releps = 0) {
               class = "GenzBretz")
 }
 
-Miwa <- function(steps = 128) {
-    if (steps > 4098) stop("maximum number of steps is 4098")
-    structure(list(steps = steps), class = "Miwa")
+Miwa <- function(steps = 128, checkCorr = TRUE, maxval = 1e3) {
+    if (steps > 4097) stop("maximum number of steps is 4097") # MAXGRD in ../src/miwa.h
+    structure(list(steps = steps, checkCorr=checkCorr, maxval = maxval), class = "Miwa")
 }
 
 probval <- function(x, ...)
     UseMethod("probval")
 
-probval.GenzBretz <- function(x, n, df, lower, upper, infin, corr, corrF, delta) {
 
+probval.GenzBretz <- function(x, n, df, lower, upper, infin, corrF, delta)
+{
     if(isInf(df)) df <- 0 # MH: deal with df=Inf (internally requires df=0!)
 
     lower[isNInf(lower)] <- 0
@@ -585,17 +589,27 @@ probval.GenzBretz <- function(x, n, df, lower, upper, infin, corr, corrF, delta)
        RND = as.integer(1)) ### init RNG
 }
 
-probval.Miwa <- function(x, n, df, lower, upper, infin, corr, corrF, delta) {
-
+probval.Miwa <- function(x, n, df, lower, upper, infin, corr, delta)
+{
     if (!( df==0 || isInf(df) ))
         stop("Miwa algorithm cannot compute t-probabilities")
-
     if (n > 20)
         stop("Miwa algorithm cannot compute probabilities for dimension n > 20")
 
-    sc <- try(solve(corr))
-    if (inherits(sc, "try-error"))
-        stop("Miwa algorithm cannot compute probabilities for singular problems")
+    if(any(delta != 0)) {
+        upper <- upper - delta
+        lower <- lower - delta
+    }
+    if(x$checkCorr) ## FIXME solve(*, tol = .Machine$double.eps); prbly need larger tol!
+        tryCatch(solve(corr), error = function(e)
+            stop("Miwa algorithm cannot compute probabilities for singular problems",
+                 call. = FALSE))
+    
+    if (length(unique(infin)) != 1L) {
+        warning("Approximating +/-Inf by +/-", x$maxval)
+        lower[infin <= 0L] <- -x$maxval
+        upper[abs(infin) == 1L] <- x$maxval
+    }
 
     p <- .Call(C_miwa, steps = as.integer(x$steps),
                          corr = as.double(corr),
@@ -604,6 +618,8 @@ probval.Miwa <- function(x, n, df, lower, upper, infin, corr, corrF, delta) {
                          infin = as.integer(infin))
     list(value = p, inform = 0, error = NA)
 }
+
+## NB:  probval.TVPACK () --- defined in  ./tvpack.R
 
 dots2GenzBretz <- function(...) {
     addargs <- list(...)

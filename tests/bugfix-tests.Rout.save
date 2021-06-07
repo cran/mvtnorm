@@ -1,6 +1,6 @@
 
-R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R Under development (unstable) (2021-06-06 r80456) -- "Unsuffered Consequences"
+Copyright (C) 2021 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -274,6 +274,11 @@ attr(,"msg")
 > # bugged Fritz (long time ago)
 > stopifnot(all.equal(pmvnormM(-Inf, c(Inf, 0), 0, diag(2)),
 + 		    pmvnormM(-Inf, c(Inf, 0), 0)))
+Warning messages:
+1: In probval.Miwa(algorithm, n, df, lower, upper, infin, corr, delta) :
+  Approximating +/-Inf by +/-1000
+2: In probval.Miwa(algorithm, n, df, lower, upper, infin, corr, delta) :
+  Approximating +/-Inf by +/-1000
 > 
 > # this is a bug in `mvtdst' nobody was able to fix yet :-(
 > stopifnot(pmvnormM(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0)) == 1)
@@ -712,4 +717,4 @@ attr(,"msg")
 > 
 > proc.time()
    user  system elapsed 
-  6.074   0.048   6.118 
+  6.059   0.086   6.126 

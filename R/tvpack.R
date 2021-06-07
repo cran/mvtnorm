@@ -1,10 +1,8 @@
 
 TVPACK <- function(abseps = 1e-6) structure(list(eps = abseps), class = "TVPACK")
 
-probval.TVPACK <- function (x, n, df, lower, upper, infin, corr, corrF, delta) {
-
-    if (n > 3)
-        stop("TVPACK algorithms cannot compute probabilities for n > 3")
+probval.TVPACK <- function (x, n, df, lower, upper, infin, corr, delta)
+{
     if (df > 0 && any(delta != 0))
         stop("TVPACK only possible for the central t-distribution.")
     ## can only deal with *integer* df :

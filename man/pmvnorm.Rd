@@ -3,13 +3,13 @@
 \title{ Multivariate Normal Distribution }
 \description{
 
-Computes the distribution function of the multivariate normal 
+Computes the distribution function of the multivariate normal
 distribution for arbitrary limits and correlation matrices.
 
 }
 \usage{
 pmvnorm(lower=-Inf, upper=Inf, mean=rep(0, length(lower)),
-        corr=NULL, sigma=NULL, algorithm = GenzBretz(), ...)
+        corr=NULL, sigma=NULL, algorithm = GenzBretz(), keepAttr=TRUE, ...)
 }
 \arguments{
   \item{lower}{ the vector of lower limits of length n.}
@@ -19,45 +19,50 @@ pmvnorm(lower=-Inf, upper=Inf, mean=rep(0, length(lower)),
   \item{sigma}{ the covariance matrix of dimension n less than 1000. Either \code{corr} or
                 \code{sigma} can be specified. If \code{sigma} is given, the
                 problem is standardized. If neither \code{corr} nor
-                \code{sigma} is given, the identity matrix is used 
+                \code{sigma} is given, the identity matrix is used
                 for \code{sigma}. }
   \item{algorithm}{ an object of class \code{\link{GenzBretz}},
                     \code{\link{Miwa}} or \code{\link{TVPACK}}
-                    specifying both the algorithm to be used as well as 
+                    specifying both the algorithm to be used as well as
                     the associated hyper parameters.}
-  \item{...}{ additional parameters (currently given to \code{GenzBretz} for 
+  \item{keepAttr}{\code{\link{logical}} indicating if
+    \code{\link{attributes}} such as \code{error} and \code{msg} should be
+    attached to the return value.  The default, \code{TRUE} is back compatible.}
+
+  \item{...}{ additional parameters (currently given to \code{GenzBretz} for
               backward compatibility issues). }
 }
 \details{
 
-This program involves the computation of 
+This program involves the computation of
 multivariate normal probabilities with arbitrary correlation matrices.
-It involves both the computation of singular and nonsingular 
+It involves both the computation of singular and nonsingular
 probabilities. The implemented methodology is described in
 Genz (1992, 1993) (for algorithm GenzBretz), in Miwa et al. (2003)
 for algorithm Miwa (useful up to dimension 20) and Genz (2004)
 for the TVPACK algorithm (which covers 2- and 3-dimensional problems
 for semi-infinite integration regions).
 
-Note the default algorithm GenzBretz is randomized and hence slightly depends on 
+Note the default algorithm GenzBretz is randomized and hence slightly depends on
 \code{\link{.Random.seed}} and that both \code{-Inf} and \code{+Inf} may
 be specified in \code{lower} and \code{upper}.  For more details see
-\code{\link{pmvt}}.  
+\code{\link{pmvt}}.
 
-The multivariate normal 
-case is treated as a special case of \code{\link{pmvt}} with \code{df=0} and 
+The multivariate normal
+case is treated as a special case of \code{\link{pmvt}} with \code{df=0} and
 univariate problems are passed to \code{\link{pnorm}}.
 
 The multivariate normal density and random deviates are available using
 \code{\link{dmvnorm}} and \code{\link{rmvnorm}}.
- 
+
 }
 \value{
-The evaluated distribution function is returned with attributes
-  \item{error}{estimated absolute error and}
-  \item{msg}{status messages.}
+  The evaluated distribution function is returned, if \code{keepAttr} is true, with attributes
+  \item{error}{estimated absolute error}
+  \item{msg}{status message(s).}
+  \item{algorithm}{a \code{\link{character}} string with \code{class(algorithm)}.}
 }
-\references{ 
+\references{
 
 Genz, A. (1992). Numerical computation of multivariate normal probabilities.
 \emph{Journal of Computational and Graphical Statistics}, \bold{1}, 141--150.
@@ -71,7 +76,7 @@ trivariate normal and t-probabilities, \emph{Statistics and
 Computing}, \bold{14}, 251--260.
 
 Genz, A. and Bretz, F. (2009), \emph{Computation of Multivariate Normal and
-t Probabilities}. Lecture Notes in Statistics, Vol. 195. Springer-Verlag,  
+t Probabilities}. Lecture Notes in Statistics, Vol. 195. Springer-Verlag,
 Heidelberg.
 
 Miwa, A., Hayter J. and Kuriki, S. (2003).
