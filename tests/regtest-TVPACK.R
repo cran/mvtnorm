@@ -14,7 +14,7 @@ pmvt_TV.7 <- replicate(7, pmvt..(dfs, TVPACK()))
 stopifnot(pmvt_TV.7 == pmvt_TV.7[,1])
 (pmvt.TV. <- pmvt_TV.7[,1])
 (pmvt.TV  <- pmvt..(dfs, TVPACK(1e-14)))# has no effect here
-pmvt.TV - pmvt.TV. ## all 0 {unexpectedly ??}
+all.equal(max(abs(pmvt.TV - pmvt.TV.)), 0) ## all 0 {unexpectedly ??}
 
 
 set.seed(47) ## and default algorithm: -> *random* result

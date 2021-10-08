@@ -13,7 +13,7 @@
 
 /*
  * Modifications for R package `mvtnorm' by
- * Xuefei Mi <mi@biostat.uni-hannover.de> and 
+ * Xuefei Mi <mi@biostat.uni-hannover.de> and
  * Torsten Hothorn <Torsten.Hothorn@R-project.org>
  *
  */
@@ -22,7 +22,6 @@
 #include <R.h>
 #include <Rmath.h>
 #include <Rinternals.h>
-#include <Rdefines.h>
 
 #define MAXM    20    /* maximum dimension size  */
 #define MAXGRD  4097  /* maximum number of grid points */

@@ -1,6 +1,6 @@
 
-R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
-Copyright (C) 2020 The R Foundation for Statistical Computing
+R version 4.1.1 (2021-08-10) -- "Kick Things"
+Copyright (C) 2021 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -40,8 +40,8 @@ Type 'q()' to quit R.
 > (pmvt.TV  <- pmvt..(dfs, TVPACK(1e-14)))# has no effect here
 [1] 0.3554119 0.3817313 0.3923546 0.3980570 0.4016042 0.4040204 0.4057708
 [8] 0.4070968 0.4081358
-> pmvt.TV - pmvt.TV. ## all 0 {unexpectedly ??}
-[1] 0 0 0 0 0 0 0 0 0
+> all.equal(max(abs(pmvt.TV - pmvt.TV.)), 0) ## all 0 {unexpectedly ??}
+[1] TRUE
 > 
 > 
 > set.seed(47) ## and default algorithm: -> *random* result
@@ -269,4 +269,4 @@ attr(,"msg")
 > 
 > proc.time()
    user  system elapsed 
-  3.497   0.079   4.910 
+  3.820   0.048   3.841 
