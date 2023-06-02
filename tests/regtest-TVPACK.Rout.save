@@ -1,6 +1,6 @@
 
-R version 4.1.1 (2021-08-10) -- "Kick Things"
-Copyright (C) 2021 The R Foundation for Statistical Computing
+R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -16,6 +16,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library("mvtnorm")
+> 
+> chk <- function(...) isTRUE(all.equal(...))
 > 
 > ## Showing the TVPACK() gives *NON*-random results:
 > (cor1 <- toeplitz(c(1, 1/4, -1/8)))
@@ -33,14 +35,14 @@ Type 'q()' to quit R.
 > dfs <- 1:9
 > pmvt_TV.7 <- replicate(7, pmvt..(dfs, TVPACK()))
 > 
-> stopifnot(pmvt_TV.7 == pmvt_TV.7[,1])
+> stopifnot(identical(unique(c(pmvt_TV.7 - pmvt_TV.7[,1])), 0))
 > (pmvt.TV. <- pmvt_TV.7[,1])
 [1] 0.3554119 0.3817313 0.3923546 0.3980570 0.4016042 0.4040204 0.4057708
 [8] 0.4070968 0.4081358
 > (pmvt.TV  <- pmvt..(dfs, TVPACK(1e-14)))# has no effect here
 [1] 0.3554119 0.3817313 0.3923546 0.3980570 0.4016042 0.4040204 0.4057708
 [8] 0.4070968 0.4081358
-> all.equal(max(abs(pmvt.TV - pmvt.TV.)), 0) ## all 0 {unexpectedly ??}
+> chk(max(abs(pmvt.TV - pmvt.TV.)), 0) ## all 0 {unexpectedly ??}
 [1] TRUE
 > 
 > 
@@ -50,7 +52,7 @@ Type 'q()' to quit R.
 > relE <- 1 - pmvt_7 / pmvt.TV
 > rng.rE <- range(abs(relE))
 > stopifnot(1e-6 < rng.rE[1], rng.rE[2] < 7e-4)
-> stopifnot(all.equal(
+> stopifnot(chk(
 +     colMeans(abs(relE)),
 +     c(88, 64, 105, 73, 52, 90, 87)*1e-6, tol= 1e-3))
 > 
@@ -248,11 +250,11 @@ attr(,"msg")
 > P2a<- pmvnorm(lower=c(-Inf, 0, 0), upper=Inf, corr=S, algorithm = Miwa(512))
 > P2.<- pmvnorm(lower=c(-Inf, 0, 0), upper=Inf, corr=S, algorithm = Miwa(2048))
 > 
-> stopifnot(all.equal(1/3, c(P0), tol=1e-14)
-+         , all.equal(1/3, c(P1), tol=1e-14)
-+         , all.equal(1/3, c(P2), tol=1e-9 ) # 3.765e-10
-+         , all.equal(1/3, c(P2a),tol=4e-12) # 8.32 e-13
-+         , all.equal(1/3, c(P2.),tol=2e-12) # 5.28 e-13
+> stopifnot(chk(1/3, c(P0), tol=1e-14),
++           chk(1/3, c(P1), tol=1e-14),
++           chk(1/3, c(P2), tol=1e-9 ), # 3.765e-10
++           chk(1/3, c(P2a),tol=4e-12), # 8.32 e-13
++           chk(1/3, c(P2.),tol=2e-12) # 5.28 e-13
 + )
 > 
 > ## t-dist [TVPACK() had failed] :
@@ -263,10 +265,10 @@ attr(,"msg")
 > Pt1 <- pmvt(lower=c(-Inf, 1, 2), upper=Inf, df=2, corr=S, algorithm = TVPACK())
 > P. <- 0.0570404044526986
 > stopifnot(exprs = {
-+     all.equal(P., c(Pt1), tol = 1e-14)# seen 3.65 e-16
++     chk(P., c(Pt1), tol = 1e-14)# seen 3.65 e-16
 +     abs(P. - Ptdef) < 1e-15 # seen 1.39 e-17
 + })
 > 
 > proc.time()
    user  system elapsed 
-  3.820   0.048   3.841 
+  3.215   0.011   3.221 

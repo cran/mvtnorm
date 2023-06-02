@@ -10,10 +10,9 @@ finding algorithm described in Bornkamp (2018).
 
 }
 \usage{
-qmvnorm(p, interval = NULL, tail = c("lower.tail", 
-        "upper.tail", "both.tails"), mean = 0, corr = NULL, 
-        sigma = NULL, algorithm = GenzBretz(),
-        ptol = 0.001, maxiter = 500, trace = FALSE, ...)
+qmvnorm(p, interval = NULL, tail = c("lower.tail", "upper.tail", "both.tails"), 
+        mean = 0, corr = NULL, sigma = NULL, algorithm = GenzBretz(),
+        ptol = 0.001, maxiter = 500, trace = FALSE, seed = NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -32,7 +31,9 @@ qmvnorm(p, interval = NULL, tail = c("lower.tail",
   \item{corr}{ the correlation matrix of dimension n.}
   \item{sigma}{ the covariance matrix of dimension n. Either \code{corr} or
                 \code{sigma} can be specified. If \code{sigma} is given, the
-                problem is standardized. If neither \code{corr} nor
+                problem is standardized internally. If \code{corr} is given,
+                it is assumed that appropriate standardization was performed
+                by the user. If neither \code{corr} nor
                 \code{sigma} is given, the identity matrix is used
                 for \code{sigma}. }
   \item{algorithm}{ an object of class \code{\link{GenzBretz}},
@@ -44,6 +45,8 @@ qmvnorm(p, interval = NULL, tail = c("lower.tail",
     for the predicted quantile is inside [p-ptol, p+ptol]. \code{maxiter} is the
     maximum number of iterations for the root finding algorithm. \code{trace}
     prints the iterations of the root finder.}
+  \item{seed}{an object specifying if and how the random number generator
+          should be initialized, see \code{\link[stats]{simulate}}.}
   \item{...}{ additional parameters to be passed to 
               \code{\link{GenzBretz}}.}
 }

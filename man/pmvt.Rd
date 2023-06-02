@@ -11,7 +11,7 @@
 \usage{
 pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
      df=1, corr=NULL, sigma=NULL, algorithm = GenzBretz(),
-     type = c("Kshirsagar", "shifted"), keepAttr=TRUE, ...)
+     type = c("Kshirsagar", "shifted"), keepAttr=TRUE, seed = NULL, ...)
 }
 \arguments{
   \item{lower}{ the vector of lower limits of length n.}
@@ -22,13 +22,15 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
   \item{corr}{ the correlation matrix of dimension n.}
   \item{sigma}{ the scale matrix of dimension n. Either \code{corr} or
     \code{sigma} can be specified. If \code{sigma} is given, the
-    problem is standardized. If neither \code{corr} nor
+                problem is standardized internally. If \code{corr} is given,
+                it is assumed that appropriate standardization was performed
+                by the user. If neither \code{corr} nor
     \code{sigma} is given, the identity matrix is used
     for \code{sigma}. }
   \item{algorithm}{ an object of class \code{\link{GenzBretz}} or
     \code{\link{TVPACK}} defining the hyper parameters of this algorithm.}
   \item{type}{ type of the noncentral multivariate t distribution
-              to be computed. \code{type = "Kshirsagar"} corresponds
+              to be computed. The choice \code{type = "Kshirsagar"} corresponds
               to formula (1.4) in Genz and Bretz (2009) (see also
 	      Chapter 5.1 in Kotz and Nadarajah (2004)). This is the
 	      noncentral t-distribution needed for calculating
@@ -45,6 +47,8 @@ pmvt(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
   \item{keepAttr}{\code{\link{logical}} indicating if
     \code{\link{attributes}} such as \code{error} and \code{msg} should be
     attached to the return value.  The default, \code{TRUE} is back compatible.}
+  \item{seed}{an object specifying if and how the random number generator
+          should be initialized, see \code{\link[stats]{simulate}}. }
   \item{...}{additional parameters (currently given to \code{GenzBretz} for
               backward compatibility issues). }
 }
@@ -139,9 +143,10 @@ multiple comparisons. \emph{Biometrics}, \bold{43}, 913--928.
 
 }
 
-\source{
-  \url{http://www.sci.wsu.edu/math/faculty/genz/homepage}
-}
+%%% can't validate certificate anymore
+%\source{
+%  \url{http://www.sci.wsu.edu/math/faculty/genz/homepage}
+%}
 
 \seealso{\code{\link{qmvt}}}
 
@@ -167,10 +172,9 @@ df <- 130
 C <- c(1,1,1,0,0,-1,0,0,1,0,0,-1,0,0,1,0,0,0,-1,-1,0,0,-1,0,0)
 C <- matrix(C, ncol=5)
 ### scale matrix
-cv <- C \%*\% V \%*\% t(C)
+cv <- C \%*\% tcrossprod(V, C)
 ### correlation matrix
-dv <- t(1/sqrt(diag(cv)))
-cr <- cv * (t(dv) \%*\% dv)
+cr <- cov2cor(cv)
 delta <- rep(0,5)
 
 myfct <- function(q, alpha) {

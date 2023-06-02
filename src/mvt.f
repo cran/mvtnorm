@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f 357 2020-02-07 14:14:01Z thothorn $
+*    $Id: mvt.f 575 2023-05-23 08:16:23Z thothorn $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
@@ -51,7 +51,7 @@
 *     INFORM INTEGER, termination status parameter:
 *            if INFORM = 0, normal completion with ERROR < EPS;
 *            if INFORM = 1, completion with ERROR > EPS and MAXPTS 
-*                           function vaules used; increase MAXPTS to 
+*                           function values used; increase MAXPTS to 
 *                           decrease ERROR;
 *            if INFORM = 2, N > 1000 or N < 1.
 *            if INFORM = 3, correlation matrix not positive semi-definite.
@@ -1248,7 +1248,7 @@
 *     Uniform (0,1) random number generator
 *
 *     use R's random number generator directly
-*     the way `Writing R extentions' advertises.
+*     the way `Writing R extensions' advertises.
 *
       DOUBLE PRECISION unifrnd, x
 

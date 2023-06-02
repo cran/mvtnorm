@@ -2,6 +2,8 @@ invisible(options(echo = TRUE))
 library("mvtnorm")
 set.seed(290875)
 
+chk <- function(...) isTRUE(all.equal(...))
+
 # correlation matrices for unequal variances were wrong
 # from Pamela Ohman-Strickland <ohmanpa@UMDNJ.EDU>
 
@@ -24,32 +26,32 @@ set.seed(290875)
 prob1 <- pmvt(lower=lower, upper=upper, delta=delta, df=df, corr=corr)
 set.seed(290875)
 prob2 <- pmvt(lower=lower, upper=upper, delta=delta, df=df, corr=corr)
-stopifnot(all.equal(prob1, prob2))
+stopifnot(chk(prob1, prob2))
 
 # confusion for univariate probabilities when sigma is a matrix
 # by Jerome Asselin <jerome@hivnet.ubc.ca>
 a <- pmvnorm(lower=-Inf,upper=2,mean=0,sigma=matrix(1.5))
 attributes(a) <- NULL
-stopifnot(all.equal(a, pnorm(2, sd=sqrt(1.5))))
+stopifnot(chk(a, pnorm(2, sd=sqrt(1.5))))
 a <- pmvnorm(lower=-Inf,upper=2,mean=0,sigma=matrix(.5))
 attributes(a) <- NULL
-stopifnot(all.equal(a, pnorm(2, sd=sqrt(.5))))
+stopifnot(chk(a, pnorm(2, sd=sqrt(.5))))
 a <- pmvnorm(lower=-Inf,upper=2,mean=0,sigma=.5)
 attributes(a) <- NULL
-stopifnot(all.equal(a, pnorm(2, sd=sqrt(.5))))
+stopifnot(chk(a, pnorm(2, sd=sqrt(.5))))
 
 # log argument added by Jerome Asselin <jerome@hivnet.ubc.ca>
 dmvnorm(x=c(0,0), mean=c(1,1),log=TRUE)
 dmvnorm(x=c(0,0), mean=c(25,25),log=TRUE)
 dmvnorm(x=c(0,0), mean=c(30,30),log=TRUE)
-stopifnot(all.equal(dmvnorm(x=0, mean=30, log=TRUE),
+stopifnot(chk(dmvnorm(x=0, mean=30, log=TRUE),
 		    dnorm  (0,	      30, log=TRUE)))
 
 stopifnot(
-    all.equal(dmvnorm(x=c(0,0), mean =c(30,30),log=TRUE) -> f.,
+    chk(dmvnorm(x=c(0,0), mean =c(30,30),log=TRUE) -> f.,
               dmvt   (x=c(0,0), delta=c(30,30),log=TRUE, df=Inf))
     ,
-    all.equal(f., dmvt(x=c(0,0), delta=c(30,30),log=TRUE, df=10000),
+    chk(f., dmvt(x=c(0,0), delta=c(30,30),log=TRUE, df=10000),
               tolerance = 0.09)
 )
 
@@ -84,20 +86,20 @@ b <- pmvt(low = -rep(1, 4), upp = rep(1, 4), df = 4999, corr = cr)
 b
 attributes(a) <- NULL
 attributes(b) <- NULL
-stopifnot(all.equal(round(a, 3), round(b, 3)))
+stopifnot(chk(round(a, 3), round(b, 3)))
 
 # cases where the support is the empty set tried to compute something.
 # spotted by Peter Thomson <peter@statsresearch.co.nz>
-stopifnot(pmvnorm(upper=c(-Inf,1)) == 0)
-stopifnot(pmvnorm(lower=c(Inf,1)) == 0)
-stopifnot(pmvnorm(lower=c(-2,0),upper=c(-1,1),corr=matrix(rep(1,4),2,2)) == 0)
+stopifnot(chk(c(pmvnorm(upper=c(-Inf,1))), 0))
+stopifnot(chk(c(pmvnorm(lower=c(Inf,1))), 0))
+stopifnot(chk(c(pmvnorm(lower=c(-2,0),upper=c(-1,1),corr=matrix(rep(1,4),2,2))), 0))
 
 # bugged Fritz (long time ago)
-stopifnot(all.equal(pmvnorm(-Inf, c(Inf, 0), 0, diag(2)),
-		    pmvnorm(-Inf, c(Inf, 0), 0)))
+stopifnot(chk(c(pmvnorm(-Inf, c(Inf, 0), 0, diag(2))),
+		    c(pmvnorm(-Inf, c(Inf, 0), 0))))
 
 # this is a bug in `mvtdst' nobody was able to fix yet :-(
-stopifnot(pmvnorm(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0)) == 1)
+stopifnot(chk(c(pmvnorm(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0))), 1))
 
 ### check for correct random seed initialization
 ### problem reported by Karen Conneely <conneely@umich.edu>
@@ -130,7 +132,7 @@ for (i in 1:iters) {
    pp <- pmvnorm(lower=ll, sigma=mat, maxpts=dm, abseps=abserr)
    p[i] <- 1-pp
 }
-stopifnot(all.equal(p, ptmp))
+stopifnot(chk(p, ptmp))
 
 ### same for algoritm = Miwa
 
@@ -155,32 +157,32 @@ set.seed(290875)
 prob1 <- pmvnormM(lower=lower, upper=upper, mean = delta, corr=corr)
 set.seed(290875)
 prob2 <- pmvnormM(lower=lower, upper=upper, mean = delta, corr=corr)
-stopifnot(all.equal(prob1, prob2))
+stopifnot(chk(prob1, prob2))
 
 # confusion for univariate probabilities when sigma is a matrix
 # by Jerome Asselin <jerome@hivnet.ubc.ca>
 a <- pmvnormM(lower=-Inf,upper=2,mean=0,sigma=matrix(1.5))
 attributes(a) <- NULL
-stopifnot(all.equal(a, pnorm(2, sd=sqrt(1.5))))
+stopifnot(chk(a, pnorm(2, sd=sqrt(1.5))))
 a <- pmvnormM(lower=-Inf,upper=2,mean=0,sigma=matrix(.5))
 attributes(a) <- NULL
-stopifnot(all.equal(a, pnorm(2, sd=sqrt(.5))))
+stopifnot(chk(a, pnorm(2, sd=sqrt(.5))))
 a <- pmvnormM(lower=-Inf,upper=2,mean=0,sigma=.5)
 attributes(a) <- NULL
-stopifnot(all.equal(a, pnorm(2, sd=sqrt(.5))))
+stopifnot(chk(a, pnorm(2, sd=sqrt(.5))))
 
 
 # cases where the support is the empty set tried to compute something.
 # spotted by Peter Thomson <peter@statsresearch.co.nz>
-stopifnot(pmvnormM(upper=c(-Inf,1)) == 0)
-stopifnot(pmvnormM(lower=c(Inf,1)) == 0)
+stopifnot(chk(c(pmvnormM(upper=c(-Inf,1))), 0))
+stopifnot(chk(c(pmvnormM(lower=c(Inf,1))), 0))
 
 # bugged Fritz (long time ago)
-stopifnot(all.equal(pmvnormM(-Inf, c(Inf, 0), 0, diag(2)),
+stopifnot(chk(pmvnormM(-Inf, c(Inf, 0), 0, diag(2)),
 		    pmvnormM(-Inf, c(Inf, 0), 0)))
 
 # this is a bug in `mvtdst' nobody was able to fix yet :-(
-stopifnot(pmvnormM(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0)) == 1)
+stopifnot(chk(c(pmvnormM(lo=c(-Inf,-Inf), up=c(Inf,Inf), mean=c(0,0))), 1))
 
 ### check for correct random seed initialization
 ### problem reported by Karen Conneely <conneely@umich.edu>
@@ -213,10 +215,10 @@ for (i in 1:iters) {
    pp <- pmvnormM(lower=ll, sigma=mat, maxpts=dm, abseps=abserr)
    p[i] <- 1-pp
 }
-stopifnot(all.equal(p, ptmp))
+stopifnot(chk(p, ptmp))
 
 ### was == 1; spotted by Alex Lenkoski <lenkoski@stat.washington.edu>
-stopifnot(pmvnorm(c(-Inf, -Inf, 0, 0)) == 0.25)
+stopifnot(chk(c(pmvnorm(c(-Inf, -Inf, 0, 0))), 0.25))
 
 #############################
 ## testing rmvt und pmvt
@@ -275,7 +277,7 @@ q1 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var,
               ptol=0.00001)$quantile
 q2 <- qmvnorm((k*(k-1))/(m*(m-1))*alpha, tail="upper", sigma=var,
          interval = c(0, 5), ptol=0.00001)$quantile
-stopifnot(all.equal(round(q1, 4), round(q2, 4)))
+stopifnot(chk(round(q1, 4), round(q2, 4)))
 
 ### grrr, still problems in approx_interval
 qmvnorm(.95, sigma = tcrossprod(c(0.009, 0.75, 0.25)))$quantile
@@ -325,7 +327,7 @@ for (i in 1:100) {
   ld1 <- d1(x=x, mean=m, sigma=Sigma)
   ld2 <- d2(x=x, mean=m, sigma=Sigma)
 
-  stopifnot(all.equal(ld1, ld2, tol = .Machine$double.eps^(1/3)))
+  stopifnot(chk(ld1, ld2, tol = .Machine$double.eps^(1/3)))
 }
 
 ### --- Singular Sigma --- Now treated the same as  dnorm(*, sd=0):  "Inf or 0"
@@ -336,7 +338,7 @@ L
 (Sig <- tcrossprod(L))
 set.seed(123)
 fx <- dmvnorm(rbind(0, 1:4, matrix(rnorm(4*10), ncol=4)), sigma = Sig)
-stopifnot(identical(fx, c(Inf, rep(0, 1+10))))
+stopifnot(chk(fx, c(Inf, rep(0, 1+10))))
 ## gave NaN for a long time, then error, then NaN, now we have converged ;-)
 
 ### NaN spotted by David Charles Airey <airey_david_charles@lilly.com>
@@ -518,9 +520,9 @@ f <- function() {
 
 ### check tail with new quantile algorithm
 p <- .95
-stopifnot(identical(round(qmvnorm(p, sigma = diag(3), tail = "upper")$quantile, 2),
+stopifnot(chk(round(qmvnorm(p, sigma = diag(3), tail = "upper")$quantile, 2),
           round(qnorm(p^(1/3), lower = FALSE), 2)))
-stopifnot(identical(round(qmvnorm(p, sigma = diag(3), tail = "lower")$quantile, 2),
+stopifnot(chk(round(qmvnorm(p, sigma = diag(3), tail = "lower")$quantile, 2),
           round(qnorm(p^(1/3), lower = TRUE), 2)))
 set.seed(29)
 p <- .95
@@ -567,3 +569,8 @@ call <- try(qmvt(p=1-0.0001726701,
 inherits(call, "try-error")
 grepl("Covariance matrix not positive semidefinite", geterrmessage())
 
+### qmvnorm was wrong for the univariate setting; reported by Chen-Wei
+### <cwliu@ntnu.edu.tw>
+
+all.equal(qnorm(p = 0.2397501, mean = 1, sd = sqrt(2)),
+          qmvnorm(p=0.2397501 , mean = 1, sigma = 2)$quantile)

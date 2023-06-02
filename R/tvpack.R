@@ -1,7 +1,7 @@
 
 TVPACK <- function(abseps = 1e-6) structure(list(eps = abseps), class = "TVPACK")
 
-probval.TVPACK <- function (x, n, df, lower, upper, infin, corr, delta)
+probval.TVPACK <- function (x, n, df, lower, upper, infin, corr, delta, ...)
 {
     if (df > 0 && any(delta != 0))
         stop("TVPACK only possible for the central t-distribution.")
@@ -24,12 +24,12 @@ probval.TVPACK <- function (x, n, df, lower, upper, infin, corr, delta)
 
     if (n == 2) {
         cr <- as.double(corr[2,1])
-        val <- .C("C_bvtlr", nu, upp[1], upp[2], cr, val = double(1))$val
+        val <- .C(mvtnorm_C_bvtlr, nu, upp[1], upp[2], cr, val = double(1))$val
     }
     else if (n == 3) {
         cr <- c(corr[2,1], corr[3,1], corr[3,2])
         cr <- as.double(cr)
-        val <- .C("C_tvtlr", nu, upp, cr, eps, val = double(1))$val # ../src/tvpack.f
+        val <- .C(mvtnorm_C_tvtlr, nu, upp, cr, eps, val = double(1))$val # ../src/tvpack.f
     }
     else stop("need n = 2 or 3 for TVPACK() algorithm")
     list(value = val, inform = 0,

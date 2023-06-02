@@ -1,5 +1,18 @@
 #!/bin/sh
 
+rm -rf *pdf
+rm -rf *tex
+rm -rf *aux
+rm -rf *Rnw
+rm -rf *blg
+rm -rf *brf
+rm -rf *bbl
+rm -rf *log
+rm -rf *out
+rm -rf *toc
+rm -rf lpmvnorm*
+rm -rf ltMatrices*
+
 for f in ./R/*~; do
     rm -f $f
 done

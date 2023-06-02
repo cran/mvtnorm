@@ -1,4 +1,4 @@
-# $Id: mvt.R 368 2021-06-07 08:52:19Z thothorn $
+# $Id: mvt.R 552 2023-04-19 11:09:30Z thothorn $
 
 ##' Do we have a correlation matrix?
 ##' @param x typically a matrix
@@ -100,8 +100,21 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
 
 
 pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL, sigma=NULL,
-                    algorithm = GenzBretz(), keepAttr=TRUE, ...)
+                    algorithm = GenzBretz(), keepAttr=TRUE, seed = NULL, ...)
 {
+
+    ### from stats:::simulate.lm
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+        runif(1)
+    if (is.null(seed)) 
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+
     carg <- checkmvArgs(lower=lower, upper=upper, mean=mean, corr=corr,
                         sigma=sigma)
     if (!is.null(carg$corr)) {
@@ -139,8 +152,21 @@ pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL
 pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
                  df=1, corr=NULL, sigma=NULL,
                  algorithm = GenzBretz(),
-                 type = c("Kshirsagar", "shifted"), keepAttr=TRUE, ...)
+                 type = c("Kshirsagar", "shifted"), keepAttr=TRUE, seed = NULL, ...)
 {
+
+    ### from stats:::simulate.lm
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+        runif(1)
+    if (is.null(seed)) 
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+
     type <- match.arg(type)
     carg <- checkmvArgs(lower=lower, upper=upper, mean=delta, corr=corr,
                         sigma=sigma)
@@ -288,7 +314,7 @@ rmvt <- function(n, sigma = diag(2), df = 1,
 {
     if (length(delta) != nrow(sigma))
         stop("delta and sigma have non-conforming size")
-    if (hasArg(mean)) # MH: normal mean variance mixture != t distribution (!)
+    if ("mean" %in% names(list(...))) # MH: normal mean variance mixture != t distribution (!); TH: was methods::hasArg(mean)
         stop("Providing 'mean' does *not* sample from a multivariate t distribution!")
     if (df == 0 || isInf(df)) # MH: now (also) properly allow df = Inf
         return(rmvnorm(n, mean = delta, sigma = sigma, ...))
@@ -389,8 +415,21 @@ qmvnorm <- function(p, interval = NULL,
                     tail = c("lower.tail", "upper.tail", "both.tails"),
                     mean = 0, corr = NULL, sigma = NULL, algorithm =
                     GenzBretz(),
-                    ptol = 0.001, maxiter = 500, trace = FALSE, ...)
+                    ptol = 0.001, maxiter = 500, trace = FALSE, seed = NULL, ...)
 {
+
+    ### from stats:::simulate.lm
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+        runif(1)
+    if (is.null(seed)) 
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
+
     if (length(p) != 1 || p < 0 || p > 1)
         stop(sQuote("p"), " is not a double between zero and one")
 
@@ -410,7 +449,7 @@ qmvnorm <- function(p, interval = NULL,
         if (is.null(args$sigma))
           stop(sQuote("sigma"), " not specified: cannot compute qnorm")
         if (tail == "both.tails") p <- ifelse(p < 0.5, p / 2, 1 - (1 - p)/2)
-        q <- qnorm(p, mean = args$mean, sd = args$sigma,
+        q <- qnorm(p, mean = args$mean, sd = sqrt(args$sigma),
                    lower.tail = (tail != "upper.tail"))
         return( list(quantile = q, f.quantile = p) )
     }
@@ -467,7 +506,20 @@ qmvt <- function(p, interval = NULL,
                  df = 1, delta = 0, corr = NULL, sigma = NULL,
                  algorithm = GenzBretz(),
                  type = c("Kshirsagar", "shifted"),
-                 ptol = 0.001, maxiter = 500, trace = FALSE, ...) {
+                 ptol = 0.001, maxiter = 500, trace = FALSE, seed = NULL, ...) 
+{
+
+    ### from stats:::simulate.lm
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+        runif(1)
+    if (is.null(seed)) 
+        RNGstate <- get(".Random.seed", envir = .GlobalEnv)
+    else {
+        R.seed <- get(".Random.seed", envir = .GlobalEnv)
+        set.seed(seed)
+        RNGstate <- structure(seed, kind = as.list(RNGkind()))
+        on.exit(assign(".Random.seed", R.seed, envir = .GlobalEnv))
+    }
 
     if (length(p) != 1 || (p <= 0 || p >= 1))
         stop(sQuote("p"), " is not a double between zero and one")
@@ -564,7 +616,7 @@ probval <- function(x, ...)
     UseMethod("probval")
 
 
-probval.GenzBretz <- function(x, n, df, lower, upper, infin, corrF, delta)
+probval.GenzBretz <- function(x, n, df, lower, upper, infin, corrF, delta, ...)
 {
     if(isInf(df)) df <- 0 # MH: deal with df=Inf (internally requires df=0!)
 
@@ -572,7 +624,7 @@ probval.GenzBretz <- function(x, n, df, lower, upper, infin, corrF, delta)
     upper[ isInf(upper)] <- 0
 
     error <- 0; value <- 0; inform <- 0
-    .C(C_mvtdst,
+    .C(mvtnorm_C_mvtdst,
        N = as.integer(n),
        NU = as.integer(df),
        LOWER = as.double(lower),
@@ -589,7 +641,7 @@ probval.GenzBretz <- function(x, n, df, lower, upper, infin, corrF, delta)
        RND = as.integer(1)) ### init RNG
 }
 
-probval.Miwa <- function(x, n, df, lower, upper, infin, corr, delta)
+probval.Miwa <- function(x, n, df, lower, upper, infin, corr, delta, ...)
 {
     if (!( df==0 || isInf(df) ))
         stop("Miwa algorithm cannot compute t-probabilities")
@@ -611,11 +663,11 @@ probval.Miwa <- function(x, n, df, lower, upper, infin, corr, delta)
         upper[abs(infin) == 1L] <- x$maxval
     }
 
-    p <- .Call(C_miwa, steps = as.integer(x$steps),
-                         corr = as.double(corr),
-                         upper = as.double(upper),
-                         lower = as.double(lower),
-                         infin = as.integer(infin))
+    p <- .Call(mvtnorm_R_miwa, steps = as.integer(x$steps),
+                               corr = as.double(corr),
+                               upper = as.double(upper),
+                               lower = as.double(lower),
+                               infin = as.integer(infin))
     list(value = p, inform = 0, error = NA)
 }
 

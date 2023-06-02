@@ -410,7 +410,7 @@ static int checkall(int *vector, int length, int value)
  *
  */
 
-SEXP C_miwa(SEXP steps, SEXP corr, SEXP upper, SEXP lower, SEXP infin)
+SEXP R_miwa(SEXP steps, SEXP corr, SEXP upper, SEXP lower, SEXP infin)
 {
     double r[MAXM][MAXM][MAXM], hv[MAXM][MAXM], d[MAXM][MAXM];
     struct GRID grid;
