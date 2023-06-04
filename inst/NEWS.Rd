@@ -2,6 +2,20 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
+\section{Changes in Version 1.2-1 (2023-06-03)}{
+  \subsection{Bugfixes}{
+    \itemize{
+      \item Avoid attempts to allocate zero length arrays
+            for one-dimensional problems.
+    }
+  }
+  \subsection{Documentation}{
+    \itemize{
+      \item Catch M1mac problems with inverting hessians.
+    }
+  }
+}
+
 \section{Changes in Version 1.2-0 (2023-06-02)}{
   \itemize{
     \item New \code{lpmvnorm} function for computing multivariate normal log-likelihoods for interval-censored observations.

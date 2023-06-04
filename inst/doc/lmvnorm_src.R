@@ -1324,9 +1324,11 @@ S_NPML
 ###################################################
 sd_ML <- ltMatrices(sqrt(diag(solve(op$hessian))))
 diagonals(sd_ML) <- 0
-sd_NPML <- ltMatrices(sqrt(diag(solve(op2$hessian))))
-diagonals(sd_NPML) <- 0
-sd_ML
-sd_NPML
+sd_NPML <- try(ltMatrices(sqrt(diag(solve(op2$hessian)))))
+if (!inherits(sd_NPML, "try-error")) {
+    diagonals(sd_NPML) <- 0
+    print(sd_ML)
+    print(sd_NPML)
+}
 
 

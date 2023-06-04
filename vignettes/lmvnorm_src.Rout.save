@@ -1594,11 +1594,13 @@ Petal.Width    0.78190591 -0.24142185    0.8713759   1.0000000
 
 > diagonals(sd_ML) <- 0
 
-> sd_NPML <- ltMatrices(sqrt(diag(solve(op2$hessian))))
+> sd_NPML <- try(ltMatrices(sqrt(diag(solve(op2$hessian)))))
 
-> diagonals(sd_NPML) <- 0
-
-> sd_ML
+> if (!inherits(sd_NPML, "try-error")) {
++     diagonals(sd_NPML) <- 0
++     print(sd_ML)
++     print(sd_NPML)
++ }
 , , 1
 
            1          2         3 4
@@ -1607,8 +1609,6 @@ Petal.Width    0.78190591 -0.24142185    0.8713759   1.0000000
 3 0.13679345 0.08761945 0.0000000 0
 4 0.12621115 0.10787495 0.1010173 0
 
-
-> sd_NPML
 , , 1
 
            1          2         3 4
@@ -1621,4 +1621,4 @@ Petal.Width    0.78190591 -0.24142185    0.8713759   1.0000000
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
- 11.461   0.080  11.542 
+ 11.319   0.087  11.419 

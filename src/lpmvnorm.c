@@ -132,7 +132,7 @@ SEXP R_lpmvnorm(SEXP a, SEXP b, SEXP C, SEXP center, SEXP N, SEXP J,
     
 
     int start, j, k;
-    double tmp, Wtmp, e, d, f, emd, x, y[iJ - 1];
+    double tmp, Wtmp, e, d, f, emd, x, y[(iJ > 1 ? iJ - 1 : 1)];
 
     /* setup return object */
     
@@ -322,26 +322,26 @@ SEXP R_slpmvnorm(SEXP a, SEXP b, SEXP C, SEXP center, SEXP N, SEXP J, SEXP W,
     
 
     int start, j, k;
-    double tmp, e, d, f, emd, x, x0, y[iJ - 1];
+    double tmp, e, d, f, emd, x, x0, y[(iJ > 1 ? iJ - 1 : 1)];
 
     /* score output object */
     
     int Jp = iJ * (iJ + 1) / 2;
     /* chol scores */
 
-    double dp_c[Jp], ep_c[Jp], fp_c[Jp], yp_c[(iJ - 1) * Jp];
+    double dp_c[Jp], ep_c[Jp], fp_c[Jp], yp_c[(iJ > 1 ? iJ - 1 : 1) * Jp];
     
     /* mean scores */
 
-    double dp_m[Jp], ep_m[Jp], fp_m[Jp], yp_m[(iJ - 1) * Jp];
+    double dp_m[Jp], ep_m[Jp], fp_m[Jp], yp_m[(iJ > 1 ? iJ - 1 : 1) * Jp];
     
     /* lower scores */
 
-    double dp_l[Jp], ep_l[Jp], fp_l[Jp], yp_l[(iJ - 1) * Jp];
+    double dp_l[Jp], ep_l[Jp], fp_l[Jp], yp_l[(iJ > 1 ? iJ - 1 : 1) * Jp];
     
     /* upper scores */
 
-    double dp_u[Jp], ep_u[Jp], fp_u[Jp], yp_u[(iJ - 1) * Jp];
+    double dp_u[Jp], ep_u[Jp], fp_u[Jp], yp_u[(iJ > 1 ? iJ - 1 : 1) * Jp];
     
     double dtmp, etmp, Wtmp, ytmp, xx;
 
