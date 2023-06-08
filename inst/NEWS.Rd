@@ -2,7 +2,20 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
-\section{Changes in Version 1.2-1 (2023-06-03)}{
+\section{Changes in Version 1.2-2 (2023-06-05)}{
+  \subsection{Bugfixes}{
+    \itemize{
+      \item Fix overflow problem reported by ASAN.
+    }
+  }
+  \subsection{Documentation}{
+    \itemize{
+      \item Be even more careful inverting / computing Cholesky factors for hessians (M1 and macos-arm64).
+    }
+  }
+}
+
+\section{Changes in Version 1.2-1 (2023-06-02)}{
   \subsection{Bugfixes}{
     \itemize{
       \item Avoid attempts to allocate zero length arrays

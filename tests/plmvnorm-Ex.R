@@ -16,7 +16,7 @@ pmvnorm <- function(lower = -Inf, upper = Inf, mean = rep(0, length(lower)),
 
     if (!is.null(args$corr)) args$sigma <- args$corr
 
-    Chol <- try(chol(args$sigma))
+    Chol <- try(chol(args$sigma), silent = TRUE)
     if (inherits(Chol, "try-error")) 
        return(mvtnorm::pmvnorm(lower = lower, upper = upper, mean = mean, 
                          sigma = sigma, corr = corr, algorithm = algorithm, ...))

@@ -1,4 +1,4 @@
-56195e0f0a1e4aebc0b43fc71ec3b432 *DESCRIPTION
+b02d3ce872a7d644944041e7a92baa0e *DESCRIPTION
 ecd520a67763973a40e5a108897d4f5e *NAMESPACE
 95cc7a63663de9d9db50eeb7f6b7f3cc *R/lpmvnorm.R
 eec923c2eaf99726daace26a751b8820 *R/ltMatrices.R
@@ -6,7 +6,7 @@ a50d041a8243c78c469af528c7a442d7 *R/mvnorm.R
 d6fa00cf2de3de94137a324751c699b5 *R/mvt.R
 ccd0495f9e9ad30e9f136c5c41cc3a03 *R/noisy-root.R
 a58509a76c614fea41250fa767c64a49 *R/tvpack.R
-cfb00c3a5fee14408423fefe385c64a1 *build/partial.rdb
+27c3aaad12021a6f55ad66e95df0bab1 *build/partial.rdb
 ea778b6ace9c492d13b6cb800ddfe4c9 *build/vignette.rds
 5d3f52c685942a64b550023c19179ddb *cleanup
 2a44eee6dc12d03d74f49d257fe871a3 *inst/CITATION
@@ -15,14 +15,14 @@ ca4c35956e7a8aa253e2c52cd49f0d99 *inst/C_API_Example/NAMESPACE
 990127bb625b41c7181a653020e3f6a9 *inst/C_API_Example/R/test.R
 5c4bbffc1a0108c090cfa2dbb1918d2d *inst/C_API_Example/src/test.c
 64fd633725dcd93cdd836e3535f19788 *inst/C_API_Example/tests/test.R
-30446552e4b3ed1faebf6ca6b353d0f0 *inst/NEWS.Rd
+6c348aa2035fca5c8cfe8812d1690552 *inst/NEWS.Rd
 c272376114253739752bd13c5eb43cb9 *inst/NEWS.old
 73e21a346386350ffebe0b09cafa5ad5 *inst/doc/MVT_Rnews.R
 e83251e0ceb0e3a2aec9f3d101e41ea6 *inst/doc/MVT_Rnews.Rnw
-c64830c043f90601d4aa965ddf8ec64d *inst/doc/MVT_Rnews.pdf
-dd73e383a56eebf4b66122c4e9ab82d4 *inst/doc/lmvnorm_src.R
-747cc55303124312be96fb900f2882c8 *inst/doc/lmvnorm_src.Rnw
-cd74434ec43e2ff78afcb7e315857874 *inst/doc/lmvnorm_src.pdf
+0d2f6f5dcd3469c27688a88288bf7db5 *inst/doc/MVT_Rnews.pdf
+69479718cce50658d8d5853b25aa8906 *inst/doc/lmvnorm_src.R
+723c4102000e9ae408427caad6251acb *inst/doc/lmvnorm_src.Rnw
+1a6dcc1acad4e2bfc3272d345c4bbdbe *inst/doc/lmvnorm_src.pdf
 e4eae4bc2b387ca2f05f31186261d431 *inst/include/mvtnorm.h
 2ac853ab98c7223bbca7e418096966fb *inst/include/mvtnormAPI.h
 a8bf3b0a605ca47e04cf69f15dba76b7 *inst/litdb.bib
@@ -39,7 +39,7 @@ e5d97a5d95fdf3fec155f923acbe117f *man/pmvnorm.Rd
 a32881a25b6d380f12082677fd9e7c5e *man/qmvt.Rd
 bca5c4987a057c2a6bab0cd6bbebed5b *src/C_FORTRAN_interface.c
 1a3e64eb2af2ed6d6fbb037da1bc216f *src/Makevars
-47213e83d2ae88712a913af1e80c964e *src/lpmvnorm.c
+c0e5ecc21173046ba5cf98a12b16599c *src/lpmvnorm.c
 47c47d527ea29729305f11c1468abe94 *src/ltMatrices.c
 62f4d884327d0b95c0dd1dea23eff5b4 *src/miwa.c
 b46cb432899a2857561790e63a41396a *src/miwa.h
@@ -52,8 +52,8 @@ a8da8d6e8672b1078e8bd4b93fb61938 *tests/Examples/mvtnorma-Ex.Rout.save
 8577b286912ff81f7db670aed3024ba4 *tests/bugfix-tests.R
 06757030c4ee95433f5b2af1623cbe73 *tests/bugfix-tests.Rout.save
 4226d0c8718a5785675e5dde917f2a10 *tests/dmvnorm-Ex.R
-d78dadca726ae770aa00d0bf3fc18708 *tests/plmvnorm-Ex.R
-bd1bd143789ff8794a2ad9a41a9ccfbd *tests/plmvnorm-Ex.Rout.save
+da0a2380a4431dca695d098a5566250a *tests/plmvnorm-Ex.R
+f0466c8e3a5ca12105b9d041fdd2e3d5 *tests/plmvnorm-Ex.Rout.save
 85383c4bcff8a13afd7b21d215ed7d8c *tests/regtest-TVPACK.R
 ad2400b5d93f61441ec68d93c6c3b93a *tests/regtest-TVPACK.Rout.save
 870aa71dd88f6223f55a48c18160531c *tests/regtest-scores.R
@@ -65,5 +65,5 @@ ffb7fa80edcd873dfca1ad13dd718da0 *tests/test-getInt.R
 b9c5f09cb4556e20e5e2a3b3f168c88a *tests/test-noisy-root.Rout.save
 e83251e0ceb0e3a2aec9f3d101e41ea6 *vignettes/MVT_Rnews.Rnw
 a8bf3b0a605ca47e04cf69f15dba76b7 *vignettes/litdb.bib
-747cc55303124312be96fb900f2882c8 *vignettes/lmvnorm_src.Rnw
-cd93918d84fad50d75460c96c89c7f97 *vignettes/lmvnorm_src.Rout.save
+723c4102000e9ae408427caad6251acb *vignettes/lmvnorm_src.Rnw
+5359ce2dc030adaac8e993acde28786b *vignettes/lmvnorm_src.Rout.save

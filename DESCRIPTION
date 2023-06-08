@@ -1,7 +1,7 @@
 Package: mvtnorm
 Title: Multivariate Normal and t Distributions
-Version: 1.2-1
-Date: 2023-06-02
+Version: 1.2-2
+Date: 2023-06-05
 Authors@R: c(person("Alan", "Genz", role = "aut"),
              person("Frank", "Bretz", role = "aut"),
              person("Tetsuhisa", "Miwa", role = "aut"),
@@ -24,7 +24,7 @@ Suggests: qrng, numDeriv
 License: GPL-2
 URL: http://mvtnorm.R-forge.R-project.org
 NeedsCompilation: yes
-Packaged: 2023-06-03 19:22:14 UTC; hothorn
+Packaged: 2023-06-07 14:41:38 UTC; hothorn
 Author: Alan Genz [aut],
   Frank Bretz [aut],
   Tetsuhisa Miwa [aut],
@@ -36,4 +36,4 @@ Author: Alan Genz [aut],
   Torsten Hothorn [aut, cre] (<https://orcid.org/0000-0001-8301-0471>)
 Maintainer: Torsten Hothorn <Torsten.Hothorn@R-project.org>
 Repository: CRAN
-Date/Publication: 2023-06-04 09:20:02 UTC
+Date/Publication: 2023-06-08 14:50:02 UTC
