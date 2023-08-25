@@ -1,7 +1,8 @@
-# $Id: mvnorm.R 557 2023-04-24 18:16:23Z thothorn $
+# $Id: mvnorm.R 601 2023-07-13 09:37:47Z thothorn $
 
 rmvnorm <- function(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
-                    method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE, checkSymmetry = TRUE)
+                    method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE, checkSymmetry = TRUE, 
+                    rnorm = stats::rnorm)
 {
 
     if (checkSymmetry && !isSymmetric(sigma, tol = sqrt(.Machine$double.eps),

@@ -2,7 +2,22 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
-\section{Changes in Version 1.2-2 (2023-06-05)}{
+\section{Changes in Version 1.2-3 (2023-08-17)}{
+  \subsection{Features}{
+    \itemize{
+      \item Allow to change \code{rnorm} in \code{rmvnorm}, feature request
+            by Ralf Stubner.
+    }
+  }
+  \subsection{Bugfixes}{
+    \itemize{
+      \item Fix variable declarations in \code{tvpack.f} as reported by Intel 
+            compilers icx/ipcx/ifx from oneAPI 2023.2.0 and oneMKL 2023.2.0, thanks to BDR
+    }
+  }
+}
+
+\section{Changes in Version 1.2-2 (2023-06-07)}{
   \subsection{Bugfixes}{
     \itemize{
       \item Fix overflow problem reported by ASAN.

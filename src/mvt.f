@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f 575 2023-05-23 08:16:23Z thothorn $
+*    $Id: mvt.f 603 2023-08-17 06:39:20Z thothorn $
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       
@@ -83,11 +83,18 @@
       
       END
 *
-      SUBROUTINE MVSUBR( N, W, NF, F )
+      SUBROUTINE MVSUBR( N, W, F )
 *     
 *     Integrand subroutine
 *
-      INTEGER N, NF, NUIN, INFIN(*), NL
+*
+*     Note that this was originally defined as 
+*         SUBROUTINE MVSUBR( N, W, NF, F )
+*     but Intel compilers icx/ipcx/ifx from oneAPI 2023.2.0 and oneMKL 2023.2.0
+*     reported NF as being unused. Removed NF from MVSUBR and later calls to FUNSUB
+*     2023/08/17
+*
+      INTEGER N, NUIN, INFIN(*), NL
       DOUBLE PRECISION W(*),F(*), LOWER(*),UPPER(*), CORREL(*), DELTA(*)
       PARAMETER ( NL = 1000 )
       INTEGER INFI(NL), NU, ND, INFORM, NY 
@@ -967,6 +974,8 @@
 *  FUNSUB  EXTERNALly declared user defined integrand subroutine.
 *          It must have parameters ( NDIM, Z, NF, FUNVLS ), where 
 *          Z is a real NDIM-vector and FUNVLS is a real NF-vector.
+*          TH NOTE: arg NF was removed because it was unused, see MVSUBR 
+*          definition
 *                                     
 *  ABSEPS  Required absolute accuracy.
 *  RELEPS  Required relative accuracy.
@@ -1228,14 +1237,16 @@
             IF ( R(J) .GT. 1 ) R(J) = R(J) - 1
             X(J) = ABS( 2*R(J) - 1 )
          END DO
-         CALL FUNSUB( NDIM, X, NF, FS )
+         CALL FUNSUB( NDIM, X, FS )
+*     This was FUNSUB( NDIM, X, NF, FS )
          DO J = 1, NF
             VALUES(J) = VALUES(J) + ( FS(J) - VALUES(J) )/( 2*K-1 )      
          END DO
          DO J = 1, NDIM
             X(J) = 1 - X(J)
          END DO
-         CALL FUNSUB( NDIM, X, NF, FS )
+         CALL FUNSUB( NDIM, X, FS )
+*     This was FUNSUB( NDIM, X, NF, FS )
          DO J = 1, NF
             VALUES(J) = VALUES(J) + ( FS(J) - VALUES(J) )/( 2*K )      
          END DO

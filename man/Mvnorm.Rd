@@ -12,7 +12,7 @@
 dmvnorm(x, mean = rep(0, p), sigma = diag(p), log = FALSE, checkSymmetry = TRUE)
 rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
            method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE, 
-           checkSymmetry = TRUE)
+           checkSymmetry = TRUE, rnorm = stats::rnorm)
 }
 \arguments{
  \item{x}{vector or matrix of quantiles. When \code{x} is a matrix, each
@@ -40,6 +40,9 @@ rmvnorm(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
    covariance matrix is symmetric or not. This will speed up the
    computation but may cause unexpected outputs when ill-behaved
    \code{sigma} is provided. The default value is \code{TRUE}.}
+ \item{rnorm}{a function with the same interface as
+   \code{\link[stats]{rnorm}}. This allows switching to other generators of
+   standard normal variables.}
 }
 \details{
 \code{dmvnorm} computes the density function of the multivariate normal
