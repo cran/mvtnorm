@@ -1,4 +1,4 @@
-a5d77427b67c188957fd7259ed1ade08 *DESCRIPTION
+720dd72866010d03978410ecbb98ca5e *DESCRIPTION
 ecd520a67763973a40e5a108897d4f5e *NAMESPACE
 95cc7a63663de9d9db50eeb7f6b7f3cc *R/lpmvnorm.R
 eec923c2eaf99726daace26a751b8820 *R/ltMatrices.R
@@ -6,8 +6,8 @@ ca05e05ca25ae52b9a8630f2b698fbf7 *R/mvnorm.R
 d6fa00cf2de3de94137a324751c699b5 *R/mvt.R
 ccd0495f9e9ad30e9f136c5c41cc3a03 *R/noisy-root.R
 a58509a76c614fea41250fa767c64a49 *R/tvpack.R
-debfc95751f416820ca31da3641b3023 *build/partial.rdb
-ffa86b244700c8b7d3b929849d93906f *build/vignette.rds
+5e639fd960e2108162918d60b27afd0e *build/partial.rdb
+7c429129fac0233643dffd64ddedbde3 *build/vignette.rds
 5d3f52c685942a64b550023c19179ddb *cleanup
 2a44eee6dc12d03d74f49d257fe871a3 *inst/CITATION
 ceb9f3d20b3e0f3ecd95cefd43449da1 *inst/C_API_Example/DESCRIPTION
@@ -15,14 +15,14 @@ ca4c35956e7a8aa253e2c52cd49f0d99 *inst/C_API_Example/NAMESPACE
 990127bb625b41c7181a653020e3f6a9 *inst/C_API_Example/R/test.R
 5c4bbffc1a0108c090cfa2dbb1918d2d *inst/C_API_Example/src/test.c
 64fd633725dcd93cdd836e3535f19788 *inst/C_API_Example/tests/test.R
-9541515ac76c4e6eaf79b65ed03f3865 *inst/NEWS.Rd
+17d6bd360ca43dbfd3a288edc25eb576 *inst/NEWS.Rd
 c272376114253739752bd13c5eb43cb9 *inst/NEWS.old
 73e21a346386350ffebe0b09cafa5ad5 *inst/doc/MVT_Rnews.R
 e83251e0ceb0e3a2aec9f3d101e41ea6 *inst/doc/MVT_Rnews.Rnw
-5f880e37472b0990b69d414acaf25859 *inst/doc/MVT_Rnews.pdf
+9ff318fab26f31c655234e5119ed3d9f *inst/doc/MVT_Rnews.pdf
 69479718cce50658d8d5853b25aa8906 *inst/doc/lmvnorm_src.R
 723c4102000e9ae408427caad6251acb *inst/doc/lmvnorm_src.Rnw
-d09a3cf2f03837f937f901b8ddd5366d *inst/doc/lmvnorm_src.pdf
+b201676d9a471dfa6e2603be6e05839a *inst/doc/lmvnorm_src.pdf
 e4eae4bc2b387ca2f05f31186261d431 *inst/include/mvtnorm.h
 2ac853ab98c7223bbca7e418096966fb *inst/include/mvtnormAPI.h
 a8bf3b0a605ca47e04cf69f15dba76b7 *inst/litdb.bib
@@ -41,7 +41,7 @@ bca5c4987a057c2a6bab0cd6bbebed5b *src/C_FORTRAN_interface.c
 1a3e64eb2af2ed6d6fbb037da1bc216f *src/Makevars
 c0e5ecc21173046ba5cf98a12b16599c *src/lpmvnorm.c
 47c47d527ea29729305f11c1468abe94 *src/ltMatrices.c
-62f4d884327d0b95c0dd1dea23eff5b4 *src/miwa.c
+f64456aad2c956a18af275f09a013bb3 *src/miwa.c
 b46cb432899a2857561790e63a41396a *src/miwa.h
 b9866a363a76d1fa0ae89a5d88142379 *src/mvt.f
 8c4b7e4643cb9f20f61b4752bf4af136 *src/mvtnorm-init.c
