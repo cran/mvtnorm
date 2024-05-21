@@ -1,7 +1,7 @@
 
-R version 4.2.2 (2022-10-31) -- "Innocent and Trusting"
-Copyright (C) 2022 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+R version 4.4.0 Patched (2024-05-17 r86565) -- "Puppy Cup"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -269,6 +269,68 @@ attr(,"msg")
 +     abs(P. - Ptdef) < 1e-15 # seen 1.39 e-17
 + })
 > 
+> ##-------- Fix dimension reduction to dimension 1  for algo  Miwa() and TVPACK(): ---------
+> 
+> ### Default algorithm  Gentz  works fine :
+> ## 3-D
+> r1 <- pmvnorm(lower= rep(-Inf,3),
++               upper= c(-1, rep(Inf,2)), sigma=diag(3))
+> str(r1)
+ num 0.159
+ - attr(*, "error")= num 2e-16
+ - attr(*, "msg")= chr "Normal Completion"
+> stopifnot(all.equal(c(r1), pnorm(-1), tolerance = 4e-16))
+> 
+> ## TVPACK()
+> r2 <- pmvnorm(lower= rep(-Inf,3),
++              upper= c(-1, rep(Inf,2)), sigma=diag(3), algorithm = TVPACK())
+> r2
+[1] 0.1586553
+attr(,"error")
+[1] 0
+attr(,"msg")
+[1] "Normal Complettion (dim reduced to 1)"
+> stopifnot(all.equal(c(r2), pnorm(-1), tolerance = 0),
++           identical("Normal Complettion (dim reduced to 1)", attr(r2, "msg")))
+> ## Previously gave error: need n = 2 or 3 for TVPACK() algorithm
+> 
+> ## Miwa()
+> r <- pmvnorm(lower= rep(-Inf,3),
++              upper= c(-1, rep(Inf,2)), sigma=diag(3), algorithm = Miwa())
+> ## gave  *** caught segfault *** ... address 0x7fff76ac80a0, cause 'memory not mapped'
+> r
+[1] 0.1586553
+attr(,"error")
+[1] 0
+attr(,"msg")
+[1] "Normal Complettion (dim reduced to 1)"
+> stopifnot(all.equal(r, r2, tolerance=0))
+> 
+> ##-------- simple 2D :  works fine with default algo ---------------
+> str(t1 <- pmvnorm(lower= c(-Inf,-Inf),
++                   upper= c(- 1,  Inf), sigma=diag(2)))
+ num 0.159
+ - attr(*, "error")= num 2e-16
+ - attr(*, "msg")= chr "Normal Completion"
+> stopifnot(all.equal(c(t1), pnorm(-1), tolerance = 4e-16))
+> 
+> (tT <- pmvnorm(lower= c(-Inf,-Inf),
++                upper= c(- 1,  Inf), sigma=diag(2), algorithm = TVPACK()))
+[1] 0.1586553
+attr(,"error")
+[1] 0
+attr(,"msg")
+[1] "Normal Complettion (dim reduced to 1)"
+> ## gave Error   either needs all(lower == -Inf) or all(upper == Inf).
+> 
+> tM <- pmvnorm(lower= c(-Inf,-Inf),
++                upper= c(- 1,  Inf), sigma=diag(2), algorithm = Miwa())
+> ## -- gave --  Warning message:
+> ## In probval.Miwa(algorithm, n, df, lower, upper, infin, corr, delta) :
+> ##   Approximating +/-Inf by +/-1000
+> stopifnot(all.equal(c(tT), pnorm(-1), tolerance = 0),
++           all.equal(c(tM), pnorm(-1), tolerance = 0))
+> 
 > proc.time()
    user  system elapsed 
-  3.215   0.011   3.221 
+  4.669   0.044   4.716 

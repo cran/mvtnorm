@@ -1,9 +1,13 @@
 \name{ltMatrices}
 \alias{ltMatrices}
+\alias{syMatrices}
+\alias{as.syMatrices}
 \alias{Tcrossprod}
 \alias{Crossprod}
 \alias{diagonals}
 \alias{Mult}
+\alias{Mult.ltMatrices}
+\alias{Mult.syMatrices}
 \alias{solve.ltMatrices}
 \alias{as.array.ltMatrices}
 \alias{as.array.syMatrices}
@@ -34,13 +38,15 @@
 \alias{standardize}
 \alias{destandardize}
 \title{
-  Multiple Lower Triangular Matrices
+  Multiple Lower Triangular or Symmetric Matrices
 }
 \description{
-  A class representing multiple lower triangular matrices and some methods.
+  A class representing multiple lower triangular or symmetric matrices and some methods.
 }
 \usage{
 ltMatrices(object, diag = FALSE, byrow = FALSE, names = TRUE)
+syMatrices(object, diag = FALSE, byrow = FALSE, names = TRUE)
+as.syMatrices(object)
 \S3method{as.array}{ltMatrices}(x, symmetric = FALSE, \dots)
 \S3method{as.array}{syMatrices}(x, \dots)
 \S3method{diagonals}{ltMatrices}(x, \dots)
@@ -53,10 +59,11 @@ diagonals(x) <- value
 \S3method{solve}{ltMatrices}(a, b, transpose = FALSE, \dots)
 \S3method{chol}{syMatrices}(x, \dots)
 \S3method{aperm}{ltMatrices}(a, perm, is_chol = FALSE, \dots)
-Lower_tri(x, diag = FALSE, byrow = attr(x, "byrow"))
-Mult(x, y, transpose = FALSE)
+\S3method{Mult}{ltMatrices}(x, y, transpose = FALSE, \dots)
+\S3method{Mult}{syMatrices}(x, y, \dots)
 Tcrossprod(x, diag_only = FALSE)
 Crossprod(x, diag_only = FALSE)
+Lower_tri(x, diag = FALSE, byrow = attr(x, "byrow"))
 chol2cov(x)
 invchol2chol(x)
 chol2invchol(x)
@@ -129,10 +136,14 @@ multiple lower triangular matrices. The corresponding class can be used to
 store such matrices efficiently. Matrix multiplications, solutions to linear
 systems, explicite inverses, and crossproducts can be computed based on such
 objects. Details can be found in the \code{lmvnorm_src} package vignette.
+
+\code{syMatrices} only store the lower triangular parts of multiple
+symmetric matrices.
 }
 \value{
 The constructor \code{ltMatrices} returns objects of class \code{ltMatrices}
-with corresponding methods.
+with corresponding methods. The constructor \code{syMatrices} returns objects of class
+\code{syMatrices} with a reduced set of methods.
 }
 \seealso{\code{vignette("lmvnorm_src", package = "mvtnorm")}}
 \examples{

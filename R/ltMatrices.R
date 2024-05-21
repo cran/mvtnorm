@@ -76,6 +76,16 @@ ltMatrices <- function(object, diag = FALSE, byrow = FALSE, names = TRUE) {
     object
 }
 
+# syMatrices
+
+as.syMatrices <- function(object) {
+    stopifnot(inherits(object, "ltMatrices"))
+    class(object)[1L] <- "syMatrices"
+    return(object)
+}
+syMatrices <- function(object, diag = FALSE, byrow = FALSE, names = TRUE)
+    as.syMatrices(ltMatrices(object = object, diag = diag, byrow = byrow, names = names))
+
 # dim ltMatrices
 
 dim.ltMatrices <- function(x) {
@@ -330,12 +340,13 @@ diagonals.integer <- function(x, ...)
 # mult ltMatrices
 
 ### C %*% y
-Mult <- function(x, y, transpose = FALSE) {
-
-    if (!inherits(x, "ltMatrices")) {
-        if (!transpose) return(x %*% y)
-        return(crossprod(x, y))
-    }
+Mult <- function(x, y, ...)
+    UseMethod("Mult")
+Mult.default <- function(x, y, transpose = FALSE, ...) {
+    if (!transpose) return(x %*% y)
+    return(crossprod(x, y))
+}
+Mult.ltMatrices <- function(x, y, transpose = FALSE, ...) {
 
     # extract slots
     
@@ -346,6 +357,7 @@ Mult <- function(x, y, transpose = FALSE) {
     dn <- dimnames(x)
     
 
+    stopifnot(is.numeric(y))
     if (!is.matrix(y)) y <- matrix(y, nrow = d[2L], ncol = d[1L])
     N <- ifelse(d[1L] == 1, ncol(y), d[1L])
     stopifnot(nrow(y) == d[2L])
@@ -355,16 +367,18 @@ Mult <- function(x, y, transpose = FALSE) {
     # mult ltMatrices transpose
     
     if (transpose) {
-        J <- dim(x)[2L]
-        if (dim(x)[1L] == 1L) x <- x[rep(1, N),]
-        ax <- as.array(x)
-        ay <- array(y[rep(1:J, J),,drop = FALSE], dim = dim(ax), 
-                    dimnames = dimnames(ax))
-        ret <- ay * ax
-        ### was: return(margin.table(ret, 2:3))
-        ret <- matrix(colSums(matrix(ret, nrow = dim(ret)[1L])), 
-                      nrow = dim(ret)[2L], ncol = dim(ret)[3L],
-                      dimnames = dimnames(ret)[-1L])
+        x <- ltMatrices(x, byrow = FALSE)
+
+        class(x) <- class(x)[-1L]
+        storage.mode(x) <- "double"
+        storage.mode(y) <- "double"
+
+        ret <- .Call(mvtnorm_R_ltMatrices_Mult_transpose, x, y, as.integer(N), 
+                     as.integer(d[2L]), as.logical(diag))
+
+        rownames(ret) <- dn[[2L]]
+        if (length(dn[[1L]]) == N)
+            colnames(ret) <- dn[[1L]]
         return(ret)
     }
     
@@ -381,6 +395,30 @@ Mult <- function(x, y, transpose = FALSE) {
     rownames(ret) <- dn[[2L]]
     if (length(dn[[1L]]) == N)
         colnames(ret) <- dn[[1L]]
+    return(ret)
+}
+
+# mult syMatrices
+
+Mult.syMatrices <- function(x, y, ...) {
+
+    # extract slots
+    
+    diag <- attr(x, "diag")
+    byrow <- attr(x, "byrow")
+    d <- dim(x)
+    J <- d[2L]
+    dn <- dimnames(x)
+    
+
+    class(x)[1L] <- "ltMatrices"
+    stopifnot(is.numeric(y))
+    if (!is.matrix(y)) y <- matrix(y, nrow = d[2L], ncol = d[1L])
+    N <- ifelse(d[1L] == 1, ncol(y), d[1L])
+    stopifnot(nrow(y) == d[2L])
+    stopifnot(ncol(y) == N)
+
+    ret <- Mult(x, y) + Mult(x, y, transpose = TRUE) - y * c(diagonals(x))
     return(ret)
 }
 
@@ -461,8 +499,7 @@ solve.ltMatrices <- function(a, b, transpose = FALSE, ...) {
         rownames(ret) <- dn[[2L]]
     } else {
         ret <- ltMatrices(ret, diag = TRUE, byrow = FALSE, names = dn[[2L]])
-        ret <- ltMatrices(ret, byrow = byrow_orig)
-        class(ret)[1L] <- "syMatrices"
+        ret <- as.syMatrices(ltMatrices(ret, byrow = byrow_orig))
     }
     return(ret)
 }
@@ -937,7 +974,8 @@ ldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
          N <- ifelse(N == 1, p, N)
          J <- dim(chol)[2L]
          obs <- .check_obs(obs = obs, mean = mean, J = J, N = N)
-         logretval <- colSums(dnorm(solve(chol, obs), log = TRUE))
+         z <- solve(chol, obs)
+         logretval <- .colSumsdnorm(z)
          if (attr(chol, "diag"))
              logretval <- logretval - colSums(log(diagonals(chol)))
          
@@ -951,9 +989,10 @@ ldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
          N <- ifelse(N == 1, p, N)
          J <- dim(invchol)[2L]
          obs <- .check_obs(obs = obs, mean = mean, J = J, N = N)
-         ## use dnorm (gets the normalizing factors right)
          ## NOTE: obs is (J x N) 
-         logretval <- colSums(dnorm(Mult(invchol, obs), log = TRUE))
+         ## dnorm takes rather long
+         z <- Mult(invchol, obs)
+         logretval <- .colSumsdnorm(z)
          ## note that the second summand gets recycled the correct number
          ## of times in case dim(invchol)[1L] == 1 but ncol(obs) > 1
          if (attr(invchol, "diag"))
@@ -964,6 +1003,17 @@ ldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
     names(logretval) <- colnames(obs)
     if (logLik) return(sum(logretval))
     return(logretval)
+}
+
+# colSumsdnorm ltMatrices
+
+.colSumsdnorm <- function(z) {
+    stopifnot(is.numeric(z))
+    if (!is.matrix(z))
+        z <- matrix(z, nrow = 1, ncol = length(z))
+    ret <- .Call(mvtnorm_R_ltMatrices_colSumsdnorm, z, ncol(z), nrow(z))
+    names(ret) <- colnames(z)
+    return(ret)
 }
 
 # sldmvnorm

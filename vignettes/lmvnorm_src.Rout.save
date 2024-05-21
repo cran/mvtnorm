@@ -96,7 +96,7 @@ E 0.4913541358 0.2849431 0.005961103 0.8901458 1
 [1] "A" "B" "C" "D" "E"
 
 
-> class(lxn) <- "syMatrices"
+> lxn <- as.syMatrices(lxn)
 
 > lxn
 , , C_1
@@ -265,7 +265,7 @@ E 0.4913541358 0.2849431 0.005961103 0.8901457863 1.000000000
 > try(ltM[1:2, j])
 Error in `[.ltMatrices`(ltM, 1:2, j) : invalid subset argument j
 
-> class(ltM) <- "syMatrices"
+> ltM <- as.syMatrices(ltM)
 
 > a <- as.array(ltM[1:2, j])
 
@@ -461,6 +461,39 @@ attr(,"rcnames")
 
 > chk(Mult(lxn, y[, 1], transpose = TRUE), Mult(lxn, 
 +     y[, rep(1, N)], transpose = TRUE))
+
+> J <- 5
+
+> N1 <- 10
+
+> ex <- expression({
++     C <- syMatrices(matrix(runif(N2 * J * (J + c(-1, 1)[DIAG + 
++         1])/2), ncol = N2), diag = DIAG)
++     x <- matrix(ru .... [TRUNCATED] 
+
+> N2 <- N1
+
+> DIAG <- TRUE
+
+> eval(ex)
+
+> N2 <- 1
+
+> DIAG <- TRUE
+
+> eval(ex)
+
+> N2 <- 1
+
+> DIAG <- FALSE
+
+> eval(ex)
+
+> N2 <- N1
+
+> DIAG <- FALSE
+
+> eval(ex)
 
 > A <- as.array(lxn)
 
@@ -1631,4 +1664,4 @@ Petal.Width    0.78190591 -0.24142185    0.8713759   1.0000000
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
- 11.957   0.088  12.061 
+ 10.114   0.088  10.201 

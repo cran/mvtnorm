@@ -1,4 +1,4 @@
-# $Id: mvt.R 552 2023-04-19 11:09:30Z thothorn $
+# $Id: mvt.R 617 2024-05-18 18:04:21Z mmaechler $
 
 ##' Do we have a correlation matrix?
 ##' @param x typically a matrix
@@ -39,7 +39,7 @@ checkmvArgs <- function(lower, upper, mean, corr, sigma)
         # warning("both ", sQuote("corr"), " and ", sQuote("sigma"),
         # " not specified: using sigma=diag(length(lower))")
     }
-    if (!is.null(corr) && !is.null(sigma)) {
+    else if (!is.null(corr) && !is.null(sigma)) {
         sigma <- NULL
         warning("both ", sQuote("corr"), " and ", sQuote("sigma"),
                 " specified: ignoring ", sQuote("sigma"))
@@ -104,9 +104,9 @@ pmvnorm <- function(lower=-Inf, upper=Inf, mean=rep(0, length(lower)), corr=NULL
 {
 
     ### from stats:::simulate.lm
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
         runif(1)
-    if (is.null(seed)) 
+    if (is.null(seed))
         RNGstate <- get(".Random.seed", envir = .GlobalEnv)
     else {
         R.seed <- get(".Random.seed", envir = .GlobalEnv)
@@ -156,9 +156,9 @@ pmvt <- function(lower=-Inf, upper=Inf, delta=rep(0, length(lower)),
 {
 
     ### from stats:::simulate.lm
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
         runif(1)
-    if (is.null(seed)) 
+    if (is.null(seed))
         RNGstate <- get(".Random.seed", envir = .GlobalEnv)
     else {
         R.seed <- get(".Random.seed", envir = .GlobalEnv)
@@ -261,8 +261,8 @@ mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
     ### fix for Miwa (and TVPACK) algo:
     ### pmvnorm(lower=c(-Inf, 0, 0), upper=c(0, Inf, Inf),
     ###         mean=c(0, 0, 0), sigma=S, algorithm = Miwa()) # returned NA
-    if((isMiwa <- inherits(algorithm, "Miwa")) || inherits(algorithm, "TVPACK")) {
-        if (n >= 3 && any(infin == -1)) { # Int(-Inf, +Inf;..) --> reduce dimension
+    if(n >= 2 && ((isMiwa <- inherits(algorithm, "Miwa")) || inherits(algorithm, "TVPACK"))) {
+        if (any(infin == -1)) { # Int(-Inf, +Inf;..) --> reduce dimension
             WhereBothInfIs <- which(infin == -1)
             n <- n - length(WhereBothInfIs)
             corr <- corr[-WhereBothInfIs, -WhereBothInfIs]
@@ -270,10 +270,16 @@ mvt <- function(lower, upper, df, corr, delta, algorithm = GenzBretz(), ...)
             lower <- lower[-WhereBothInfIs]
             if(!missing(delta))
                 delta <- delta[-WhereBothInfIs]
+
+            if(n <= 1) {
+                if(n && !missing(delta)) { upper <- upper - delta; lower <- lower - delta }
+                return(list(value = if(n == 0) 1 else pnorm(upper) - pnorm(lower),
+                            error = 0, msg = "Normal Complettion (dim reduced to 1)"))
+            }
             infin <- infin[-WhereBothInfIs]
         }
 
-        if (isMiwa && n >= 2 && any(infin == 0)) {
+        if (isMiwa && any(infin == 0)) {
             WhereNegativInfIs <- which(infin==0)
             inversecorr <- rep(1, n)
             inversecorr[WhereNegativInfIs] <- -1
@@ -419,9 +425,9 @@ qmvnorm <- function(p, interval = NULL,
 {
 
     ### from stats:::simulate.lm
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
         runif(1)
-    if (is.null(seed)) 
+    if (is.null(seed))
         RNGstate <- get(".Random.seed", envir = .GlobalEnv)
     else {
         R.seed <- get(".Random.seed", envir = .GlobalEnv)
@@ -506,13 +512,13 @@ qmvt <- function(p, interval = NULL,
                  df = 1, delta = 0, corr = NULL, sigma = NULL,
                  algorithm = GenzBretz(),
                  type = c("Kshirsagar", "shifted"),
-                 ptol = 0.001, maxiter = 500, trace = FALSE, seed = NULL, ...) 
+                 ptol = 0.001, maxiter = 500, trace = FALSE, seed = NULL, ...)
 {
 
     ### from stats:::simulate.lm
-    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) 
+    if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
         runif(1)
-    if (is.null(seed)) 
+    if (is.null(seed))
         RNGstate <- get(".Random.seed", envir = .GlobalEnv)
     else {
         R.seed <- get(".Random.seed", envir = .GlobalEnv)
@@ -656,11 +662,11 @@ probval.Miwa <- function(x, n, df, lower, upper, infin, corr, delta, ...)
         tryCatch(solve(corr), error = function(e)
             stop("Miwa algorithm cannot compute probabilities for singular problems",
                  call. = FALSE))
-    
-    if (length(unique(infin)) != 1L) {
+
+    if (length(unique(infin)) != 1L) { ## should no longer happen: we reduce dimension!
         warning("Approximating +/-Inf by +/-", x$maxval)
-        lower[infin <= 0L] <- -x$maxval
-        upper[abs(infin) == 1L] <- x$maxval
+        lower[infin      <= 0L] <- -x$maxval
+        upper[abs(infin) == 1L] <-  x$maxval
     }
 
     p <- .Call(mvtnorm_R_miwa, steps = as.integer(x$steps),

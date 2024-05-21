@@ -2,6 +2,30 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
+\section{Changes in Version 1.2-5 (2024-05-18)}{
+  \subsection{Features}{
+    \itemize{
+      \item Update the \code{Using mvtnorm} package vignette and references therein.
+      \item Speed up \code{Mult(<ltMatrices>, transpose = TRUE)}.
+      \item Speed up \code{ldmvnorm()}.
+      \item Add constructor \code{syMatrices} for multiple symmetric
+            matrices and \code{as.syMatrices} for coercion from \code{ltMatrices}.}
+  }
+  \subsection{Bugfixes}{
+    \itemize{
+      \item Fix segmentation fault or unnecessary error or warning + approximation for
+      \code{algorithm = Miwa()} or \code{TVPACK()}, in case dimension
+      reduction to one-dimensional is possible, e.g., for \preformatted{
+  pmvnorm(lower = rep(-Inf,3), upper = c(-1, Inf, Inf),
+          sigma = diag(3), algorithm = Miwa())
+     # or
+  pmvnorm(lower = c(-Inf,-Inf),
+          upper = c(- 1,  Inf), sigma=diag(2), algorithm = TVPACK())
+        }
+    }
+  }
+}
+
 \section{Changes in Version 1.2-4 (2023-11-27)}{
   \subsection{Bugfixes}{
     \itemize{
@@ -19,7 +43,7 @@
   }
   \subsection{Bugfixes}{
     \itemize{
-      \item Fix variable declarations in \code{tvpack.f} as reported by Intel 
+      \item Fix variable declarations in \code{tvpack.f} as reported by Intel
             compilers icx/ipcx/ifx from oneAPI 2023.2.0 and oneMKL 2023.2.0, thanks to BDR
     }
   }

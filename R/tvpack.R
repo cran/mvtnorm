@@ -13,6 +13,7 @@ probval.TVPACK <- function (x, n, df, lower, upper, infin, corr, delta, ...)
     upp <- upper - delta
     low <- lower - delta
 
+### FIXME: stupid;  do dimension reduction for  (low,up) = (-Inf, Inf) pairs!
     if ((any(infin < 0) | any(infin > 1)) | length(unique(infin)) > 1)
         stop("TVPACK either needs all(lower == -Inf) or all(upper == Inf).")
 
@@ -22,6 +23,11 @@ probval.TVPACK <- function (x, n, df, lower, upper, infin, corr, delta, ...)
     upp <- as.double(upp)
     eps <- as.double(x$eps)
 
+    if (n == 1) {
+        val <-
+            if(nu == 0) pnorm(upp) - pnorm(low)
+            else    pt(upp, df=nu) - pt(low, df=nu)
+    }
     if (n == 2) {
         cr <- as.double(corr[2,1])
         val <- .C(mvtnorm_C_bvtlr, nu, upp[1], upp[2], cr, val = double(1))$val
@@ -33,5 +39,5 @@ probval.TVPACK <- function (x, n, df, lower, upper, infin, corr, delta, ...)
     }
     else stop("need n = 2 or 3 for TVPACK() algorithm")
     list(value = val, inform = 0,
-         error = if(n == 3) eps else NA)
+         error = if(n == 3) eps else if(n == 1) 0 else NA)
 }

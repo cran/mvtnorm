@@ -30,6 +30,33 @@
 #include <Rdefines.h>
 #include <Rconfig.h>
 #include <R_ext/Lapack.h> /* for dtptri */
+/* colSumsdnorm */
+
+SEXP R_ltMatrices_colSumsdnorm (SEXP z, SEXP N, SEXP J) {
+    /* number of columns */
+    int iN = INTEGER(N)[0];
+    /* number of rows */
+    int iJ = INTEGER(J)[0];
+    SEXP ans;
+    double *dans, Jl2pi, *dz;
+
+    Jl2pi = iJ * log(2 * PI);
+    PROTECT(ans = allocVector(REALSXP, iN));
+    dans = REAL(ans);
+    dz = REAL(z);
+
+    for (int i = 0; i < iN; i++) {
+        dans[i] = 0.0;
+        for (int j = 0; j < iJ; j++)
+            dans[i] += pow(dz[j], 2);
+        dans[i] = - 0.5 * (Jl2pi + dans[i]);
+        dz += iJ;
+    }
+    
+    UNPROTECT(1);
+    return(ans);
+}
+
 /* solve */
 
 SEXP R_ltMatrices_solve (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpose)
@@ -341,6 +368,63 @@ SEXP R_ltMatrices_Mult (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag) {
                 dans[j] += dy[j]; 
                 start += j;
             }
+        }
+        dC += p;
+        dy += iJ;
+        dans += iJ;
+    }
+    UNPROTECT(1);
+    return(ans);
+}
+
+/* mult transpose */
+
+SEXP R_ltMatrices_Mult_transpose (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag) {
+
+    SEXP ans;
+    double *dans, *dy = REAL(y);
+    int i, j, k, start;
+
+    /* RC input */
+    
+    /* pointer to C matrices */
+    double *dC = REAL(C);
+    /* number of matrices */
+    int iN = INTEGER(N)[0];
+    /* dimension of matrices */
+    int iJ = INTEGER(J)[0];
+    /* C contains diagonal elements */
+    Rboolean Rdiag = asLogical(diag);
+    /* p = J * (J - 1) / 2 + diag * J */
+    int len = iJ * (iJ - 1) / 2 + Rdiag * iJ;
+    
+    /* C length */
+    
+    int p;
+    if (LENGTH(C) == len)
+        /* C is constant for i = 1, ..., N */
+        p = 0;
+    else 
+        /* C contains C_1, ...., C_N */
+        p = len;
+    
+
+    PROTECT(ans = allocMatrix(REALSXP, iJ, iN));
+    dans = REAL(ans);
+    
+    for (i = 0; i < iN; i++) {
+        start = 0;
+        for (j = 0; j < iJ; j++) {
+            dans[j] = 0.0;
+            if (Rdiag) {
+                dans[j] += dC[start] * dy[j];
+                start++;
+            } else {
+                dans[j] += dy[j]; 
+            }
+            for (k = 0; k < (iJ - j - 1); k++)
+                dans[j] += dC[start + k] * dy[j + k + 1];
+            start += iJ - j - 1;
         }
         dC += p;
         dy += iJ;
