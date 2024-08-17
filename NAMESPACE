@@ -11,7 +11,7 @@ export(rmvnorm, dmvnorm, pmvnorm, pmvt, rmvt, qmvnorm, qmvt, dmvt,
        GenzBretz, Miwa, TVPACK, ltMatrices, syMatrices, as.syMatrices, Tcrossprod, Crossprod, diagonals, 
        chol2cov, invchol2chol, chol2invchol, invchol2cov, 
        invchol2pre, chol2pre, Dchol, invcholD, chol2cor, invchol2cor,
-       invchol2pc, chol2pc, "diagonals<-", vectrick, Lower_tri,
+       invchol2pc, chol2pc, "diagonals<-", vectrick, Lower_tri, logdet,
        marg_mvnorm, cond_mvnorm, Mult, lpmvnorm, slpmvnorm,
        ldmvnorm, sldmvnorm, ldpmvnorm, sldpmvnorm, standardize, destandardize)
 

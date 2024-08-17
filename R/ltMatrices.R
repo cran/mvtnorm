@@ -90,21 +90,20 @@ syMatrices <- function(object, diag = FALSE, byrow = FALSE, names = TRUE)
 
 dim.ltMatrices <- function(x) {
     J <- attr(x, "J")
-    class(x) <- class(x)[-1L]
-    return(c(ncol(x), J, J))
+    return(c(attr(x, "dim")[2L], J, J)) ### ncol(unclass(x)) may trigger gc
 }
 dim.syMatrices <- dim.ltMatrices
 
 # dimnames ltMatrices
 
 dimnames.ltMatrices <- function(x)
-    return(list(colnames(unclass(x)), attr(x, "rcnames"), attr(x, "rcnames")))
+    return(list(attr(x, "dimnames")[[2L]], attr(x, "rcnames"), attr(x, "rcnames")))
 dimnames.syMatrices <- dimnames.ltMatrices
 
 # names ltMatrices
 
 names.ltMatrices <- function(x) {
-    return(rownames(unclass(x)))
+    return(attr(x, "dimnames")[[1L]])
 }
 names.syMatrices <- names.ltMatrices
 
@@ -121,7 +120,7 @@ as.array.ltMatrices <- function(x, symmetric = FALSE, ...) {
     dn <- dimnames(x)
     
 
-    class(x) <- class(x)[-1L]
+    x <- unclass(x)
 
     L <- matrix(1L, nrow = J, ncol = J)
     diag(L) <- 2L
@@ -169,7 +168,7 @@ print.syMatrices <- function(x, ...)
     dn <- dimnames(x)
     
 
-    class(x) <- class(x)[-1L]
+    x <- unclass(x)
 
     rL <- cL <- diag(0, nrow = J)
     rL[lower.tri(rL, diag = diag)] <- cL[upper.tri(cL, diag = diag)] <- 1:nrow(x)
@@ -200,7 +199,7 @@ print.syMatrices <- function(x, ...)
     dn <- dimnames(x)
     
 
-    class(x) <- class(x)[-1L]
+    x <- unclass(x) 
 
     if (!missing(j)) {
 
@@ -309,7 +308,7 @@ diagonals.ltMatrices <- function(x, ...) {
     dn <- dimnames(x)
     
 
-    class(x) <- class(x)[-1L]
+    x <- unclass(x)
 
     if (!diag) {
         ret <- matrix(1, nrow = J, ncol = ncol(x))
@@ -368,10 +367,8 @@ Mult.ltMatrices <- function(x, y, transpose = FALSE, ...) {
     
     if (transpose) {
         x <- ltMatrices(x, byrow = FALSE)
-
-        class(x) <- class(x)[-1L]
-        storage.mode(x) <- "double"
-        storage.mode(y) <- "double"
+        if (!is.double(x)) storage.mode(x) <- "double"
+        if (!is.double(y)) storage.mode(y) <- "double"
 
         ret <- .Call(mvtnorm_R_ltMatrices_Mult_transpose, x, y, as.integer(N), 
                      as.integer(d[2L]), as.logical(diag))
@@ -384,10 +381,8 @@ Mult.ltMatrices <- function(x, y, transpose = FALSE, ...) {
     
 
     x <- ltMatrices(x, byrow = TRUE)
-
-    class(x) <- class(x)[-1L]
-    storage.mode(x) <- "double"
-    storage.mode(y) <- "double"
+    if (!is.double(x)) storage.mode(x) <- "double"
+    if (!is.double(y)) storage.mode(y) <- "double"
 
     ret <- .Call(mvtnorm_R_ltMatrices_Mult, x, y, as.integer(N), 
                  as.integer(d[2L]), as.logical(diag))
@@ -430,18 +425,19 @@ solve.ltMatrices <- function(a, b, transpose = FALSE, ...) {
 
     x <- ltMatrices(a, byrow = FALSE)
     diag <- attr(x, "diag")
+    ### dtptri and dtpsv require diagonal elements being present
+    if (!diag) diagonals(x) <- diagonals(x)
     d <- dim(x)
     J <- d[2L]
     dn <- dimnames(x)
-    class(x) <- class(x)[-1L]
-    storage.mode(x) <- "double"
+    if (!is.double(x)) storage.mode(x) <- "double"
 
     if (!missing(b)) {
-        if (!is.matrix(b)) b <- matrix(b, nrow = J, ncol = ncol(x))
+        if (!is.matrix(b)) b <- matrix(b, nrow = J, ncol = d[1L])
         stopifnot(nrow(b) == J)
         N <- ifelse(d[1L] == 1, ncol(b), d[1L])
         stopifnot(ncol(b) == N)
-        storage.mode(b) <- "double"
+        if (!is.double(b)) storage.mode(b) <- "double"
         ret <- .Call(mvtnorm_R_ltMatrices_solve, x, b, 
                      as.integer(N), as.integer(J), as.logical(diag),
                      as.logical(transpose))
@@ -455,9 +451,9 @@ solve.ltMatrices <- function(a, b, transpose = FALSE, ...) {
     }
 
     if (transpose) stop("cannot compute inverse of t(a)")
-    ret <- try(.Call(mvtnorm_R_ltMatrices_solve, x, NULL,
-                     as.integer(ncol(x)), as.integer(J), as.logical(diag),
-                     as.logical(FALSE)))
+    ret <- .Call(mvtnorm_R_ltMatrices_solve_C, x, 
+                 as.integer(d[1L]), as.integer(J), as.logical(diag),
+                 as.logical(FALSE))
     colnames(ret) <- dn[[1L]]
 
     if (!diag)
@@ -467,6 +463,27 @@ solve.ltMatrices <- function(a, b, transpose = FALSE, ...) {
     ret <- ltMatrices(ret, diag = diag, byrow = FALSE, names = dn[[2L]])
     ret <- ltMatrices(ret, byrow = byrow_orig)
     return(ret)
+}
+
+# logdet ltMatrices
+
+logdet <- function(x) {
+
+    if (!inherits(x, "ltMatrices"))
+        stop("x is not an ltMatrices object")
+
+    byrow <- attr(x, "byrow")
+    diag <- attr(x, "diag")
+    d <- dim(x)
+    J <- d[2L]
+    dn <- dimnames(x)
+    if (!is.double(x)) storage.mode(x) <- "double"
+
+    ret <- .Call(mvtnorm_R_ltMatrices_logdet, x, 
+                 as.integer(d[1L]), as.integer(J), as.logical(diag), 
+                 as.logical(byrow))
+    names(ret) <- dn[[1L]]
+    return(ret) 
 }
 
 # tcrossprod ltMatrices
@@ -484,13 +501,12 @@ solve.ltMatrices <- function(a, b, transpose = FALSE, ...) {
     byrow_orig <- attr(x, "byrow")
     diag <- attr(x, "diag")
     d <- dim(x)
+    N <- d[1L]
     J <- d[2L]
     dn <- dimnames(x)
 
     x <- ltMatrices(x, byrow = FALSE)
-    class(x) <- class(x)[-1L]
-    N <- d[1L]
-    storage.mode(x) <- "double"
+    if (!is.double(x)) storage.mode(x) <- "double"
 
     ret <- .Call(mvtnorm_R_ltMatrices_tcrossprod, x, as.integer(N), as.integer(J), 
                  as.logical(diag), as.logical(diag_only), as.logical(transpose))
@@ -525,8 +541,8 @@ chol.syMatrices <- function(x, ...) {
     x <- ltMatrices(unclass(x), diag = TRUE, 
                     byrow = byrow_orig, names = dnm[[2L]])
     x <- ltMatrices(x, byrow = FALSE)
-    class(x) <- class(x)[-1]
-    storage.mode(x) <- "double"
+    # class(x) <- class(x)[-1]
+    if (!is.double(x)) storage.mode(x) <- "double"
 
     ret <- .Call(mvtnorm_R_syMatrices_chol, x, 
                  as.integer(d[1L]), as.integer(d[2L]))
@@ -561,7 +577,7 @@ chol.syMatrices <- function(x, ...) {
     D <- diag(J)
     ret <- matrix(D[lower.tri(D, diag = TRUE)], 
                   nrow = J * (J + 1) / 2, ncol = N)
-    colnames(ret) <- colnames(unclass(x))
+    colnames(ret) <- dimnames(x)[[1L]]
     ret[L[lower.tri(L, diag = FALSE)],] <- unclass(x)
 
     ret <- ltMatrices(ret, diag = TRUE, byrow = FALSE, names = nm)
@@ -647,7 +663,7 @@ vectrick <- function(C, S, A, transpose = c(TRUE, TRUE)) {
     N <- dC[1L]
     J <- dC[2L]
     class(C) <- class(C)[-1L]
-    storage.mode(C) <- "double"
+    if (!is.double(C)) storage.mode(C) <- "double"
     
     # check S argument
     
@@ -676,7 +692,7 @@ vectrick <- function(C, S, A, transpose = c(TRUE, TRUE)) {
             N <- ncol(S)
         }
     }
-    storage.mode(S) <- "double"
+    if (!is.double(S)) storage.mode(S) <- "double"
     
     # check A argument
     
@@ -691,7 +707,7 @@ vectrick <- function(C, S, A, transpose = c(TRUE, TRUE)) {
         dA <- dim(A)
         stopifnot(dC[2L] == dA[2L])
         class(A) <- class(A)[-1L]
-        storage.mode(A) <- "double"
+        if (!is.double(A)) storage.mode(A) <- "double"
         if (dC[1L] != dA[1L]) {
             if (dC[1L] == 1L)
                 C <- C[, rep(1, N), drop = FALSE]
@@ -977,7 +993,7 @@ ldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
          z <- solve(chol, obs)
          logretval <- .colSumsdnorm(z)
          if (attr(chol, "diag"))
-             logretval <- logretval - colSums(log(diagonals(chol)))
+             logretval <- logretval - logdet(chol)
          
     } else {
          # ldmvnorm invchol
@@ -996,7 +1012,7 @@ ldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
          ## note that the second summand gets recycled the correct number
          ## of times in case dim(invchol)[1L] == 1 but ncol(obs) > 1
          if (attr(invchol, "diag"))
-             logretval <- logretval + colSums(log(diagonals(invchol)))
+             logretval <- logretval + logdet(invchol)
          
     }
 

@@ -48,6 +48,8 @@ static const R_CMethodDef cMethods[] = {
 static const R_CallMethodDef callMethods[] = {
     {"R_miwa", (DL_FUNC) &R_miwa, 5},
     {"R_ltMatrices_solve", (DL_FUNC) &R_ltMatrices_solve, 6},
+    {"R_ltMatrices_solve_C", (DL_FUNC) &R_ltMatrices_solve_C, 5},
+    {"R_ltMatrices_logdet", (DL_FUNC) &R_ltMatrices_logdet, 5},
     {"R_ltMatrices_tcrossprod", (DL_FUNC) &R_ltMatrices_tcrossprod , 6},
     {"R_ltMatrices_Mult", (DL_FUNC) &R_ltMatrices_Mult, 5},
     {"R_ltMatrices_Mult_transpose", (DL_FUNC) &R_ltMatrices_Mult_transpose, 5},
@@ -67,6 +69,8 @@ void attribute_visible R_init_mvtnorm(DllInfo *dll)
     R_RegisterCCallable("mvtnorm", "C_mvtdst", (DL_FUNC) &C_mvtdst);
     R_RegisterCCallable("mvtnorm", "R_miwa", (DL_FUNC) &R_miwa);
     R_RegisterCCallable("mvtnorm", "R_ltMatrices_solve", (DL_FUNC) &R_ltMatrices_solve);
+    R_RegisterCCallable("mvtnorm", "R_ltMatrices_solve_C", (DL_FUNC) &R_ltMatrices_solve_C);
+    R_RegisterCCallable("mvtnorm", "R_ltMatrices_logdet", (DL_FUNC) &R_ltMatrices_logdet);
     R_RegisterCCallable("mvtnorm", "R_ltMatrices_tcrossprod", (DL_FUNC) &R_ltMatrices_tcrossprod);
     R_RegisterCCallable("mvtnorm", "R_ltMatrices_Mult", (DL_FUNC) &R_ltMatrices_Mult);
     R_RegisterCCallable("mvtnorm", "R_ltMatrices_Mult_transpose", (DL_FUNC) &R_ltMatrices_Mult_transpose);

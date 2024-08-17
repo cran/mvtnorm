@@ -9,6 +9,7 @@
 \alias{Mult.ltMatrices}
 \alias{Mult.syMatrices}
 \alias{solve.ltMatrices}
+\alias{logdet}
 \alias{as.array.ltMatrices}
 \alias{as.array.syMatrices}
 \alias{diagonals.ltMatrices}
@@ -63,6 +64,7 @@ diagonals(x) <- value
 \S3method{Mult}{syMatrices}(x, y, \dots)
 Tcrossprod(x, diag_only = FALSE)
 Crossprod(x, diag_only = FALSE)
+logdet(x)
 Lower_tri(x, diag = FALSE, byrow = attr(x, "byrow"))
 chol2cov(x)
 invchol2chol(x)

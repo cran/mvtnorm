@@ -24,12 +24,18 @@
     Edit 'lmvnorm_src.w' and run 'nuweb -r lmvnorm_src.w'
 */
 
+#ifndef  USE_FC_LEN_T
+# define USE_FC_LEN_T
+#endif
+#include <Rconfig.h>
+#include <R_ext/Lapack.h> /* for dtptri */
+#ifndef FCONE
+# define FCONE
+#endif
 #include <R.h>
 #include <Rmath.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
-#include <Rconfig.h>
-#include <R_ext/Lapack.h> /* for dtptri */
 /* colSumsdnorm */
 
 SEXP R_ltMatrices_colSumsdnorm (SEXP z, SEXP N, SEXP J) {
@@ -40,7 +46,7 @@ SEXP R_ltMatrices_colSumsdnorm (SEXP z, SEXP N, SEXP J) {
     SEXP ans;
     double *dans, Jl2pi, *dz;
 
-    Jl2pi = iJ * log(2 * PI);
+    Jl2pi = iJ * log(2 * M_PI);
     PROTECT(ans = allocVector(REALSXP, iN));
     dans = REAL(ans);
     dz = REAL(z);
@@ -62,9 +68,9 @@ SEXP R_ltMatrices_colSumsdnorm (SEXP z, SEXP N, SEXP J) {
 SEXP R_ltMatrices_solve (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpose)
 {
 
-    SEXP ans, ansx;
-    double *dans, *dansx, *dy;
-    int i, j, k, info, nrow, ncol, jj, idx, ONE = 1;
+    SEXP ans;
+    double *dans, *dy;
+    int i, j, info, ONE = 1;
 
     /* RC input */
     
@@ -79,6 +85,8 @@ SEXP R_ltMatrices_solve (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpo
     /* p = J * (J - 1) / 2 + diag * J */
     int len = iJ * (iJ - 1) / 2 + Rdiag * iJ;
     
+    /* diagonal elements are always present */
+    if (!Rdiag) len += iJ;
     /* C length */
     
     int p;
@@ -89,13 +97,15 @@ SEXP R_ltMatrices_solve (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpo
         /* C contains C_1, ...., C_N */
         p = len;
     
-
+    /* lapack options */
+    
     char di, lo = 'L', tr = 'N';
     if (Rdiag) {
         /* non-unit diagonal elements */
         di = 'N';
     } else {
-        /* unit diagonal elements */
+        /* unit diagonal elements; NOTE: these diagonals 1s ARE always present but
+           ignored in the computations */
         di = 'U';
     }
 
@@ -108,90 +118,153 @@ SEXP R_ltMatrices_solve (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpo
         /* C */
         tr = 'N';
     }
-
-    /* setup memory */
     
-    /* return object: include unit diagonal elements if Rdiag == 0 */
 
-    /* add diagonal elements (expected by Lapack) */
-    nrow = (Rdiag ? len : len + iJ);
-    ncol = (p > 0 ? iN : 1);
-    PROTECT(ans = allocMatrix(REALSXP, nrow, ncol));
+    dy = REAL(y);
+    PROTECT(ans = allocMatrix(REALSXP, iJ, iN));
     dans = REAL(ans);
-
-    ansx = ans;
-    dansx = dans;
-    dy = dans;
-    if (y != R_NilValue) {
-        dy = REAL(y);
-        PROTECT(ansx = allocMatrix(REALSXP, iJ, iN));
-        dansx = REAL(ansx);
-    }
-    
+    memcpy(dans, dy, iJ * iN * sizeof(double));
     
     /* loop over matrices, ie columns of C  / y */    
     for (i = 0; i < iN; i++) {
 
-        /* copy elements */
-        
-        /* copy data and insert unit diagonal elements when necessary */
-        if (p > 0 || i == 0) {
-            jj = 0;
-            k = 0;
-            idx = 0;
-            j = 0;
-            while(j < len) {
-                if (!Rdiag && (jj == idx)) {
-                    dans[jj] = 1.0;
-                    idx = idx + (iJ - k);
-                    k++;
-                } else {
-                    dans[jj] = dC[j];
-                    j++;
-                }
-                jj++;
+        /* solve linear system */
+        F77_CALL(dtpsv)(&lo, &tr, &di, &iJ, dC, dans, &ONE FCONE FCONE FCONE);
+        dans += iJ;
+        dC += p;
+    }
+
+    UNPROTECT(1);
+    return(ans);
+}
+
+/* solve C */
+
+SEXP R_ltMatrices_solve_C (SEXP C, SEXP N, SEXP J, SEXP diag, SEXP transpose)
+{
+
+    SEXP ans;
+    double *dans;
+    int i, j, info, jj, idx, ONE = 1;
+
+    /* RC input */
+    
+    /* pointer to C matrices */
+    double *dC = REAL(C);
+    /* number of matrices */
+    int iN = INTEGER(N)[0];
+    /* dimension of matrices */
+    int iJ = INTEGER(J)[0];
+    /* C contains diagonal elements */
+    Rboolean Rdiag = asLogical(diag);
+    /* p = J * (J - 1) / 2 + diag * J */
+    int len = iJ * (iJ - 1) / 2 + Rdiag * iJ;
+    
+    /* diagonal elements are always present */
+    if (!Rdiag) len += iJ;
+    /* C length */
+    
+    int p;
+    if (LENGTH(C) == len)
+        /* C is constant for i = 1, ..., N */
+        p = 0;
+    else 
+        /* C contains C_1, ...., C_N */
+        p = len;
+    
+    /* lapack options */
+    
+    char di, lo = 'L', tr = 'N';
+    if (Rdiag) {
+        /* non-unit diagonal elements */
+        di = 'N';
+    } else {
+        /* unit diagonal elements; NOTE: these diagonals 1s ARE always present but
+           ignored in the computations */
+        di = 'U';
+    }
+
+    /* t(C) instead of C */
+    Rboolean Rtranspose = asLogical(transpose);
+    if (Rtranspose) {
+        /* t(C) */
+        tr = 'T';
+    } else {
+        /* C */
+        tr = 'N';
+    }
+    
+
+    PROTECT(ans = allocMatrix(REALSXP, len, iN));
+    dans = REAL(ans);
+    memcpy(dans, dC, iN * len * sizeof(double));
+    
+    /* loop over matrices, ie columns of C  / y */    
+    for (i = 0; i < iN; i++) {
+
+        /* compute inverse */
+        F77_CALL(dtptri)(&lo, &di, &iJ, dans, &info FCONE FCONE);
+        if (info != 0)
+            error("Cannot solve ltmatices");
+
+        dans += len;
+    }
+
+    UNPROTECT(1);
+    /* note: ans always includes diagonal elements */
+    return(ans);
+}
+
+/* logdet */
+
+SEXP R_ltMatrices_logdet (SEXP C, SEXP N, SEXP J, SEXP diag, SEXP byrow) {
+
+    SEXP ans;
+    double *dans;
+    int i, j, k;
+
+    /* RC input */
+    
+    /* pointer to C matrices */
+    double *dC = REAL(C);
+    /* number of matrices */
+    int iN = INTEGER(N)[0];
+    /* dimension of matrices */
+    int iJ = INTEGER(J)[0];
+    /* C contains diagonal elements */
+    Rboolean Rdiag = asLogical(diag);
+    /* p = J * (J - 1) / 2 + diag * J */
+    int len = iJ * (iJ - 1) / 2 + Rdiag * iJ;
+    
+    Rboolean Rbyrow = asLogical(byrow);
+    /* C length */
+    
+    int p;
+    if (LENGTH(C) == len)
+        /* C is constant for i = 1, ..., N */
+        p = 0;
+    else 
+        /* C contains C_1, ...., C_N */
+        p = len;
+    
+
+    PROTECT(ans = allocVector(REALSXP, iN));
+    dans = REAL(ans);
+
+    for (i = 0; i < iN; i++) {
+        dans[i] = 0.0;
+        if (Rdiag) {
+            k = 1;
+            for (j = 0; j < iJ; j++) {
+                dans[i] += log(dC[k - 1]);
+                k += (Rbyrow ? j + 2 : iJ - j);
             }
-            if (!Rdiag) dans[idx] = 1.0;
-        }
-
-        if (y != R_NilValue) {
-            for (j = 0; j < iJ; j++)
-                dansx[j] = dy[j];
-        }
-        
-        /* call Lapack */
-        
-        if (y == R_NilValue) {
-            /* compute inverse */
-            F77_CALL(dtptri)(&lo, &di, &iJ, dans, &info FCONE FCONE);
-            if (info != 0)
-                error("Cannot solve ltmatices");
-        } else {
-            /* solve linear system */
-            F77_CALL(dtpsv)(&lo, &tr, &di, &iJ, dans, dansx, &ONE FCONE FCONE FCONE);
-            dansx += iJ;
-            dy += iJ;
-        }
-        
-
-        /* next matrix */
-        if (p > 0) {
-            dans += nrow;
             dC += p;
         }
     }
-
-    /* return objects */
     
-    if (y == R_NilValue) {
-        UNPROTECT(1);
-        /* note: ans always includes diagonal elements */
-        return(ans);
-    } else {
-        UNPROTECT(2);
-        return(ansx);
-    }
-    
+    UNPROTECT(1);
+    return(ans);
 }
 
 /* tcrossprod */

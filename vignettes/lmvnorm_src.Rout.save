@@ -530,6 +530,17 @@ attr(,"rcnames")
 > chk(solve(lxn[1, ], y, transpose = TRUE), t(as.array(solve(lxn[1, 
 +     ]))[, , 1]) %*% y)
 
+> chk(logdet(lxn), colSums(log(diagonals(lxn))))
+
+> chk(logdet(lxd[1, ]), colSums(log(diagonals(lxd[1, 
++     ]))))
+
+> chk(logdet(lxd), colSums(log(diagonals(lxd))))
+
+> lxd2 <- ltMatrices(lxd, byrow = !attr(lxd, "byrow"))
+
+> chk(logdet(lxd2), colSums(log(diagonals(lxd2))))
+
 > a <- as.array(Tcrossprod(lxn))
 
 > b <- array(apply(as.array(lxn), 3, function(x) tcrossprod(x), 
@@ -1664,4 +1675,4 @@ Petal.Width    0.78190591 -0.24142185    0.8713759   1.0000000
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
- 10.114   0.088  10.201 
+ 10.496   0.083  10.660 

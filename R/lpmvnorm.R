@@ -85,14 +85,16 @@ lpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol,
         ac <- lower / c(dchol)
         bc <- upper / c(dchol)
         C <- Dchol(chol, D = 1 / dchol)
-        uC <- unclass(C)
-        if (J > 1) ### else: univariate problem; C is no longer used
-           uC <- Lower_tri(C)
+        if (J > 1) { ### else: univariate problem; C is no longer used
+            uC <- Lower_tri(C)
         } else {
-            ac <- lower
-            bc <- upper
-            uC <- Lower_tri(chol)
+            uC <- unclass(C)
         }
+    } else {
+        ac <- lower
+        bc <- upper
+        uC <- Lower_tri(chol)
+    }
     
     # check and / or set integration weights
     
@@ -102,7 +104,7 @@ lpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol,
         if (is.null(M))
             M <- ncol(w)
         stopifnot(ncol(w) %in% c(M, M * N))
-        storage.mode(w) <- "double"
+        if (!is.double(w)) storage.mode(w) <- "double"
     } else {
         if (J > 1) {
             if (is.null(M)) stop("either w or M must be specified")
@@ -180,14 +182,16 @@ slpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol, logL
         ac <- lower / c(dchol)
         bc <- upper / c(dchol)
         C <- Dchol(chol, D = 1 / dchol)
-        uC <- unclass(C)
-        if (J > 1) ### else: univariate problem; C is no longer used
-           uC <- Lower_tri(C)
+        if (J > 1) { ### else: univariate problem; C is no longer used
+            uC <- Lower_tri(C)
         } else {
-            ac <- lower
-            bc <- upper
-            uC <- Lower_tri(chol)
+            uC <- unclass(C)
         }
+    } else {
+        ac <- lower
+        bc <- upper
+        uC <- Lower_tri(chol)
+    }
     
     # check and / or set integration weights
     
@@ -197,7 +201,7 @@ slpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol, logL
         if (is.null(M))
             M <- ncol(w)
         stopifnot(ncol(w) %in% c(M, M * N))
-        storage.mode(w) <- "double"
+        if (!is.double(w)) storage.mode(w) <- "double"
     } else {
         if (J > 1) {
             if (is.null(M)) stop("either w or M must be specified")
