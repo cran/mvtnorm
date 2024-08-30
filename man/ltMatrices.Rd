@@ -1,7 +1,6 @@
 \name{ltMatrices}
 \alias{ltMatrices}
 \alias{syMatrices}
-\alias{as.syMatrices}
 \alias{Tcrossprod}
 \alias{Crossprod}
 \alias{diagonals}
@@ -19,9 +18,23 @@
 \alias{diagonals<-.ltMatrices}
 \alias{diagonals<-.syMatrices}
 \alias{diagonals.integer}
+\alias{is.ltMatrices}
+\alias{is.syMatrices}
+\alias{as.ltMatrices}
+\alias{as.ltMatrices.ltMatrices}
+\alias{as.ltMatrices.syMatrices}
+\alias{as.syMatrices}
+\alias{is.chol}
+\alias{is.invchol}
+\alias{as.chol}
+\alias{as.invchol}
 \alias{Lower_tri}
 \alias{chol.syMatrices}
+\alias{aperm.chol}
+\alias{aperm.invchol}
 \alias{aperm.ltMatrices}
+\alias{aperm.syMatrices}
+\alias{deperma}
 \alias{adddiag}
 \alias{chol2cov}
 \alias{invchol2chol}
@@ -47,7 +60,6 @@
 \usage{
 ltMatrices(object, diag = FALSE, byrow = FALSE, names = TRUE)
 syMatrices(object, diag = FALSE, byrow = FALSE, names = TRUE)
-as.syMatrices(object)
 \S3method{as.array}{ltMatrices}(x, symmetric = FALSE, \dots)
 \S3method{as.array}{syMatrices}(x, \dots)
 \S3method{diagonals}{ltMatrices}(x, \dots)
@@ -59,13 +71,28 @@ diagonals(x) <- value
 \S3method{diagonals}{syMatrices}(x) <- value
 \S3method{solve}{ltMatrices}(a, b, transpose = FALSE, \dots)
 \S3method{chol}{syMatrices}(x, \dots)
-\S3method{aperm}{ltMatrices}(a, perm, is_chol = FALSE, \dots)
+\S3method{aperm}{chol}(a, perm, \dots)
+\S3method{aperm}{invchol}(a, perm, \dots)
+\S3method{aperm}{ltMatrices}(a, perm, \dots)
+\S3method{aperm}{syMatrices}(a, perm, \dots)
+deperma(chol = solve(invchol), permuted_chol = solve(permuted_invchol), 
+        invchol, permuted_invchol, perm, score_schol)
 \S3method{Mult}{ltMatrices}(x, y, transpose = FALSE, \dots)
 \S3method{Mult}{syMatrices}(x, y, \dots)
 Tcrossprod(x, diag_only = FALSE)
 Crossprod(x, diag_only = FALSE)
 logdet(x)
 Lower_tri(x, diag = FALSE, byrow = attr(x, "byrow"))
+is.ltMatrices(x)
+is.syMatrices(x)
+as.ltMatrices(x)
+\S3method{as.ltMatrices}{ltMatrices}(x)
+\S3method{as.ltMatrices}{syMatrices}(x)
+as.syMatrices(x)
+is.chol(x)
+is.invchol(x)
+as.chol(x)
+as.invchol(x)
 chol2cov(x)
 invchol2chol(x)
 chol2invchol(x)
@@ -81,6 +108,7 @@ invchol2pc(x)
 vectrick(C, S, A, transpose = c(TRUE, TRUE))
 standardize(chol, invchol)
 destandardize(chol = solve(invchol), invchol, score_schol)
+as.ltMatrices(x)
 }
 \arguments{
   \item{object}{a \code{matrix} representing the lower triagular elements of
@@ -103,16 +131,13 @@ destandardize(chol = solve(invchol), invchol, score_schol)
   \item{diag_only}{logical, compute diagonal elements of crossproduct only
 if \code{TRUE}.
 }
-  \item{x,chol,invchol}{object of class \code{ltMatrices} or \code{syMatrices} (for \code{chol}).
+  \item{x,chol,invchol,permuted_chol,permuted_invchol}{object of class \code{ltMatrices} or \code{syMatrices} (for \code{chol}).
 }
   \item{value}{a matrix of diagonal elements to be assigned (of dimension \eqn{J \times N}).
 }
   \item{a}{object of class \code{ltMatrices}.
 }
   \item{perm}{a permutation of the covariance matrix corresponding to \code{a}.
-}
-  \item{is_chol}{a logical indicating if \code{a} is the Cholesky of the
-covariance (\code{chol = TRUE}) of the precision matrix.
 }
   \item{D}{a matrix (of dimension \eqn{J \times N}) of diagonal elements to be multiplied with.
 }

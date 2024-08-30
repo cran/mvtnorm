@@ -70,7 +70,7 @@ SEXP R_ltMatrices_solve (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpo
 
     SEXP ans;
     double *dans, *dy;
-    int i, j, info, ONE = 1;
+    int i, ONE = 1;
 
     /* RC input */
     
@@ -99,7 +99,7 @@ SEXP R_ltMatrices_solve (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpo
     
     /* lapack options */
     
-    char di, lo = 'L', tr = 'N';
+    char di, lo = 'L';
     if (Rdiag) {
         /* non-unit diagonal elements */
         di = 'N';
@@ -108,7 +108,9 @@ SEXP R_ltMatrices_solve (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpo
            ignored in the computations */
         di = 'U';
     }
+    
 
+    char tr = 'N';
     /* t(C) instead of C */
     Rboolean Rtranspose = asLogical(transpose);
     if (Rtranspose) {
@@ -118,7 +120,6 @@ SEXP R_ltMatrices_solve (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpo
         /* C */
         tr = 'N';
     }
-    
 
     dy = REAL(y);
     PROTECT(ans = allocMatrix(REALSXP, iJ, iN));
@@ -145,7 +146,7 @@ SEXP R_ltMatrices_solve_C (SEXP C, SEXP N, SEXP J, SEXP diag, SEXP transpose)
 
     SEXP ans;
     double *dans;
-    int i, j, info, jj, idx, ONE = 1;
+    int i, info;
 
     /* RC input */
     
@@ -162,19 +163,9 @@ SEXP R_ltMatrices_solve_C (SEXP C, SEXP N, SEXP J, SEXP diag, SEXP transpose)
     
     /* diagonal elements are always present */
     if (!Rdiag) len += iJ;
-    /* C length */
-    
-    int p;
-    if (LENGTH(C) == len)
-        /* C is constant for i = 1, ..., N */
-        p = 0;
-    else 
-        /* C contains C_1, ...., C_N */
-        p = len;
-    
     /* lapack options */
     
-    char di, lo = 'L', tr = 'N';
+    char di, lo = 'L';
     if (Rdiag) {
         /* non-unit diagonal elements */
         di = 'N';
@@ -182,16 +173,6 @@ SEXP R_ltMatrices_solve_C (SEXP C, SEXP N, SEXP J, SEXP diag, SEXP transpose)
         /* unit diagonal elements; NOTE: these diagonals 1s ARE always present but
            ignored in the computations */
         di = 'U';
-    }
-
-    /* t(C) instead of C */
-    Rboolean Rtranspose = asLogical(transpose);
-    if (Rtranspose) {
-        /* t(C) */
-        tr = 'T';
-    } else {
-        /* C */
-        tr = 'N';
     }
     
 

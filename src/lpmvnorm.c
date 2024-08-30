@@ -280,7 +280,6 @@ SEXP R_slpmvnorm(SEXP a, SEXP b, SEXP C, SEXP center, SEXP N, SEXP J, SEXP W,
     
     double intsum;
     int p, idx;
-
     /* dimensions */
     
     int iM = INTEGER(M)[0]; 
@@ -326,7 +325,6 @@ SEXP R_slpmvnorm(SEXP a, SEXP b, SEXP C, SEXP center, SEXP N, SEXP J, SEXP W,
             error("incorrect dimensions of center");
     }
     
-
     int start, j, k;
     double tmp, e, d, f, emd, x, x0, y[(iJ > 1 ? iJ - 1 : 1)];
 
@@ -415,7 +413,6 @@ SEXP R_slpmvnorm(SEXP a, SEXP b, SEXP C, SEXP center, SEXP N, SEXP J, SEXP W,
             dW = REAL(W);
 
         for (int m = 0; m < iM; m++) {
-
             /* init score loop */
             
             /* init logLik loop */
@@ -624,7 +621,6 @@ SEXP R_slpmvnorm(SEXP a, SEXP b, SEXP C, SEXP center, SEXP N, SEXP J, SEXP W,
                 dans[idx + 2 * iJ] += fp_u[j];
             }
             
-
             if (W != R_NilValue)
                 dW += iJ - 1;
         }
@@ -636,7 +632,6 @@ SEXP R_slpmvnorm(SEXP a, SEXP b, SEXP C, SEXP center, SEXP N, SEXP J, SEXP W,
         dC += p;
         if (LENGTH(center)) dcenter += iJ;
         
-
         dans += Jp + 1 + 3 * iJ;
     }
 

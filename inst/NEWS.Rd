@@ -2,6 +2,28 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
+\section{Changes in Version 1.3-0 (2024-08-28)}{
+  \subsection{Features}{
+    \itemize{
+      \item New (but still experimental) user interface for computing
+            on multivariate normal distributions.
+      \item Explain \code{cond\_mvnorm} a bit better in the vignette.
+      \item Add the possibility to compute log-likelihood and score
+            functions for permutations of variables (function \code{deperma})
+            and explain the derivation of the gradient in the vignette.
+      \item Add \code{chol} and \code{invchol} classes, mainly to avoid
+            confusion.
+      \item Make sure \code{logdet(standardize())} is finite, always. 
+    }
+  }
+  \subsection{Bugfixes}{
+    \itemize{
+      \item Names didn't propagate properly in several places.
+      \item Allow character subsets.
+    }
+  }
+}
+
 \section{Changes in Version 1.2-6 (2024-08-17)}{
   \subsection{Features}{
     \itemize{
@@ -18,15 +40,6 @@
     }
   }
 }
-
-\section{Changes in Version 1.2-7 (2024-07-11)}{
-  \subsection{Bugfixes}{
-    \itemize{
-      \item Fix typos in package vignette.
-    }
-  }
-}
-
 
 \section{Changes in Version 1.2-5 (2024-05-18)}{
   \subsection{Features}{

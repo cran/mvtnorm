@@ -53,7 +53,7 @@ lpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol,
     if (!is.matrix(upper)) upper <- matrix(upper, ncol = 1)
     stopifnot(isTRUE(all.equal(dim(lower), dim(upper))))
 
-    stopifnot(inherits(chol, "ltMatrices"))
+    stopifnot(is.ltMatrices(chol))          ### NOTE: replace with is.chol
     byrow_orig <- attr(chol, "byrow")
     chol <- ltMatrices(chol, byrow = TRUE)
     d <- dim(chol)
@@ -63,8 +63,11 @@ lpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol,
 
     stopifnot(nrow(lower) == J && ncol(lower) == N)
     stopifnot(nrow(upper) == J && ncol(upper) == N)
-    if (is.matrix(mean))
+    if (is.matrix(mean)) {
+        if (ncol(mean) == 1L) 
+            mean <- mean[,rep(1, N),drop = FALSE]
         stopifnot(nrow(mean) == J && ncol(mean) == N)
+    }
 
     lower <- lower - mean
     upper <- upper - mean
@@ -122,8 +125,10 @@ lpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol,
 
 # slpmvnorm
 
-slpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol, logLik = TRUE, M = NULL, 
-                    w = NULL, seed = NULL, tol = .Machine$double.eps, fast = FALSE) {
+slpmvnorm <- function(lower, upper, mean = 0, center = NULL, 
+                      chol, invchol, logLik = TRUE, M = NULL, 
+                      w = NULL, seed = NULL, tol = .Machine$double.eps, 
+                      fast = FALSE) {
 
     # init random seed, reset on exit
     
@@ -150,7 +155,7 @@ slpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol, logL
     if (!is.matrix(upper)) upper <- matrix(upper, ncol = 1)
     stopifnot(isTRUE(all.equal(dim(lower), dim(upper))))
 
-    stopifnot(inherits(chol, "ltMatrices"))
+    stopifnot(is.ltMatrices(chol))          ### NOTE: replace with is.chol
     byrow_orig <- attr(chol, "byrow")
     chol <- ltMatrices(chol, byrow = TRUE)
     d <- dim(chol)
@@ -160,8 +165,11 @@ slpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol, logL
 
     stopifnot(nrow(lower) == J && ncol(lower) == N)
     stopifnot(nrow(upper) == J && ncol(upper) == N)
-    if (is.matrix(mean))
+    if (is.matrix(mean)) {
+        if (ncol(mean) == 1L) 
+            mean <- mean[,rep(1, N),drop = FALSE]
         stopifnot(nrow(mean) == J && ncol(mean) == N)
+    }
 
     lower <- lower - mean
     upper <- upper - mean
@@ -257,7 +265,8 @@ slpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol, logL
     # post differentiate invchol score
     
     if (!missing(invchol)) {
-        ret <- ltMatrices(ret, diag = TRUE, byrow = TRUE)
+        ret <- ltMatrices(ret, diag = TRUE, byrow = TRUE,
+                          names = dimnames(chol)[[2L]])
         ### this means vectrick(chol, ret, chol)
         ret <- - unclass(vectrick(chol, ret))
     }
@@ -267,10 +276,14 @@ slpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol, logL
     if (!attr(chol, "diag"))
         ### remove scores for constant diagonal elements
         ret[idx,] <- 0
-    ret <- ltMatrices(ret, diag = TRUE, byrow = TRUE)
+    ret <- ltMatrices(ret, diag = TRUE, byrow = TRUE, 
+                      names = dimnames(chol)[[2L]])
     
 
     ret <- ltMatrices(ret, byrow = byrow_orig)
+
+    rownames(smean) <- rownames(slower) <- 
+        rownames(supper) <- dimnames(chol)[[2L]]
 
     if (logLik) {
         ret <- list(logLik = ll, 
@@ -282,6 +295,409 @@ slpmvnorm <- function(lower, upper, mean = 0, center = NULL, chol, invchol, logL
         return(ret)
     }
     
+    return(ret)
+}
+
+# ldmvnorm
+
+ldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
+
+    stopifnot(xor(missing(chol), missing(invchol)))
+    if (!is.matrix(obs)) obs <- matrix(obs, ncol = 1L)
+    p <- ncol(obs)
+
+    if (!missing(chol)) {
+         # ldmvnorm chol
+         
+         if (missing(chol))
+             stop("either chol or invchol must be given")
+         ## chol is given
+         if (!is.ltMatrices(chol))       ### NOTE: replace with is.chol
+             stop("chol is not an object of class ltMatrices")
+         N <- dim(chol)[1L]
+         N <- ifelse(N == 1, p, N)
+         J <- dim(chol)[2L]
+         obs <- .check_obs(obs = obs, mean = mean, J = J, N = N)
+         z <- solve(chol, obs)
+         logretval <- .colSumsdnorm(z)
+         if (attr(chol, "diag"))
+             logretval <- logretval - logdet(chol)
+         
+    } else {
+         # ldmvnorm invchol
+         
+         ## invchol is given
+         if (!is.ltMatrices(invchol))    ### NOTE: replace with is.invchol
+             stop("invchol is not an object of class ltMatrices")
+         N <- dim(invchol)[1L]
+         N <- ifelse(N == 1, p, N)
+         J <- dim(invchol)[2L]
+         obs <- .check_obs(obs = obs, mean = mean, J = J, N = N)
+         ## NOTE: obs is (J x N) 
+         ## dnorm takes rather long
+         z <- Mult(invchol, obs)
+         logretval <- .colSumsdnorm(z)
+         ## note that the second summand gets recycled the correct number
+         ## of times in case dim(invchol)[1L] == 1 but ncol(obs) > 1
+         if (attr(invchol, "diag"))
+             logretval <- logretval + logdet(invchol)
+         
+    }
+
+    names(logretval) <- colnames(obs)
+    if (logLik) return(sum(logretval))
+    return(logretval)
+}
+
+# sldmvnorm
+
+sldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
+
+    stopifnot(xor(missing(chol), missing(invchol)))
+    if (!is.matrix(obs)) obs <- matrix(obs, ncol = 1L)
+
+    if (!missing(invchol)) {
+
+        N <- dim(invchol)[1L]
+        N <- ifelse(N == 1, ncol(obs), N)
+        J <- dim(invchol)[2L]
+        obs <- .check_obs(obs = obs, mean = mean, J = J, N = N)
+
+        Mix <- Mult(invchol, obs)
+        sobs <- - Mult(invchol, Mix, transpose = TRUE)
+
+        Y <- matrix(obs, byrow = TRUE, nrow = J, ncol = N * J)
+        ret <- - matrix(Mix[, rep(1:N, each = J)] * Y, ncol = N)
+
+        M <- matrix(1:(J^2), nrow = J, byrow = FALSE)
+        ret <- ret[M[lower.tri(M, diag = attr(invchol, "diag"))],,drop = FALSE]
+        if (!is.null(dimnames(invchol)[[1L]]))
+            colnames(ret) <- dimnames(invchol)[[1]]
+        ret <- ltMatrices(ret,
+                          diag = attr(invchol, "diag"), byrow = FALSE,
+                          names = dimnames(invchol)[[2L]])
+        ret <- ltMatrices(ret, diag = attr(invchol, "diag"), 
+                          byrow = attr(invchol, "byrow"))
+        if (attr(invchol, "diag")) {
+            ### recycle properly
+            diagonals(ret) <- diagonals(ret) + c(1 / diagonals(invchol))
+        } else {
+            diagonals(ret) <- 0
+        }
+        ret <- list(obs = sobs, invchol = ret)
+        if (logLik) 
+            ret$logLik <- ldmvnorm(obs = obs, mean = mean, 
+                                   invchol = invchol, logLik = FALSE)
+        return(ret)
+    }
+
+    invchol <- solve(chol)
+    ret <- sldmvnorm(obs = obs, mean = mean, invchol = invchol)
+    ### this means: ret$chol <- - vectrick(invchol, ret$invchol, invchol)
+    ret$chol <- as.chol(- vectrick(invchol, ret$invchol))
+    ret$invchol <- NULL
+    return(ret)
+}
+
+# ldpmvnorm
+
+ldpmvnorm <- function(obs, lower, upper, mean = 0, chol, invchol, 
+                      logLik = TRUE, ...) {
+
+    if (missing(obs) || is.null(obs))
+        return(lpmvnorm(lower = lower, upper = upper, mean = mean,
+                        chol = chol, invchol = invchol, logLik = logLik, ...))
+    if (missing(lower) && missing(upper) || is.null(lower) && is.null(upper))
+        return(ldmvnorm(obs = obs, mean = mean,
+                        chol = chol, invchol = invchol, logLik = logLik))
+
+    # dp input checks
+    
+    stopifnot(xor(missing(chol), missing(invchol)))
+    cJ <- nrow(obs)
+    dJ <- nrow(lower)
+    N <- ncol(obs)
+    stopifnot(N == ncol(lower))
+    stopifnot(N == ncol(upper))
+    if (all(mean == 0)) {
+        cmean <- 0
+        dmean <- 0
+    } else {
+        if (!is.matrix(mean) || NCOL(mean) == 1L) 
+            mean <- matrix(mean, nrow = cJ + dJ, ncol = N)
+        stopifnot(nrow(mean) == cJ + dJ)
+        stopifnot(ncol(mean) == N)
+        cmean <- mean[1:cJ,, drop = FALSE]
+        dmean <- mean[-(1:cJ),, drop = FALSE]
+    }
+        
+
+    if (!missing(invchol)) {
+        J <- dim(invchol)[2L]
+        stopifnot(cJ + dJ == J)
+
+        md <- marg_mvnorm(invchol = invchol, which = 1:cJ)
+        ret <- ldmvnorm(obs = obs, mean = cmean, invchol = md$invchol, 
+                        logLik = logLik)
+
+        cd <- cond_mvnorm(invchol = invchol, which_given = 1:cJ, 
+                          given = obs - cmean, center = TRUE)
+        ret <- ret + lpmvnorm(lower = lower, upper = upper, mean = dmean, 
+                              invchol = cd$invchol, center = cd$center, 
+                              logLik = logLik, ...)
+        return(ret)
+    }
+
+    J <- dim(chol)[2L]
+    stopifnot(cJ + dJ == J)
+
+    md <- marg_mvnorm(chol = chol, which = 1:cJ)
+    ret <- ldmvnorm(obs = obs, mean = cmean, chol = md$chol, logLik = logLik)
+
+    cd <- cond_mvnorm(chol = chol, which_given = 1:cJ, 
+                      given = obs - cmean, center = TRUE)
+    ret <- ret + lpmvnorm(lower = lower, upper = upper, mean = dmean, 
+                          chol = cd$chol, center = cd$center, 
+                          logLik = logLik, ...)
+    return(ret)
+}
+
+# sldpmvnorm
+
+sldpmvnorm <- function(obs, lower, upper, mean = 0, chol, invchol, 
+                       logLik = TRUE, ...) {
+
+    if (missing(obs) || is.null(obs))
+        return(slpmvnorm(lower = lower, upper = upper, mean = mean,
+                         chol = chol, invchol = invchol, logLik = logLik, ...))
+    if (missing(lower) && missing(upper) || is.null(lower) && is.null(upper))
+        return(sldmvnorm(obs = obs, mean = mean,
+                         chol = chol, invchol = invchol, logLik = logLik))
+
+    # dp input checks
+    
+    stopifnot(xor(missing(chol), missing(invchol)))
+    cJ <- nrow(obs)
+    dJ <- nrow(lower)
+    N <- ncol(obs)
+    stopifnot(N == ncol(lower))
+    stopifnot(N == ncol(upper))
+    if (all(mean == 0)) {
+        cmean <- 0
+        dmean <- 0
+    } else {
+        if (!is.matrix(mean) || NCOL(mean) == 1L) 
+            mean <- matrix(mean, nrow = cJ + dJ, ncol = N)
+        stopifnot(nrow(mean) == cJ + dJ)
+        stopifnot(ncol(mean) == N)
+        cmean <- mean[1:cJ,, drop = FALSE]
+        dmean <- mean[-(1:cJ),, drop = FALSE]
+    }
+        
+
+    if (!missing(invchol)) {
+        # sldpmvnorm invchol
+        
+        byrow_orig <- attr(invchol, "byrow")
+        invchol <- ltMatrices(invchol, byrow = TRUE)
+
+        J <- dim(invchol)[2L]
+        stopifnot(cJ + dJ == J)
+
+        md <- marg_mvnorm(invchol = invchol, which = 1:cJ)
+        cs <- sldmvnorm(obs = obs, mean = cmean, invchol = md$invchol)
+
+        obs_cmean <- obs - cmean
+        cd <- cond_mvnorm(invchol = invchol, which_given = 1:cJ, 
+                          given = obs_cmean, center = TRUE)
+        ds <- slpmvnorm(lower = lower, upper = upper, mean = dmean, 
+                        center = cd$center, invchol = cd$invchol, 
+                        logLik = logLik, ...)
+
+        tmp0 <- solve(cd$invchol, ds$mean, transpose = TRUE)
+        tmp <- - tmp0[rep(1:dJ, each = cJ),,drop = FALSE] * 
+                 obs_cmean[rep(1:cJ, dJ),,drop = FALSE]
+
+        Jp <- nrow(unclass(invchol))
+        diag <- attr(invchol, "diag")
+        M <- as.array(ltMatrices(1:Jp, diag = diag, byrow = TRUE))[,,1]
+        ret <- matrix(0, nrow = Jp, ncol = ncol(obs))
+        M1 <- M[1:cJ, 1:cJ]
+        idx <- t(M1)[upper.tri(M1, diag = diag)]
+        ret[idx,] <- Lower_tri(cs$invchol, diag = diag)
+
+        idx <- c(t(M[-(1:cJ), 1:cJ]))
+        ret[idx,] <- tmp
+
+        M3 <- M[-(1:cJ), -(1:cJ)]
+        idx <- t(M3)[upper.tri(M3, diag = diag)]
+        ret[idx,] <- Lower_tri(ds$invchol, diag = diag)
+
+        ret <- ltMatrices(ret, diag = diag, byrow = TRUE)
+        if (!diag) diagonals(ret) <- 0
+        ret <- ltMatrices(ret, byrow = byrow_orig)
+
+        ### post differentiate mean 
+        aL <- as.array(invchol)[-(1:cJ), 1:cJ,,drop = FALSE]
+        lst <- tmp0[rep(1:dJ, cJ),,drop = FALSE]
+        if (dim(aL)[3] == 1)
+              aL <- aL[,,rep(1, ncol(lst)), drop = FALSE]
+        dim <- dim(aL)
+        dobs <- -margin.table(aL * array(lst, dim = dim), 2:3)
+
+        ret <- c(list(invchol = ret, obs = cs$obs + dobs), 
+                 ds[c("lower", "upper")])
+        ret$mean <- rbind(-ret$obs, ds$mean)
+        return(ret)
+        
+    }
+
+    invchol <- solve(chol)
+    ret <- sldpmvnorm(obs = obs, lower = lower, upper = upper, 
+                      mean = mean, invchol = invchol, logLik = logLik, ...)
+    ### this means: ret$chol <- - vectrick(invchol, ret$invchol, invchol)
+    ret$chol <- as.chol(- vectrick(invchol, ret$invchol))
+    ret$invchol <- NULL
+    return(ret)
+}
+
+# deperma
+
+deperma <- function(chol = solve(invchol), 
+                    permuted_chol = solve(permuted_invchol), 
+                    invchol, permuted_invchol, perm, score_schol) {
+
+    # deperma input checks chol
+    
+    stopifnot(is.ltMatrices(chol))  ### NOTE: replace with is.chol
+    byrow_orig <- attr(chol, "byrow")
+    chol <- ltMatrices(chol, byrow = FALSE)
+    stopifnot(is.ltMatrices(permuted_chol)) ### NOTE: replace with is.chol
+    permuted_chol <- ltMatrices(permuted_chol, byrow = FALSE)
+    stopifnot(max(abs(dim(chol) - dim(permuted_chol))) == 0)
+    J <- dim(chol)[2L]
+    stopifnot(attr(chol, "diag"))
+    INVCHOL <- !missing(invchol)
+    
+    # deperma input checks perm
+    
+    if (missing(perm)) return(score_schol)
+    stopifnot(isTRUE(all.equal(sort(perm), 1:J)))
+    if (max(abs(perm - 1:J)) == 0) return(score_schol)
+    
+    # deperma input checks schol
+    
+    if (is.ltMatrices(score_schol)) { 
+        byrow_orig_s <- attr(score_schol, "byrow")
+        score_schol <- ltMatrices(score_schol, byrow = FALSE)
+        ### don't do this here!
+        ### if (INVCHOL) score_schol <- -vectrick(permuted_invchol, score_schol)
+        score_schol <- unclass(score_schol) ### this preserves byrow
+    }
+    stopifnot(is.matrix(score_schol))
+    N <- ncol(score_schol)
+    stopifnot(J * (J + 1) / 2 == nrow(score_schol))
+    
+
+    # deperma indices
+    
+    idx <- matrix(1:J^2, nrow = J, ncol = J)        ### assuming byrow = TRUE
+    tidx <- c(t(idx))
+    ltT <- idx[lower.tri(idx, diag = TRUE)]
+    P <- matrix(0, nrow = J, ncol = J)
+    P[cbind(1:J, perm)] <- 1
+    ID <- diag(J)
+    IDP <- (ID %x% P)
+    
+
+    Nc <- dim(chol)[1L]
+    mC <- as.array(chol)[perm,,,drop = FALSE]
+    Ct <- as.array(permuted_chol)
+    ret <- lapply(1:Nc, function(i) {
+        B1 <- (mC[,,i] %x% ID) + (ID %x% mC[,,i])[,tidx]
+        #                                        ^^^^^^^ <- d t(A) / d A
+        B1 <- B1 %*% IDP
+        B1 <- B1[,ltT] ### relevant columns of B1
+        B2 <- (Ct[,,i] %x% ID) + (ID %x% Ct[,,i])[,tidx]
+        B2 <- B2[,ltT] ### relevant columns of B2
+        B3 <- try(solve(crossprod(B2), crossprod(B2, B1)))
+        if (inherits(B3, "try-error")) 
+            stop("failure computing permutation score")
+        if (Nc == 1L)
+            return(crossprod(score_schol, B3))
+        return(crossprod(score_schol[,i,drop = FALSE], B3))
+    })
+    ret <- do.call("rbind", ret)
+    ret <-ltMatrices(t(ret), diag = TRUE, byrow = FALSE)
+    if (INVCHOL)
+        ret <- -vectrick(chol, ret)
+    ret <- ltMatrices(ret, byrow = byrow_orig_s)
+    return(ret)
+}
+
+# standardize
+
+standardize <- function(chol, invchol) {
+    stopifnot(xor(missing(chol), missing(invchol)))
+    if (!missing(invchol)) {
+        stopifnot(!attr(invchol, "diag"))
+        return(invcholD(invchol))
+    }
+    stopifnot(!attr(chol, "diag"))
+    return(Dchol(chol))
+}
+
+# destandardize
+
+destandardize <- function(chol = solve(invchol), invchol, score_schol)
+{
+    stopifnot(is.ltMatrices(chol))      ### NOTE: replace with is.chol
+    J <- dim(chol)[2L]
+    stopifnot(!attr(chol, "diag"))
+    byrow_orig <- attr(chol, "byrow")
+    chol <- ltMatrices(chol, byrow = FALSE)
+    
+    ### TODO: check byrow in score_schol?
+
+    if (is.ltMatrices(score_schol))
+        score_schol <- matrix(as.array(score_schol), 
+                              nrow = dim(score_schol)[2L]^2)
+    stopifnot(is.matrix(score_schol))
+    N <- ncol(score_schol)
+    stopifnot(J^2 == nrow(score_schol))
+
+    CCt <- Tcrossprod(chol, diag_only = TRUE)
+    DC <- Dchol(chol, D = Dinv <- 1 / sqrt(CCt))
+    SDC <- solve(DC)
+
+    IDX <- t(M <- matrix(1:J^2, nrow = J, ncol = J))
+    i <- cumsum(c(1, rep(J + 1, J - 1)))
+    ID <- diagonals(as.integer(J), byrow = FALSE)
+    if (dim(ID)[1L] != dim(chol)[1L])
+        ID <- ID[rep(1, dim(chol)[1L]),]
+
+    B <- vectrick(ID, score_schol, chol)
+    B[i,] <- B[i,] * (-.5) * c(CCt)^(-3/2)
+    B[-i,] <- 0
+
+    Dtmp <- Dchol(ID, D = Dinv)
+
+    ret <- vectrick(ID, B, chol, transpose = c(TRUE, FALSE)) +
+           vectrick(chol, B, ID)[IDX,] +
+           vectrick(Dtmp, score_schol, ID)
+
+    if (!missing(invchol)) {
+        ### this means: ret <- - vectrick(chol, ret, chol)
+        ret <- - vectrick(chol, ret)
+    }
+    ret <- ret[M[lower.tri(M)],,drop = FALSE]
+    if (!is.null(dimnames(chol)[[1L]]))
+        colnames(ret) <- dimnames(chol)[[1L]]
+    ret <- ltMatrices(ret,
+                      diag = FALSE, byrow = FALSE, 
+                      names = dimnames(chol)[[2L]])
+    ret <- ltMatrices(ret, byrow = byrow_orig)
+    diagonals(ret) <- 0
     return(ret)
 }
 
