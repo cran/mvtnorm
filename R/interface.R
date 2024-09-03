@@ -87,7 +87,9 @@ simulate.mvnorm <- function(object, nsim = dim(object$scale)[1L], seed = NULL,
     } else {
         Y <- solve(object$scale, Z)
     }
-    ret <- Y + c(object$mean)
+    ret <- Y
+    if (!is.null(object$mean))
+        ret <- ret + c(object$mean)
     rownames(ret) <- dimnames(object$scale)[[2L]]
     if (!as.data.frame)
         return(ret)
