@@ -879,7 +879,8 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 > cS <- Sigma[-j, -j] - Sigma[-j, j, drop = FALSE] %*% 
 +     solve(Sigma[j, j]) %*% Sigma[j, -j, drop = FALSE]
 
-> cmv <- cond_mvnorm(chol = lxd[1, ], which = j, given = y)
+> cmv <- cond_mvnorm(chol = lxd[1, ], which_given = j, 
++     given = y)
 
 > chk(cm, cmv$mean)
 
@@ -897,7 +898,7 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 > cS <- Sigma[-j, -j] - Sigma[-j, j, drop = FALSE] %*% 
 +     solve(Sigma[j, j]) %*% Sigma[j, -j, drop = FALSE]
 
-> cmv <- cond_mvnorm(invchol = lxd[1, ], which = j, 
+> cmv <- cond_mvnorm(invchol = lxd[1, ], which_given = j, 
 +     given = y)
 
 > chk(cm, cmv$mean)
@@ -917,7 +918,8 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 > cS <- Sigma[-j, -j] - Sigma[-j, j, drop = FALSE] %*% 
 +     solve(Sigma[j, j]) %*% Sigma[j, -j, drop = FALSE]
 
-> cmv <- cond_mvnorm(chol = lxd[1, ], which = j, given = y)
+> cmv <- cond_mvnorm(chol = lxd[1, ], which_given = j, 
++     given = y)
 
 > chk(c(cm), c(cmv$mean))
 
@@ -935,7 +937,7 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 > cS <- Sigma[-j, -j] - Sigma[-j, j, drop = FALSE] %*% 
 +     solve(Sigma[j, j]) %*% Sigma[j, -j, drop = FALSE]
 
-> cmv <- cond_mvnorm(invchol = lxd[1, ], which = j, 
+> cmv <- cond_mvnorm(invchol = lxd[1, ], which_given = j, 
 +     given = y)
 
 > chk(c(cm), c(cmv$mean))
@@ -972,7 +974,7 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > md <- marg_mvnorm(invchol = lt, which = j)
 
-> cd <- cond_mvnorm(invchol = lt, which = j, given = Y[j, 
+> cd <- cond_mvnorm(invchol = lt, which_given = j, given = Y[j, 
 +     ])
 
 > ll3 <- sum(dnorm(Mult(md$invchol, Y[j, ]), log = TRUE)) + 
@@ -1465,12 +1467,12 @@ attr(,"rcnames")
 3 0.34222 0.08992 1.36055 0.08104
 4 0.01609 0.84310 0.08104 1.63302
 
-> c(cond_mvnorm(chol = C, which = 2:J, given = diag(J - 
+> c(cond_mvnorm(chol = C, which_given = 2:J, given = diag(J - 
 +     1))$mean)
 [1]  0.2602  0.2270 -0.1299
 
 > c(cond_mvnorm(chol = aperm(as.chol(C), perm = c(2:J, 
-+     1)), which = 1:(J - 1), given = diag(J - 1))$mean)
++     1)), which_given = 1:(J - 1), given = diag(J - 1))$mean)
 [1]  0.2602  0.2270 -0.1299
 
 > x <- as.array(chol2pre(aperm(as.chol(C), perm = c(2:J, 
@@ -1514,8 +1516,8 @@ attr(,"rcnames")
 
 > rC <- ltMatrices(rC, diag = TRUE)
 
-> rbeta <- cond_mvnorm(chol = rC, which = 2:J, given = diag(J - 
-+     1))$mean
+> rbeta <- cond_mvnorm(chol = rC, which_given = 2:J, 
++     given = diag(J - 1))$mean
 
 > sqrt(rowMeans((rbeta - rowMeans(rbeta))^2))
 [1] 0.08793 0.04869 0.07752
@@ -1540,7 +1542,7 @@ attr(,"rcnames")
 
 > if (require("numDeriv", quietly = TRUE)) chk(grad(ll_cd, 
 +     start, J = J), sc_cd(start, J = J), check.attributes = FALSE, 
-+     tol = 1e-06)
++     tolerance = 1e- .... [TRUNCATED] 
 
 > op <- optim(start, fn = ll_cd, gr = sc_cd, J = J, 
 +     method = "L-BFGS-B", lower = llim, control = list(trace = FALSE))
@@ -1589,7 +1591,7 @@ attr(,"rcnames")
 
 > if (require("numDeriv", quietly = TRUE)) chk(grad(ll_ap, 
 +     start, J = J), sc_ap(start, J = J), check.attributes = FALSE, 
-+     tol = 1e-06)
++     tolerance = 1e- .... [TRUNCATED] 
 
 > op <- optim(start, fn = ll_ap, gr = sc_ap, J = J, 
 +     method = "L-BFGS-B", lower = llim, control = list(trace = FALSE))
@@ -1786,7 +1788,8 @@ attr(,"class")
 
 > gm <- t(iris[, vars[-(j)]])
 
-> iris_cmvn <- condDist(iris_mvn, which = vars[j], given = gm)
+> iris_cmvn <- condDist(iris_mvn, which_given = vars[j], 
++     given = gm)
 
 > logLik(object = iris_cmvn, obs = t(iris[, vars[-j]]))
 [1] -4782
@@ -1850,7 +1853,7 @@ Sepal.Length  Sepal.Width Petal.Length  Petal.Width
 
 > v1 <- vars[1]
 
-> q1 <- quantile(iris[[v1]], prob = 1:4/5)
+> q1 <- quantile(iris[[v1]], probs = 1:4/5)
 
 > head(f1 <- cut(iris[[v1]], breaks = c(-Inf, q1, Inf)))
 [1] (5,5.6]  (-Inf,5] (-Inf,5] (-Inf,5] (-Inf,5] (5,5.6] 
@@ -1909,7 +1912,144 @@ Sepal.Length  Sepal.Width Petal.Length  Petal.Width
 Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
        5.843        3.057        3.758        1.199 
 
+> N <- 3
+
+> J <- 4
+
+> L <- ltMatrices(runif(J * (J + 1)/2), diag = TRUE, 
++     names = LETTERS[1:J])
+
+> Z <- matrix(rnorm(J * N), nrow = J)
+
+> Y <- solve(L, Z)
+
+> lwrA <- matrix(-1, nrow = 1, ncol = N)
+
+> uprA <- matrix(1, nrow = 1, ncol = N)
+
+> rownames(lwrA) <- rownames(uprA) <- "A"
+
+> lwrB <- matrix(-Inf, nrow = 1, ncol = N)
+
+> uprB <- matrix(Inf, nrow = 1, ncol = N)
+
+> rownames(lwrB) <- rownames(uprB) <- "B"
+
+> lwr <- rbind(lwrA, lwrB)
+
+> upr <- rbind(uprA, uprB)
+
+> obs <- Y[rev(LETTERS[3:J]), ]
+
+> w <- matrix(runif(1000), nrow = 1)
+
+> lABCD <- logLik(mvnorm(invchol = L), obs = obs, lower = lwr, 
++     upper = upr, w = w)
+
+> sABCD <- lLgrad(mvnorm(invchol = L), obs = obs, lower = lwr, 
++     upper = upr, w = w)
+
+> lACD <- logLik(mvnorm(invchol = L), obs = obs, lower = lwrA, 
++     upper = uprA)
+
+> sACD <- lLgrad(mvnorm(invchol = L), obs = obs, lower = lwrA, 
++     upper = uprA)
+
+> chk(lABCD, lACD)
+
+> nm <- names(sABCD)
+
+> nm <- nm[!nm %in% c("lower", "upper")]
+
+> chk(sABCD[nm], sACD[nm])
+
+> chk(sABCD$lower["A", , drop = FALSE], sACD$lower)
+
+> chk(sABCD$upper["A", , drop = FALSE], sACD$upper)
+
+> sABCD$lower["B", ]
+[1] 0 0 0
+
+> sABCD$upper["B", ]
+[1] 0 0 0
+
+> J <- 6
+
+> K <- 3
+
+> B <- matrix(rnorm(J * K), nrow = J)
+
+> D <- runif(J)
+
+> S <- tcrossprod(B) + diag(D)
+
+> Linv <- t(chol(S))
+
+> Linv <- ltMatrices(Linv[lower.tri(Linv, diag = TRUE)], 
++     diag = TRUE)
+
+> a <- -(2 + runif(J))
+
+> b <- 2 + runif(J)
+
+> M <- 1e+06
+
+> dim(w <- matrix(runif((J - 1) * M), nrow = J - 1))
+[1]       5 1000000
+
+> lpmvnorm(lower = a, upper = b, chol = Linv, w = w)
+[1] -1.138
+
+> dim(Z <- matrix(rnorm(K * M), nrow = K))
+[1]       3 1000000
+
+> lpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+[1] -1.139
+
+> smv <- slpmvnorm(lower = a, upper = b, chol = Linv, 
++     w = w)
+
+> sRR <- slpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+
+> chk(c(smv$lower), sRR$lower, tolerance = 0.01)
+
+> chk(c(smv$upper), sRR$upper, tolerance = 0.01)
+
+> chk(c(smv$mean), sRR$mean, tolerance = 0.01)
+
+> Z <- matrix(rnorm(K * 1000), nrow = K)
+
+> lB <- function(B) lpRR(lower = a, upper = b, B = B, 
++     D = D, Z = Z)
+
+> gB <- grad(lB, B)
+
+> sRR <- slpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+
+> chk(gB, c(sRR$B), tolerance = 0.001)
+
+> lD <- function(D) lpRR(lower = a, upper = b, B = B, 
++     D = D, Z = Z)
+
+> gD <- grad(lD, D)
+
+> chk(gD, c(sRR$D), tolerance = 0.001)
+
+> llwr <- function(a) lpRR(lower = a, upper = b, B = B, 
++     D = D, Z = Z)
+
+> glwr <- grad(llwr, a)
+
+> chk(glwr, c(sRR$lower))
+
+> lupr <- function(b) lpRR(lower = a, upper = b, B = B, 
++     D = D, Z = Z)
+
+> gupr <- grad(lupr, b)
+
+> chk(gupr, c(sRR$upper))
+
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
- 11.414   0.061  11.476 
+ 14.835   0.239  15.073 

@@ -660,7 +660,7 @@ cm <- Sigma[-j, j,drop = FALSE] %*% solve(Sigma[j,j]) %*%  y
 cS <- Sigma[-j, -j] - Sigma[-j,j,drop = FALSE] %*% 
       solve(Sigma[j,j]) %*% Sigma[j,-j,drop = FALSE]
 
-cmv <- cond_mvnorm(chol = lxd[1,], which = j, given = y)
+cmv <- cond_mvnorm(chol = lxd[1,], which_given = j, given = y)
 
 chk(cm, cmv$mean)
 chk(cS, as.array(Tcrossprod(cmv$chol))[,,1])
@@ -673,7 +673,7 @@ cm <- Sigma[-j, j,drop = FALSE] %*% solve(Sigma[j,j]) %*%  y
 cS <- Sigma[-j, -j] - Sigma[-j,j,drop = FALSE] %*% 
       solve(Sigma[j,j]) %*% Sigma[j,-j,drop = FALSE]
 
-cmv <- cond_mvnorm(invchol = lxd[1,], which = j, given = y)
+cmv <- cond_mvnorm(invchol = lxd[1,], which_given = j, given = y)
 
 chk(cm, cmv$mean)
 chk(cS, as.array(Tcrossprod(solve(cmv$invchol)))[,,1])
@@ -690,7 +690,7 @@ cm <- Sigma[-j, j,drop = FALSE] %*% solve(Sigma[j,j]) %*%  y
 cS <- Sigma[-j, -j] - Sigma[-j,j,drop = FALSE] %*% 
       solve(Sigma[j,j]) %*% Sigma[j,-j,drop = FALSE]
 
-cmv <- cond_mvnorm(chol = lxd[1,], which = j, given = y)
+cmv <- cond_mvnorm(chol = lxd[1,], which_given = j, given = y)
 
 chk(c(cm), c(cmv$mean))
 chk(cS, as.array(Tcrossprod(cmv$chol))[,,1])
@@ -703,7 +703,7 @@ cm <- Sigma[-j, j,drop = FALSE] %*% solve(Sigma[j,j]) %*%  y
 cS <- Sigma[-j, -j] - Sigma[-j,j,drop = FALSE] %*% 
       solve(Sigma[j,j]) %*% Sigma[j,-j,drop = FALSE]
 
-cmv <- cond_mvnorm(invchol = lxd[1,], which = j, given = y)
+cmv <- cond_mvnorm(invchol = lxd[1,], which_given = j, given = y)
 
 chk(c(cm), c(cmv$mean))
 chk(cS, as.array(Tcrossprod(solve(cmv$invchol)))[,,1])
@@ -739,7 +739,7 @@ chk(ll1, ll3)
 ## marginal of and conditional on these
 (j <- 1:5 * 10)
 md <- marg_mvnorm(invchol = lt, which = j)
-cd <- cond_mvnorm(invchol = lt, which = j, given = Y[j,])
+cd <- cond_mvnorm(invchol = lt, which_given = j, given = Y[j,])
 
 ll3 <- sum(dnorm(Mult(md$invchol, Y[j,]), log = TRUE)) + 
        sum(log(diagonals(md$invchol))) +
@@ -1249,14 +1249,14 @@ Shat                      ### "exact" obs
 ###################################################
 ### code chunk number 68: regressions
 ###################################################
-c(cond_mvnorm(chol = C, which = 2:J, given = diag(J - 1))$mean)
+c(cond_mvnorm(chol = C, which_given = 2:J, given = diag(J - 1))$mean)
 
 
 ###################################################
 ### code chunk number 69: regressionsC
 ###################################################
 c(cond_mvnorm(chol = aperm(as.chol(C), perm = c(2:J, 1)),
-              which = 1:(J - 1), given = diag(J - 1))$mean)
+              which_given = 1:(J - 1), given = diag(J - 1))$mean)
 
 
 ###################################################
@@ -1311,7 +1311,7 @@ rC <- ltMatrices(rC, diag = TRUE)
 ###################################################
 ### code chunk number 76: ML-beta
 ###################################################
-rbeta <- cond_mvnorm(chol = rC, which = 2:J, given = diag(J - 1))$mean
+rbeta <- cond_mvnorm(chol = rC, which_given = 2:J, given = diag(J - 1))$mean
 sqrt(rowMeans((rbeta - rowMeans(rbeta))^2))
 
 
@@ -1352,7 +1352,7 @@ sc_cd <- function(parm, J) {
 ###################################################
 if (require("numDeriv", quietly = TRUE))
     chk(grad(ll_cd, start, J = J), sc_cd(start, J = J), 
-        check.attributes = FALSE, tol = 1e-6)
+        check.attributes = FALSE, tolerance = 1e-6)
 
 
 ###################################################
@@ -1415,7 +1415,7 @@ sc_ap <- function(parm, J) {
 ###################################################
 if (require("numDeriv", quietly = TRUE))
     chk(grad(ll_ap, start, J = J), sc_ap(start, J = J), 
-        check.attributes = FALSE, tol = 1e-6)
+        check.attributes = FALSE, tolerance = 1e-6)
 
 
 ###################################################
@@ -1544,7 +1544,7 @@ iris_var <- simulate(iris_mvn, nsim = nrow(iris))
 j <- 3:4
 margDist(iris_mvn, which = vars[j])
 gm <- t(iris[,vars[-(j)]])
-iris_cmvn <- condDist(iris_mvn, which = vars[j], given = gm)
+iris_cmvn <- condDist(iris_mvn, which_given = vars[j], given = gm)
 
 
 ###################################################
@@ -1604,7 +1604,7 @@ m
 ### code chunk number 97: iris-interval
 ###################################################
 v1 <- vars[1]
-q1 <- quantile(iris[[v1]], prob = 1:4 / 5)
+q1 <- quantile(iris[[v1]], probs = 1:4 / 5)
 head(f1 <- cut(iris[[v1]], breaks = c(-Inf, q1, Inf)))
 
 
@@ -1634,5 +1634,109 @@ chol2cov(ML$scale)
 ### mean
 MLi$mean[,,drop = TRUE]
 ML$mean[,,drop = TRUE]
+
+
+###################################################
+### code chunk number 100: marginB
+###################################################
+N <- 3
+J <- 4
+L <- ltMatrices(runif(J * (J + 1) / 2), diag = TRUE, names = LETTERS[1:J])
+Z <- matrix(rnorm(J * N), nrow = J)
+Y <- solve(L, Z)
+
+lwrA <- matrix(-1, nrow = 1, ncol = N)
+uprA <- matrix(1, nrow = 1, ncol = N)
+rownames(lwrA) <- rownames(uprA) <- "A"
+
+lwrB <- matrix(-Inf, nrow = 1, ncol = N)
+uprB <- matrix(Inf, nrow = 1, ncol = N)
+rownames(lwrB) <- rownames(uprB) <- "B"
+
+lwr <- rbind(lwrA, lwrB)
+upr <- rbind(uprA, uprB)
+obs <- Y[rev(LETTERS[3:J]),]    ### change order of dimensions
+
+
+###################################################
+### code chunk number 101: marginBllsc
+###################################################
+w <- matrix(runif(1000), nrow = 1)
+lABCD <- logLik(mvnorm(invchol = L), obs = obs, lower = lwr, upper = upr, w = w)
+sABCD <- lLgrad(mvnorm(invchol = L), obs = obs, lower = lwr, upper = upr, w = w)
+
+
+###################################################
+### code chunk number 102: marginllsc
+###################################################
+lACD <- logLik(mvnorm(invchol = L), obs = obs, lower = lwrA, upper = uprA)
+sACD <- lLgrad(mvnorm(invchol = L), obs = obs, lower = lwrA, upper = uprA)
+
+
+###################################################
+### code chunk number 103: marginchk
+###################################################
+chk(lABCD, lACD)
+nm <- names(sABCD)
+nm <- nm[!nm %in% c("lower", "upper")]
+chk(sABCD[nm], sACD[nm])
+
+
+###################################################
+### code chunk number 104: marginsc
+###################################################
+chk(sABCD$lower["A",,drop = FALSE], sACD$lower)
+chk(sABCD$upper["A",,drop = FALSE], sACD$upper)
+sABCD$lower["B",]	### zero
+sABCD$upper["B",]	### zero
+
+
+###################################################
+### code chunk number 105: RR-ll
+###################################################
+J <- 6
+K <- 3
+B <- matrix(rnorm(J * K), nrow = J)
+D <- runif(J)
+S <- tcrossprod(B) + diag(D)
+Linv <- t(chol(S))
+Linv <- ltMatrices(Linv[lower.tri(Linv, diag = TRUE)], diag = TRUE)
+a <- -(2 + runif(J))
+b <- 2 + runif(J)
+M <- 1e6
+dim(w <- matrix(runif((J - 1) * M), nrow = J - 1))
+lpmvnorm(lower = a, upper = b, chol = Linv, w = w)
+dim(Z <- matrix(rnorm(K * M), nrow = K))
+lpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+
+
+###################################################
+### code chunk number 106: RR-sc
+###################################################
+smv <- slpmvnorm(lower = a, upper = b, chol = Linv, w = w)
+sRR <- slpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+chk(c(smv$lower), sRR$lower, tolerance = 1e-2)
+chk(c(smv$upper), sRR$upper, tolerance = 1e-2)
+chk(c(smv$mean), sRR$mean, tolerance = 1e-2)
+
+
+###################################################
+### code chunk number 107: RR-sc-BD
+###################################################
+Z <- matrix(rnorm(K * 1000), nrow = K)
+lB <- function(B) lpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+gB <- grad(lB, B)
+sRR <- slpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+chk(gB, c(sRR$B), tolerance = 1e-3)
+lD <- function(D) lpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+gD <- grad(lD, D)
+chk(gD, c(sRR$D), tolerance = 1e-3)
+### while we are at it, check lower and again
+llwr <- function(a) lpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+glwr <- grad(llwr, a)
+chk(glwr, c(sRR$lower))
+lupr <- function(b) lpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+gupr <- grad(lupr, b)
+chk(gupr, c(sRR$upper))
 
 

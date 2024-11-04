@@ -505,7 +505,7 @@ sldpmvnorm <- function(obs, lower, upper, mean = 0, chol, invchol,
         stopifnot(cJ + dJ == J)
 
         md <- marg_mvnorm(invchol = invchol, which = 1:cJ)
-        cs <- sldmvnorm(obs = obs, mean = cmean, invchol = md$invchol)
+        cs <- sldmvnorm(obs = obs, mean = cmean, invchol = md$invchol, logLik = logLik)
 
         obs_cmean <- obs - cmean
         cd <- cond_mvnorm(invchol = invchol, which_given = 1:cJ, 
@@ -547,6 +547,7 @@ sldpmvnorm <- function(obs, lower, upper, mean = 0, chol, invchol,
 
         ret <- c(list(invchol = ret, obs = cs$obs + dobs), 
                  ds[c("lower", "upper")])
+        if (logLik) ret$logLik <- cs$logLik + ds$logLik
         ret$mean <- rbind(-ret$obs, ds$mean)
         return(ret)
         
@@ -699,5 +700,129 @@ destandardize <- function(chol = solve(invchol), invchol, score_schol)
     ret <- ltMatrices(ret, byrow = byrow_orig)
     diagonals(ret) <- 0
     return(ret)
+}
+
+# lpRR
+
+lpRR <- function(lower, upper, mean = 0, B, D = rep(1, nrow(B)), 
+                 Z, weights = 1 / ncol(Z), log.p = TRUE) {
+
+    # RR input B D
+    
+    stopifnot(!missing(B))
+    if (!is.matrix(B)) B <- matrix(B, ncol = 1)
+    J <- nrow(B)
+    K <- ncol(B)
+    Dsqrt <- sqrt(D)
+    
+    # RR input Z, weights
+    
+    stopifnot(nrow(Z) == K)
+    stopifnot(length(weights) == 1 || length(weights) == ncol(Z))
+    BZ <- (B / Dsqrt) %*% Z
+    
+    # RR input lower
+    
+    if (missing(lower)) {
+        pl <- 0
+    } else {
+        stopifnot(length(lower) == J)
+        lower <- c(lower)
+        lower <- (lower - mean) / Dsqrt
+        pl <- pnorm(lBZ <- lower - BZ)
+    }
+    
+    # RR input upper
+    
+    if (missing(upper)) {
+        pl <- 0
+    } else {
+        stopifnot(length(upper) == J)
+        upper <- c(upper)
+        upper <- (upper - mean) / Dsqrt
+        pu <- pnorm(uBZ <- upper - BZ)
+    }
+    
+
+    # RR inner
+    
+    inner <- pu - pl
+    inner <- pmax(0, inner)
+    retw <-  weights * exp(.colSums(m = J, n = ncol(Z), 
+                                    x = log(inner), na.rm = TRUE))
+    
+    ret <- sum(retw)
+    if (log.p) return(log(max(c(0, ret))))
+    return(ret)
+}
+
+# slpRR
+
+slpRR <- function(lower, upper, mean = 0, B, D = rep(1, nrow(B)), 
+                  Z, weights = 1 / ncol(Z), log.p = TRUE) {
+    # RR input B D
+    
+    stopifnot(!missing(B))
+    if (!is.matrix(B)) B <- matrix(B, ncol = 1)
+    J <- nrow(B)
+    K <- ncol(B)
+    Dsqrt <- sqrt(D)
+    
+    # RR input Z, weights
+    
+    stopifnot(nrow(Z) == K)
+    stopifnot(length(weights) == 1 || length(weights) == ncol(Z))
+    BZ <- (B / Dsqrt) %*% Z
+    
+    # RR input lower
+    
+    if (missing(lower)) {
+        pl <- 0
+    } else {
+        stopifnot(length(lower) == J)
+        lower <- c(lower)
+        lower <- (lower - mean) / Dsqrt
+        pl <- pnorm(lBZ <- lower - BZ)
+    }
+    
+    # RR input upper
+    
+    if (missing(upper)) {
+        pl <- 0
+    } else {
+        stopifnot(length(upper) == J)
+        upper <- c(upper)
+        upper <- (upper - mean) / Dsqrt
+        pu <- pnorm(uBZ <- upper - BZ)
+    }
+    
+
+    # RR inner
+    
+    inner <- pu - pl
+    inner <- pmax(0, inner)
+    retw <-  weights * exp(.colSums(m = J, n = ncol(Z), 
+                                    x = log(inner), na.rm = TRUE))
+    
+ 
+    dlBZ <- dnorm(lBZ)
+    duBZ <- dnorm(uBZ)
+
+    d <- matrix(retw, nrow = nrow(B), ncol = ncol(Z), byrow = TRUE) / inner
+    db <- d * (duBZ - dlBZ)
+    tdb <- t(db)
+    dB <- -1 * do.call("cbind", lapply(1:nrow(Z), 
+                       function(r) colSums(tdb * Z[r,], na.rm = TRUE))) / Dsqrt
+    Du <- -.5 / D * uBZ
+    Dl <- -.5 / D * lBZ
+    dD <-  rowSums(d * duBZ * Du, na.rm = TRUE) - 
+           rowSums(d * dlBZ * Dl, na.rm = TRUE)
+    dl <- -rowSums(d * dlBZ, na.rm = TRUE) / Dsqrt
+    du <-  rowSums(d * duBZ, na.rm = TRUE) / Dsqrt
+    dm <- -du - dl # Dinb %*% -rowSums(d * (duBZ - dlBZ))
+    fct <- 1
+    if (log.p) fct <- 1 / sum(retw)
+    list(lower = fct * dl, upper = fct * du, mean = fct * dm, 
+         B = fct * dB, D = fct * dD)
 }
 
