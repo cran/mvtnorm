@@ -1,4 +1,4 @@
-9dd3b98a94943e54e44d0a3643a47f6f *DESCRIPTION
+1663f0ead8124398313d0a7266d5b51f *DESCRIPTION
 220df6edac9f01406b413d81b3e96b6d *NAMESPACE
 8b53e45c66d7df2cbc42475cb3f5c613 *R/interface.R
 661604bb36e1ea49c8eec5dc595c0f3f *R/lpmvnorm.R
@@ -7,7 +7,7 @@ ca05e05ca25ae52b9a8630f2b698fbf7 *R/mvnorm.R
 27cb73940c326c1e2bc4e7b294895eeb *R/mvt.R
 ccd0495f9e9ad30e9f136c5c41cc3a03 *R/noisy-root.R
 468c054d0ef43dd8e7835772599869e3 *R/tvpack.R
-17f4d49a797c1b049c5d0384c89d13ad *build/partial.rdb
+b1f05f19cf3350d37392dcc8a824bc68 *build/partial.rdb
 32538cf12d9b48846153e7a40e17b2b7 *build/vignette.rds
 3d99dd47f69e76b29b9c3d6f161567cf *cleanup
 2a44eee6dc12d03d74f49d257fe871a3 *inst/CITATION
@@ -16,14 +16,14 @@ ca4c35956e7a8aa253e2c52cd49f0d99 *inst/C_API_Example/NAMESPACE
 990127bb625b41c7181a653020e3f6a9 *inst/C_API_Example/R/test.R
 5c4bbffc1a0108c090cfa2dbb1918d2d *inst/C_API_Example/src/test.c
 64fd633725dcd93cdd836e3535f19788 *inst/C_API_Example/tests/test.R
-8830784f51752c8ab2a6224fc56cd8a1 *inst/NEWS.Rd
+cd47f6d21fa16324328505bffe406fcb *inst/NEWS.Rd
 18cb4997813a62c609ac2519f4013a4b *inst/NEWS.old
 1b063d23365215f4e5822ba94010c85c *inst/doc/MVT_Rnews.R
 8f949c53fd5c9bfbf8f0949c949a6682 *inst/doc/MVT_Rnews.Rnw
-852e0a4c8c451a1831fb19cf49f23b0c *inst/doc/MVT_Rnews.pdf
+8d2fbae7797b2165ed43649c08c7f79d *inst/doc/MVT_Rnews.pdf
 0259358272d3688627e1c8f3d6390f62 *inst/doc/lmvnorm_src.R
 a6bdb63c62cb006de0d5f93ebeda707a *inst/doc/lmvnorm_src.Rnw
-273b2ec171434b6cede5f1242bd745f3 *inst/doc/lmvnorm_src.pdf
+f05956ca54804831cc467aead90b2e7f *inst/doc/lmvnorm_src.pdf
 c01fca8c2a532bb50cedc724d28a4019 *inst/include/mvtnorm.h
 2ac853ab98c7223bbca7e418096966fb *inst/include/mvtnormAPI.h
 371845c2011c4e02d1bbd1177f5b4497 *inst/litdb.bib
@@ -45,7 +45,7 @@ bca5c4987a057c2a6bab0cd6bbebed5b *src/C_FORTRAN_interface.c
 565f028eade9d79e1004774bebc1ff16 *src/lpmvnorm.c
 d971c269cdc4d2ef4606bd59e06ec63f *src/ltMatrices.c
 f64456aad2c956a18af275f09a013bb3 *src/miwa.c
-b46cb432899a2857561790e63a41396a *src/miwa.h
+f49d99b171c5d4b79c4fcd6bc60e9ffd *src/miwa.h
 b9866a363a76d1fa0ae89a5d88142379 *src/mvt.f
 7033d85bd4da4e4c09f5c6460cb25a3f *src/mvtnorm-init.c
 c01fca8c2a532bb50cedc724d28a4019 *src/mvtnorm.h

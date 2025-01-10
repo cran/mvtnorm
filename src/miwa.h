@@ -24,7 +24,13 @@
 #include <Rinternals.h>
 
 #define MAXM    20    /* maximum dimension size  */
-#define MAXGRD  4097  /* maximum number of grid points */
+#define MAXGRD  4098  /* maximum number of grid points */
+/* TH: was: MAXGRD 4097 and thus (miwa.c line 56) z[MAXM][MAXGRD] ...
+   mvnorm::Miwa(steps) fails if (steps > 4097)
+   however, miwa.c:92 iterates until k <= steps 
+   this fails if steps == 4097 (e.g. in pkg OptimalGoldstandardDesigns)
+   2025-01-09: increase MAXGRD by 1, thus avoiding change of the API
+*/
 
 /* normal density function */
 #define nrml_dn(X)  dnorm(X, 0, 1, 0)
