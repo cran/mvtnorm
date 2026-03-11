@@ -52,8 +52,8 @@ otherwise the individual contributions to the sum are returned.
 estimated errors is NOT implemented.
 }
   \item{w}{an optional matrix of weights with \eqn{J - 1} rows. This allows to replace the default
-Monte-Carlo procedure (Genz, 1992) with a quasi-Monte-Carlo approach (Genz &
-Bretz, 2002). Note that the same weights for evaluating the
+Monte-Carlo procedure \bibcitep{mvtnorm::numerical-:1992} with a quasi-Monte-Carlo approach
+\bibcitep{mvtnorm::Genz_Bretz_2002}. Note that the same weights for evaluating the
 multivariate normal probability are used for all observations when
 \code{ncol(w) == M} is specified. If \code{ncol(w) == ncol(lower) * M}, each
 likelihood contribution is evaluated on the corresponding sub-matrix.
@@ -78,7 +78,8 @@ as zero.
   \code{chol} over boxes defined by \code{lower} and \code{upper} or for
   exact observations \code{obs}. 
 
-  Monte-Carlo (Genz, 1992, the default) and quasi-Monte-Carlo (Genz & Bretz, 2002)
+  Monte-Carlo \bibcitep{|mvtnorm::numerical-:1992|the default} and quasi-Monte-Carlo 
+  \bibcitep{mvtnorm::Genz_Bretz_2002}
   integration is implemented, the latter with weights obtained, for example,
   from packages \pkg{qrng} or \pkg{randtoolbox}. It is the responsibility of
   the user to ensure a meaningful lattice is used. In case of doubt, use
@@ -102,16 +103,7 @@ as well as scores for \code{obs}, \code{lower}, \code{upper}, and
 \code{mean}.
 }
 \seealso{\code{\link{dmvnorm}}, \code{vignette("lmvnorm_src", package = "mvtnorm")}}
-\references{
-
-  Genz, A. (1992). Numerical computation of multivariate normal probabilities.
-  \emph{Journal of Computational and Graphical Statistics}, \bold{1}, 141--150.
-
-  Genz, A. and Bretz, F. (2002), Methods for the computation of multivariate
-  t-probabilities. \emph{Journal of Computational and Graphical Statistics},
-  \bold{11}, 950--971.
-
-}
+\references{\bibshow{*}}
 \examples{
 
   ### five observations

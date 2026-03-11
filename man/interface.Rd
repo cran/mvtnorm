@@ -10,14 +10,14 @@
 \alias{condDist}
 \alias{condDist.mvnorm}
 \title{
-    (Experimental) User Interface to Multiple Multivariate Normal Distributions
+    User Interface to Multiple Multivariate Normal Distributions
 }
 \description{
-    A (still experimental) simple user interface for computing on multiple multivariate
+    A simple user interface for computing on multiple multivariate
     normal distributions.
 }
 \usage{
-mvnorm(mean, chol, invchol)
+mvnorm(mean, invcholmean, chol, invchol)
 \S3method{aperm}{mvnorm}(a, perm, ...)
 margDist(object, which, ...)
 \S3method{margDist}{mvnorm}(object, which, ...)
@@ -59,6 +59,9 @@ condDist(object, which_given, given, ...)
 }
   \item{mean}{matrix of means (one column for each observation, length is
              recycled to length of \code{obs}, \code{lower} and \code{upper}).
+}
+  \item{invcholmean}{matrix of scaled means, that is, \code{invchol \%*\% mean}, one column for each observation, length is
+             recycled to length of \code{obs}, \code{lower} and \code{upper}.
 }
 \item{seed}{an object specifying if and how the random number generator
             should be initialized, see \code{\link[stats]{simulate}}. 

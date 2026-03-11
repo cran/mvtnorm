@@ -5,6 +5,10 @@
 
 \usepackage{hyperref}
 
+%% hyperlinked dois in jss refstyle
+\newcommand{\doi}[1]{\href{https://doi.org/#1}{\normalfont\texttt{\@doi{#1}}}}
+
+
 %%\VignetteIndexEntry{Using mvtnorm}
 
 \newcommand{\ba}{{\bf a}}
@@ -253,7 +257,7 @@ multivariate normal or $ t $ probabilities is now available
 in \textsf{R}. We hope that this is helpful to users / programmers who
 deal with multiple testing problems.
 
-\bibliographystyle{plainnat}
-\bibliography{litdb}
+\bibliographystyle{jss}
+\bibliography{\Sexpr{gsub("\\.bib", "", system.file("REFERENCES.bib", package = "mvtnorm"))}}
 
 \end{document}

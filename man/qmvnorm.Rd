@@ -53,18 +53,15 @@ qmvnorm(p, interval = NULL, tail = c("lower.tail", "upper.tail", "both.tails"),
 \details{
 
   Only equicoordinate quantiles are computed, i.e., the quantiles in each
-  dimension coincide. The result is seed dependend.
+  dimension coincide. The result is seed dependend. The concept is explained
+  in \bibcitet{mvtnorm::Bornkamp:2018}.
 }
 \value{
   A list with two components: \code{quantile} and \code{f.quantile} 
   give the location of the quantile and the difference between the distribution
   function evaluated at the quantile and \code{p}. 
 }
-\references{
-Bornkamp, B. (2018). Calculating quantiles of noisy distribution
-functions using local linear regressions. \emph{Computational
-  Statistics}, \bold{33}, 487--501.
-}
+\references{\bibshow{*}}
 \seealso{\code{\link{pmvnorm}}, \code{\link{qmvt}}}
 \examples{
 qmvnorm(0.95, sigma = diag(2), tail = "both")

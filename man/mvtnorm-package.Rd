@@ -33,7 +33,5 @@ considerably. Users interested in this functionality should
 consult the \code{lmvnorm_src} package vignette.
 
 }
+\seealso{\code{vignette("lmvnorm_src", package = "mvtnorm")}}
 \keyword{ package }
-\seealso{
-\code{vignette("lmvnorm_src", package = "mvtnorm")}
-}

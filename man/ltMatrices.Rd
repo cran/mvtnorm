@@ -3,6 +3,10 @@
 \alias{syMatrices}
 \alias{Tcrossprod}
 \alias{Crossprod}
+\alias{tcrossprod.ltMatrices}
+\alias{crossprod.ltMatrices}
+\alias{tcrossprod.syMatrices}
+\alias{crossprod.syMatrices}
 \alias{diagonals}
 \alias{Mult}
 \alias{Mult.ltMatrices}
@@ -81,6 +85,10 @@ deperma(chol = solve(invchol), permuted_chol = solve(permuted_invchol),
 \S3method{Mult}{syMatrices}(x, y, \dots)
 Tcrossprod(x, diag_only = FALSE)
 Crossprod(x, diag_only = FALSE)
+\S3method{tcrossprod}{ltMatrices}(x, y = NULL, ...)
+\S3method{tcrossprod}{syMatrices}(x, y = NULL, ...)
+\S3method{crossprod}{ltMatrices}(x, y = NULL, ...)
+\S3method{crossprod}{syMatrices}(x, y = NULL, ...)
 logdet(x)
 Lower_tri(x, diag = FALSE, byrow = attr(x, "byrow"))
 is.ltMatrices(x)
@@ -194,6 +202,7 @@ with corresponding methods. The constructor \code{syMatrices} returns objects of
   ## multiplication
   y <- matrix(runif(N * J), nrow = J)
   Mult(C, y)
+  C %*% y
 
   ## solve
   solve(C)
@@ -201,6 +210,7 @@ with corresponding methods. The constructor \code{syMatrices} returns objects of
 
   ## tcrossprod
   Tcrossprod(C)
+  tcrossprod(C)
 
   ## convert to matrix
   as.array(solve(C[1,]))[,,1]

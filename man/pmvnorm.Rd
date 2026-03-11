@@ -42,10 +42,11 @@ This program involves the computation of
 multivariate normal probabilities with arbitrary correlation matrices.
 It involves both the computation of singular and nonsingular
 probabilities. The implemented methodology is described in
-Genz (1992, 1993) (for algorithm GenzBretz), in Miwa et al. (2003)
-for algorithm Miwa (useful up to dimension 20) and Genz (2004)
-for the TVPACK algorithm (which covers 2- and 3-dimensional problems
-for semi-infinite integration regions).
+\bibcitet{mvtnorm::numerical-:1992} and \bibcitet{mvtnorm::comparison:1993} for algorithm
+\code{GenzBretz}, in \bibcitet{mvtnorm::Miwa+Hayter+Kuriki:2003} for algorithm
+\code{Miwa}, useful up to dimension 20, and \bibcitet{mvtnorm::Genz:2004}
+for the \code{TVPACK} algorithm, which covers 2- and 3-dimensional problems
+for semi-infinite integration regions.
 
 Note the default algorithm GenzBretz is randomized and hence slightly depends on
 \code{\link{.Random.seed}} and that both \code{-Inf} and \code{+Inf} may
@@ -66,6 +67,8 @@ such normal probabilities should consider function \code{\link{lpmvnorm}},
 which is more flexible and efficient for this task and comes with the
 ability to evaluate score functions.
 
+An overview is available from \bibcitet{mvtnorm::Genz_Bretz_2009}.
+
 }
 \value{
   The evaluated distribution function is returned, if \code{keepAttr} is true, with attributes
@@ -73,34 +76,7 @@ ability to evaluate score functions.
   \item{msg}{status message(s).}
   \item{algorithm}{a \code{\link{character}} string with \code{class(algorithm)}.}
 }
-\references{
-
-Genz, A. (1992). Numerical computation of multivariate normal probabilities.
-\emph{Journal of Computational and Graphical Statistics}, \bold{1}, 141--150.
-
-Genz, A. (1993). Comparison of methods for the computation of multivariate
-normal probabilities. \emph{Computing Science and Statistics}, \bold{25},
-400--405.
-
-Genz, A. (2004), Numerical computation of rectangular bivariate and
-trivariate normal and t-probabilities, \emph{Statistics and
-Computing}, \bold{14}, 251--260.
-
-Genz, A. and Bretz, F. (2009), \emph{Computation of Multivariate Normal and
-t Probabilities}. Lecture Notes in Statistics, Vol. 195. Springer-Verlag,
-Heidelberg.
-
-Miwa, T., Hayter J. and Kuriki, S. (2003).
-The evaluation of general non-centred orthant probabilities.
-\emph{Journal of the Royal Statistical Society}, Ser. B, 65, 223--234.
-
-}
-
-%%% can't validate certificate anymore
-%\source{
-%  \url{http://www.sci.wsu.edu/math/faculty/genz/homepage}
-%}
-
+\references{\bibshow{*}}
 \seealso{\code{\link{qmvnorm}} for quantiles and \code{\link{lpmvnorm}} for
 log-likelihoods.}
 

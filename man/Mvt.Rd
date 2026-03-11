@@ -28,14 +28,14 @@ dmvt(x, delta = rep(0, p), sigma = diag(p), df = 1, log = TRUE,
   \item{log}{\code{\link{logical}} indicating whether densities \eqn{d}
     are given as \eqn{\log(d)}{log(d)}.}
   \item{type}{type of the noncentral multivariate \eqn{t} distribution.
-    \code{type = "Kshirsagar"} corresponds
-    to formula (1.4) in Genz and Bretz (2009) (see also
-    Chapter 5.1 in Kotz and Nadarajah (2004)). This is the
-    noncentral t-distribution  needed for calculating
-    the power of multiple contrast tests under a normality
-    assumption. \code{type = "shifted"} corresponds to the
-    formula right before formula (1.4) in Genz and Bretz (2009)
-    (see also formula (1.1) in Kotz and Nadarajah (2004)). It
+              The choice \code{type = "Kshirsagar"} corresponds
+              to formula (1.4) in \bibcitet{mvtnorm::Genz_Bretz_2009}, see also
+              Chapter 5.1 in \bibcitet{mvtnorm::Kotz+Nadarajah:2004}. This is the
+              noncentral t-distribution needed for calculating
+              the power of multiple contrast tests under a normality
+              assumption. \code{type = "shifted"} corresponds to the
+               formula right before formula (1.4) in \bibcitet{mvtnorm::Genz_Bretz_2009}
+              \bibcitep{see also formula (1.1) in|mvtnorm::Kotz+Nadarajah:2004|}.  It
     is a location shifted version of the central t-distribution.
     This noncentral multivariate \eqn{t} distribution appears for
     example as the Bayesian posterior distribution
@@ -65,8 +65,8 @@ dmvt(x, delta = rep(0, p), sigma = diag(p), df = 1, log = TRUE,
   the correlation matrix corresponding to the scale matrix
   \eqn{\Sigma}{Sigma} (which can be computed with
   \code{\link{cov2cor}()}). Note that the scale matrix is sometimes
-  referred to as \dQuote{dispersion matrix};
-  see McNeil, Frey, Embrechts (2005, p. 74).
+  referred to as \dQuote{dispersion matrix}; 
+  see \bibcitet{mvtnorm::McNeil+Frey+Embrechts:2005}, p. 74.
 
   For \code{type = "shifted"} the density
   \deqn{c(1+(x-\delta)'S^{-1}(x-\delta)/\nu)^{-(\nu+m)/2}}
@@ -85,11 +85,7 @@ dmvt(x, delta = rep(0, p), sigma = diag(p), df = 1, log = TRUE,
   Note that \code{dmvt()} has default \code{log = TRUE}, whereas
   \code{\link{dmvnorm}()} has default \code{log = FALSE}.
 }
-\references{
-  McNeil, A. J., Frey, R., and Embrechts, P. (2005).
-  \emph{Quantitative Risk Management: Concepts, Techniques, Tools}.
-  Princeton University Press.
-}
+\references{\bibshow{*}}
 \seealso{\code{\link{pmvt}()} and \code{\link{qmvt}()}}
 \examples{
 ## basic evaluation

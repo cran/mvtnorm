@@ -2,6 +2,37 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
+\section{Changes in Version 1.3-5 (2026-03-10)}{
+  \subsection{Documentation}{
+    \itemize{
+      \item Use \code{REFERENCES.bib}.
+    }
+  }
+}
+
+\section{Changes in Version 1.3-4 (2025-09-15)}{
+  \subsection{Features}{
+    \itemize{
+      \item \code{mvnorm} gains a \code{invcholmean} argument allowing a
+             parameterisation leading to convex optimisation problems.
+      \item Added \code{zero.print = "."} argument for printing lower
+            triangular matrices.
+    }
+  }
+  \subsection{Bugfixes}{
+    \itemize{
+      \item \code{condDist()} sometimes failed to return a 
+            \code{scale} slot.
+    }
+  }
+  \subsection{Documentation}{
+    \itemize{
+      \item Explain how to use \code{condDist()} to obtain regression
+            coefficients for an example involving means.
+    }
+  }
+}
+
 \section{Changes in Version 1.3-3 (2025-01-09)}{
   \subsection{Bugfixes}{
     \itemize{

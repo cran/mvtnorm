@@ -317,6 +317,7 @@ ldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
          N <- dim(chol)[1L]
          N <- ifelse(N == 1, p, N)
          J <- dim(chol)[2L]
+         ## NOTE: obs is now mean-centered
          obs <- .check_obs(obs = obs, mean = mean, J = J, N = N)
          z <- solve(chol, obs)
          logretval <- .colSumsdnorm(z)
@@ -333,7 +334,7 @@ ldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
          N <- ifelse(N == 1, p, N)
          J <- dim(invchol)[2L]
          obs <- .check_obs(obs = obs, mean = mean, J = J, N = N)
-         ## NOTE: obs is (J x N) 
+         ## NOTE: obs is (J x N) and mean-centered
          ## dnorm takes rather long
          z <- Mult(invchol, obs)
          logretval <- .colSumsdnorm(z)
@@ -362,6 +363,7 @@ sldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
         N <- ifelse(N == 1, ncol(obs), N)
         J <- dim(invchol)[2L]
         obs <- .check_obs(obs = obs, mean = mean, J = J, N = N)
+        ## NOTE: obs is mean-centered now 
 
         Mix <- Mult(invchol, obs)
         sobs <- - Mult(invchol, Mix, transpose = TRUE)

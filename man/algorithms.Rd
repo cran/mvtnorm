@@ -32,12 +32,13 @@ TVPACK(abseps = 1e-6)
   There are three algorithms available for evaluating normal
   (and two algorithms for t-)
 probabilities: The default is the randomized Quasi-Monte-Carlo procedure
-by Genz (1992, 1993) and Genz and Bretz (2002) applicable to
+by \bibcitet{mvtnorm::numerical-:1992,mvtnorm::comparison:1993} and
+\bibcitet{mvtnorm::Genz_Bretz_2002} applicable to
 arbitrary covariance structures and dimensions up to 1000.
 
 For normal probabilities, smaller dimensions (up to 20) and non-singular
 covariance matrices,
-the algorithm by Miwa et al. (2003) can be used as well. This algorithm can
+the algorithm by \bibcitet{mvtnorm::Miwa+Hayter+Kuriki:2003} can be used as well. This algorithm can
 compute orthant probabilities (\code{lower} being \code{-Inf} or
 \code{upper} equal to \code{Inf}). Non-orthant probabilities are computed
 from the corresponding orthant probabilities, however, infinite limits are
@@ -45,41 +46,12 @@ replaced by \code{maxval} along with a warning.
 
 For two- and three-dimensional problems and semi-infinite integration
 region, \code{TVPACK} implements an interface to the methods described
-by Genz (2004).
+by \bibcitet{mvtnorm::Genz:2004}.
 
 }
 \value{
   An object of class \code{"GenzBretz"}, \code{"Miwa"}, or \code{"TVPACK"}
   defining hyper parameters.
 }
-\references{
-
-Genz, A. (1992). Numerical computation of multivariate normal probabilities.
-\emph{Journal of Computational and Graphical Statistics}, \bold{1}, 141--150.
-
-Genz, A. (1993). Comparison of methods for the computation of multivariate
-normal probabilities. \emph{Computing Science and Statistics}, \bold{25},
-400--405.
-
-Genz, A. and Bretz, F. (2002), Methods for the computation of multivariate
-t-probabilities. \emph{Journal of Computational and Graphical Statistics},
-\bold{11}, 950--971.
-
-Genz, A. (2004), Numerical computation of rectangular bivariate and
-trivariate normal and t-probabilities, \emph{Statistics and
-Computing}, \bold{14}, 251--260.
-
-Genz, A. and Bretz, F. (2009), \emph{Computation of Multivariate Normal and
-t Probabilities}. Lecture Notes in Statistics, Vol. 195. Springer-Verlag,
-Heidelberg.
-
-Miwa, A., Hayter J. and Kuriki, S. (2003).
-The evaluation of general non-centred orthant probabilities.
-\emph{Journal of the Royal Statistical Society}, Ser. B, 65, 223--234.
-
-Mi, X., Miwa, T. and Hothorn, T. (2009).
-\code{mvtnorm}: New numerical algorithm for multivariate normal probabilities.
-\emph{The R Journal} \bold{1}(1): 37--39.
-\url{https://journal.r-project.org/archive/2009-1/RJournal_2009-1_Mi+et+al.pdf}
-}
+\references{\bibshow{*}}
 \keyword{distribution}

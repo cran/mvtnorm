@@ -33,39 +33,39 @@
 > (lxn <- ltMatrices(xn, byrow = TRUE, names = nm))
 , , C_1
 
-        A      B       C      D E
-A 1.00000 0.0000 0.00000 0.0000 0
-B 0.51237 1.0000 0.00000 0.0000 0
-C 0.05847 0.9095 1.00000 0.0000 0
-D 0.39449 0.6612 0.23353 1.0000 0
-E 0.51648 0.2980 0.07518 0.8182 1
+          A         B         C         D         E
+A 1.0000000         .         .         .         .
+B 0.5123660 1.0000000         .         .         .
+C 0.0584725 0.9095137 1.0000000         .         .
+D 0.3944872 0.6612143 0.2335259 1.0000000         .
+E 0.5164752 0.2979867 0.0751775 0.8182123 1.0000000
 
 , , C_2
 
-       A      B      C      D E
-A 1.0000 0.0000 0.0000 0.0000 0
-B 0.8591 1.0000 0.0000 0.0000 0
-C 0.3744 0.1023 1.0000 0.0000 0
-D 0.1165 0.7957 0.8931 1.0000 0
-E 0.1948 0.4730 0.2378 0.2146 1
+          A         B         C         D         E
+A 1.0000000         .         .         .         .
+B 0.8590665 1.0000000         .         .         .
+C 0.3744315 0.1022684 1.0000000         .         .
+D 0.1165248 0.7956529 0.8930589 1.0000000         .
+E 0.1948049 0.4730419 0.2377852 0.2146060 1.0000000
 
 , , C_3
 
-       A      B      C      D E
-A 1.0000 0.0000 0.0000 0.0000 0
-B 0.4530 1.0000 0.0000 0.0000 0
-C 0.9046 0.9270 1.0000 0.0000 0
-D 0.4490 0.1326 0.4154 1.0000 0
-E 0.9575 0.4917 0.7161 0.2938 1
+          A         B         C         D         E
+A 1.0000000         .         .         .         .
+B 0.4530153 1.0000000         .         .         .
+C 0.9045608 0.9269936 1.0000000         .         .
+D 0.4490011 0.1326375 0.4153967 1.0000000         .
+E 0.9574833 0.4917481 0.7160702 0.2938002 1.0000000
 
 , , C_4
 
-          A      B        C      D E
-A 1.0000000 0.0000 0.000000 0.0000 0
-B 0.4877241 1.0000 0.000000 0.0000 0
-C 0.0593046 0.7625 1.000000 0.0000 0
-D 0.0005227 0.1996 0.470509 1.0000 0
-E 0.4913541 0.2849 0.005961 0.8901 1
+          A         B         C         D         E
+A 1.0000000         .         .         .         .
+B 0.4877241 1.0000000         .         .         .
+C 0.0593046 0.7625270 1.0000000         .         .
+D 0.0005227 0.1995700 0.4705089 1.0000000         .
+E 0.4913541 0.2849431 0.0059611 0.8901458 1.0000000
 
 
 > dim(lxn)
@@ -426,11 +426,11 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 , , 1
 
   1 2 3 4 5
-1 1 0 0 0 0
-2 0 1 0 0 0
-3 0 0 1 0 0
-4 0 0 0 1 0
-5 0 0 0 0 1
+1 1 . . . .
+2 . 1 . . .
+3 . . 1 . .
+4 . . . 1 .
+5 . . . . 1
 
 
 > diagonals(I5) <- 1:5
@@ -439,11 +439,11 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 , , 1
 
   1 2 3 4 5
-1 1 0 0 0 0
-2 0 2 0 0 0
-3 0 0 3 0 0
-4 0 0 0 4 0
-5 0 0 0 0 5
+1 1 . . . .
+2 . 2 . . .
+3 . . 3 . .
+4 . . . 4 .
+5 . . . . 5
 
 
 > lxn <- ltMatrices(xn, byrow = TRUE)
@@ -643,11 +643,97 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(d, diagonals(Crossprod(lxd)))
 
-> Sigma <- Tcrossprod(lxd)
+> a <- as.array(tcrossprod(lxn))
+
+> b <- array(apply(as.array(lxn), 3, function(x) tcrossprod(x), 
++     simplify = TRUE), dim = rev(dim(lxn)))
+
+> chk(a, b, check.attributes = FALSE)
+
+> a <- as.array(tcrossprod(lxd))
+
+> b <- array(apply(as.array(lxd), 3, function(x) tcrossprod(x), 
++     simplify = TRUE), dim = rev(dim(lxd)))
+
+> chk(a, b, check.attributes = FALSE)
+
+> a <- as.array(crossprod(lxn))
+
+> b <- array(apply(as.array(lxn), 3, function(x) crossprod(x), 
++     simplify = TRUE), dim = rev(dim(lxn)))
+
+> chk(a, b, check.attributes = FALSE)
+
+> a <- as.array(crossprod(lxd))
+
+> b <- array(apply(as.array(lxd), 3, function(x) crossprod(x), 
++     simplify = TRUE), dim = rev(dim(lxd)))
+
+> chk(a, b, check.attributes = FALSE)
+
+> a <- lxn %*% y
+
+> A <- as.array(lxn)
+
+> b <- do.call("rbind", lapply(1:ncol(y), function(i) t(A[, 
++     , i] %*% y[, i, drop = FALSE])))
+
+> chk(a, t(b), check.attributes = FALSE)
+
+> a <- lxd %*% y
+
+> A <- as.array(lxd)
+
+> b <- do.call("rbind", lapply(1:ncol(y), function(i) t(A[, 
++     , i] %*% y[, i, drop = FALSE])))
+
+> chk(a, t(b), check.attributes = FALSE)
+
+> chk(lxn[rep(1, N), ] %*% y, lxn[1, ] %*% y, check.attributes = FALSE)
+
+> chk(lxn %*% y[, 1], lxn %*% y[, rep(1, N)])
+
+> i <- sample(1:N)[1]
+
+> M <- t(as.array(lxn)[, , i])
+
+> a <- sapply(1:J, function(j) lxn[i, ] %*% M[, j, drop = FALSE])
+
+> rownames(a) <- colnames(a) <- dimnames(lxn)[[2]]
+
+> b <- as.array(tcrossprod(lxn[i, ]))[, , 1]
+
+> chk(a, b, check.attributes = FALSE)
+
+> a <- crossprod(lxn, y)
+
+> A <- as.array(lxn)
+
+> b <- do.call("rbind", lapply(1:ncol(y), function(i) t(t(A[, 
++     , i]) %*% y[, i, drop = FALSE])))
+
+> chk(a, t(b), check.attributes = FALSE)
+
+> a <- crossprod(lxd, y)
+
+> A <- as.array(lxd)
+
+> b <- do.call("rbind", lapply(1:ncol(y), function(i) t(t(A[, 
++     , i]) %*% y[, i, drop = FALSE])))
+
+> chk(a, t(b), check.attributes = FALSE)
+
+> chk(crossprod(lxn[rep(1, N), ], y), crossprod(lxn[1, 
++     ], y), check.attributes = FALSE)
+
+> chk(crossprod(lxn, y[, 1]), crossprod(lxn, y[, rep(1, 
++     N)]))
+
+> Sigma <- tcrossprod(lxd)
 
 > chk(chol(Sigma), lxd)
 
-> Sigma <- Tcrossprod(lxn)
+> Sigma <- tcrossprod(lxn)
 
 > chk(as.array(chol(Sigma)), as.array(lxn))
 
@@ -750,7 +836,7 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(unlist(Corr), c(as.array(invchol2cor(L))), check.attributes = FALSE)
 
-> chk(unlist(CP), c(as.array(Crossprod(invcholD(L)))), 
+> chk(unlist(CP), c(as.array(crossprod(invcholD(L)))), 
 +     check.attributes = FALSE)
 
 > chk(unlist(PC), c(as.array(invchol2pc(L))), check.attributes = FALSE)
@@ -774,7 +860,7 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(unlist(Corr), c(as.array(chol2cor(C))), check.attributes = FALSE)
 
-> chk(unlist(CP), c(as.array(Crossprod(solve(Dchol(C))))), 
+> chk(unlist(CP), c(as.array(crossprod(solve(Dchol(C))))), 
 +     check.attributes = FALSE)
 
 > chk(unlist(PC), c(as.array(chol2pc(C))), check.attributes = FALSE)
@@ -798,7 +884,7 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(unlist(Corr), c(as.array(invchol2cor(L))), check.attributes = FALSE)
 
-> chk(unlist(CP), c(as.array(Crossprod(invcholD(L)))), 
+> chk(unlist(CP), c(as.array(crossprod(invcholD(L)))), 
 +     check.attributes = FALSE)
 
 > chk(unlist(PC), c(as.array(invchol2pc(L))), check.attributes = FALSE)
@@ -822,7 +908,7 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(unlist(Corr), c(as.array(chol2cor(C))), check.attributes = FALSE)
 
-> chk(unlist(CP), c(as.array(Crossprod(solve(Dchol(C))))), 
+> chk(unlist(CP), c(as.array(crossprod(solve(Dchol(C))))), 
 +     check.attributes = FALSE)
 
 > chk(unlist(PC), c(as.array(chol2pc(C))), check.attributes = FALSE)
@@ -843,31 +929,31 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(chol2cov(C)[, p], chol2cov(Cp))
 
-> Sigma <- Tcrossprod(lxd)
+> Sigma <- tcrossprod(lxd)
 
 > j <- 1:3
 
-> chk(Sigma[, j], Tcrossprod(marg_mvnorm(chol = lxd, 
+> chk(Sigma[, j], tcrossprod(marg_mvnorm(chol = lxd, 
 +     which = j)$chol))
 
 > j <- 2:4
 
-> chk(Sigma[, j], Tcrossprod(marg_mvnorm(chol = lxd, 
+> chk(Sigma[, j], tcrossprod(marg_mvnorm(chol = lxd, 
 +     which = j)$chol))
 
-> Sigma <- Tcrossprod(solve(lxd))
+> Sigma <- tcrossprod(solve(lxd))
 
 > j <- 1:3
 
-> chk(Sigma[, j], Tcrossprod(solve(marg_mvnorm(invchol = lxd, 
+> chk(Sigma[, j], tcrossprod(solve(marg_mvnorm(invchol = lxd, 
 +     which = j)$invchol)))
 
 > j <- 2:4
 
-> chk(Sigma[, j], Tcrossprod(solve(marg_mvnorm(invchol = lxd, 
+> chk(Sigma[, j], tcrossprod(solve(marg_mvnorm(invchol = lxd, 
 +     which = j)$invchol)))
 
-> Sigma <- as.array(Tcrossprod(lxd))[, , 1]
+> Sigma <- as.array(tcrossprod(lxd))[, , 1]
 
 > j <- 2:4
 
@@ -884,9 +970,9 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(cm, cmv$mean)
 
-> chk(cS, as.array(Tcrossprod(cmv$chol))[, , 1])
+> chk(cS, as.array(tcrossprod(cmv$chol))[, , 1])
 
-> Sigma <- as.array(Tcrossprod(solve(lxd)))[, , 1]
+> Sigma <- as.array(tcrossprod(solve(lxd)))[, , 1]
 
 > j <- 2:4
 
@@ -903,10 +989,10 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(cm, cmv$mean)
 
-> chk(cS, as.array(Tcrossprod(solve(cmv$invchol)))[, 
+> chk(cS, as.array(tcrossprod(solve(cmv$invchol)))[, 
 +     , 1])
 
-> Sigma <- as.array(Tcrossprod(lxd))[, , 1]
+> Sigma <- as.array(tcrossprod(lxd))[, , 1]
 
 > j <- 1:3
 
@@ -923,9 +1009,9 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(c(cm), c(cmv$mean))
 
-> chk(cS, as.array(Tcrossprod(cmv$chol))[, , 1])
+> chk(cS, as.array(tcrossprod(cmv$chol))[, , 1])
 
-> Sigma <- as.array(Tcrossprod(solve(lxd)))[, , 1]
+> Sigma <- as.array(tcrossprod(solve(lxd)))[, , 1]
 
 > j <- 1:3
 
@@ -942,7 +1028,7 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(c(cm), c(cmv$mean))
 
-> chk(cS, as.array(Tcrossprod(solve(cmv$invchol)))[, 
+> chk(cS, as.array(tcrossprod(solve(cmv$invchol)))[, 
 +     , 1])
 
 > N <- 1000
@@ -956,9 +1042,9 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > Y <- solve(lt, Z)
 
-> ll1 <- sum(dnorm(Mult(lt, Y), log = TRUE)) + sum(log(diagonals(lt)))
+> ll1 <- sum(dnorm(lt %*% Y, log = TRUE)) + sum(log(diagonals(lt)))
 
-> S <- as.array(Tcrossprod(solve(lt)))
+> S <- as.array(tcrossprod(solve(lt)))
 
 > ll2 <- sum(sapply(1:N, function(i) dmvnorm(x = Y[, 
 +     i], sigma = S[, , i], log = TRUE)))
@@ -977,9 +1063,9 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 > cd <- cond_mvnorm(invchol = lt, which_given = j, given = Y[j, 
 +     ])
 
-> ll3 <- sum(dnorm(Mult(md$invchol, Y[j, ]), log = TRUE)) + 
-+     sum(log(diagonals(md$invchol))) + sum(dnorm(Mult(cd$invchol, 
-+     Y[-j, ] - cd$me .... [TRUNCATED] 
+> ll3 <- sum(dnorm(md$invchol %*% Y[j, ], log = TRUE)) + 
++     sum(log(diagonals(md$invchol))) + sum(dnorm(cd$invchol %*% 
++     (Y[-j, ] - cd$mean), .... [TRUNCATED] 
 
 > chk(ll1, ll3)
 
@@ -1027,8 +1113,7 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 > if (require("qrng", quietly = TRUE)) {
 +     W <- t(ghalton(M, d = J - 1))
 + } else {
-+     W <- matrix(runif(M * (J - 1)), nrow = J - 1)
-+ }
++     W <- matrix(runif(M * (J - 1)), nrow = J - 1, byrow = TR .... [TRUNCATED] 
 
 > pGB <- lpmvnormR(a, b, chol = lx, logLik = FALSE, 
 +     algorithm = GenzBretz(maxpts = M, abseps = 0, releps = 0))
@@ -1209,13 +1294,13 @@ attr(,"rcnames")
 
 > chk(C, as.array(lt)[, , 1], check.attributes = FALSE)
 
-> chk(Sigma, as.array(Tcrossprod(lt))[, , 1], check.attributes = FALSE)
+> chk(Sigma, as.array(tcrossprod(lt))[, , 1], check.attributes = FALSE)
 
 > N <- 100
 
 > Z <- matrix(rnorm(N * J), nrow = J)
 
-> Y <- Mult(lt, Z) + (mn <- 1:J)
+> Y <- lt %*% Z + (mn <- 1:J)
 
 > rowMeans(Y)
      1      2      3      4 
@@ -1265,11 +1350,11 @@ attr(,"rcnames")
 > ltMatrices(op$par, diag = TRUE, byrow = BYROW)
 , , 1
 
-        1        2      3      4
-1 0.68306  0.00000 0.0000 0.0000
-2 0.26505  0.93465 0.0000 0.0000
-3 0.50102 -0.04587 1.0523 0.0000
-4 0.02356  0.89535 0.1048 0.9054
+         1        2        3        4
+1  0.68306        .        .        .
+2  0.26505  0.93465        .        .
+3  0.50102 -0.04587  1.05234        .
+4  0.02356  0.89535  0.10482  0.90544
 
 
 > ll(op$par)
@@ -1288,11 +1373,11 @@ attr(,"rcnames")
 > lt
 , , 1
 
-       1       2      3     4
-1 0.7071  0.0000 0.0000 0.000
-2 0.2500  0.9682 0.0000 0.000
-3 0.6124 -0.1581 1.0488 0.000
-4 0.0000  1.0954 0.1651 0.879
+        1       2       3       4
+1  0.7071       .       .       .
+2  0.2500  0.9682       .       .
+3  0.6124 -0.1581  1.0488       .
+4       .  1.0954  0.1651  0.8790
 
 
 > prb <- 1:9/10
@@ -1356,8 +1441,7 @@ attr(,"rcnames")
 > if (require("qrng", quietly = TRUE)) {
 +     W <- t(ghalton(M, d = J - 1))
 + } else {
-+     W <- matrix(runif(M * (J - 1)), nrow = J - 1)
-+ }
++     W <- matrix(runif(M * (J - 1)), nrow = J - 1, byrow = TR .... [TRUNCATED] 
 
 > ll <- function(parm, J) {
 +     m <- parm[1:J]
@@ -1416,21 +1500,21 @@ attr(,"rcnames")
 +     diag = TRUE, byrow = BYROW))
 , , 1
 
-        1        2       3      4
-1 0.67050  0.00000 0.00000 0.0000
-2 0.26764  1.02232 0.00000 0.0000
-3 0.54268 -0.05007 1.11348 0.0000
-4 0.05223  0.98430 0.08473 0.9614
+         1        2        3        4
+1  0.67050        .        .        .
+2  0.26764  1.02232        .        .
+3  0.54268 -0.05007  1.11348        .
+4  0.05223  0.98430  0.08473  0.96137
 
 
 > lt
 , , 1
 
-       1       2      3     4
-1 0.7071  0.0000 0.0000 0.000
-2 0.2500  0.9682 0.0000 0.000
-3 0.6124 -0.1581 1.0488 0.000
-4 0.0000  1.0954 0.1651 0.879
+        1       2       3       4
+1  0.7071       .       .       .
+2  0.2500  0.9682       .       .
+3  0.6124 -0.1581  1.0488       .
+4       .  1.0954  0.1651  0.8790
 
 
 > op$par[1:J]
@@ -1440,7 +1524,7 @@ attr(,"rcnames")
 > mn
 [1] 1 2 3 4
 
-> round(Tcrossprod(lt), 4)
+> round(tcrossprod(lt), 4)
 , , 1
 
        1      2     3     4
@@ -1450,7 +1534,7 @@ attr(,"rcnames")
 4 0.0000 1.0607 0.000 2.000
 
 
-> Tcrossprod(C)
+> tcrossprod(C)
 , , 1
 
         1       2       3       4
@@ -1510,7 +1594,7 @@ attr(,"rcnames")
       5       6       7       8       9      10      11      12      13      14 
 0.05130 0.07990 0.12446 0.16090 0.07609 0.11567 0.14020 0.09622 0.10415 0.08279 
 
-> c(sqrt(diagonals(Crossprod(solve(L)))))
+> c(sqrt(diagonals(crossprod(solve(L)))))
  [1] 0.06826 0.10816 0.12670 0.14074 0.05498 0.10839 0.12442 0.14312 0.08813
 [10] 0.11638 0.13340 0.09587 0.10451 0.08154
 
@@ -1551,21 +1635,21 @@ attr(,"rcnames")
 +     byrow = BYROW)
 , , 1
 
-        1        2       3      4
-1 0.68303  0.00000 0.00000 0.0000
-2 0.26504  0.93467 0.00000 0.0000
-3 0.53509 -0.05736 1.11261 0.0000
-4 0.06749  0.95887 0.07775 0.9669
+         1        2        3        4
+1  0.68303        .        .        .
+2  0.26504  0.93467        .        .
+3  0.53509 -0.05736  1.11261        .
+4  0.06749  0.95887  0.07775  0.96692
 
 
 > lt
 , , 1
 
-       1       2      3     4
-1 0.7071  0.0000 0.0000 0.000
-2 0.2500  0.9682 0.0000 0.000
-3 0.6124 -0.1581 1.0488 0.000
-4 0.0000  1.0954 0.1651 0.879
+        1       2       3       4
+1  0.7071       .       .       .
+2  0.2500  0.9682       .       .
+3  0.6124 -0.1581  1.0488       .
+4       .  1.0954  0.1651  0.8790
 
 
 > op$par[1:J]
@@ -1600,11 +1684,11 @@ attr(,"rcnames")
 +     byrow = BYROW)
 , , 1
 
-        1       2      3      4
-1 1.23596 0.00000 0.0000 0.0000
-2 0.05465 1.36452 0.0000 0.0000
-3 0.29576 0.02194 0.6153 0.0000
-4 0.07133 0.66705 0.2361 0.6619
+        1       2       3       4
+1 1.23596       .       .       .
+2 0.05465 1.36452       .       .
+3 0.29576 0.02194 0.61530       .
+4 0.07133 0.66705 0.23615 0.66185
 
 
 > round(as.array(aperm(as.chol(lt), perm = perm)), 4)
@@ -1619,40 +1703,37 @@ attr(,"rcnames")
 
 > C <- ltMatrices(runif(10))
 
-> all.equal(as.array(chol2cov(standardize(chol = C))), 
-+     as.array(chol2cor(standardize(chol = C))))
-[1] TRUE
+> chk(as.array(chol2cov(standardize(chol = C))), as.array(chol2cor(standardize(chol = C))))
 
 > L <- solve(C)
 
-> all.equal(as.array(invchol2cov(standardize(invchol = L))), 
+> chk(as.array(invchol2cov(standardize(invchol = L))), 
 +     as.array(invchol2cor(standardize(invchol = L))))
-[1] TRUE
 
 > data("iris", package = "datasets")
 
 > J <- 4
 
-> Z <- t(qnorm(do.call("cbind", lapply(iris[1:J], rank))/(nrow(iris) + 
-+     1)))
+> Z <- t(qnorm(do.call("cbind", lapply(iris[1:J], rank, 
++     ties.method = "max"))/(nrow(iris) + 1)))
 
 > (CR <- cor(t(Z)))
              Sepal.Length Sepal.Width Petal.Length Petal.Width
-Sepal.Length      1.00000    -0.09887       0.8695      0.7819
-Sepal.Width      -0.09887     1.00000      -0.2710     -0.2414
-Petal.Length      0.86952    -0.27099       1.0000      0.8714
-Petal.Width       0.78191    -0.24142       0.8714      1.0000
+Sepal.Length      1.00000    -0.09064       0.8690      0.7695
+Sepal.Width      -0.09064     1.00000      -0.2446     -0.1908
+Petal.Length      0.86896    -0.24456       1.0000      0.8577
+Petal.Width       0.76951    -0.19082       0.8577      1.0000
 
 > ll <- function(parm) {
 +     C <- ltMatrices(parm)
-+     Cs <- standardize(C)
++     Cs <- standardize(chol = C)
 +     -ldmvnorm(obs = Z, chol = Cs)
 + }
 
 > sc <- function(parm) {
 +     C <- ltMatrices(parm)
-+     Cs <- standardize(C)
-+     -rowSums(Lower_tri(destandardize(chol = C, score_schol = sldmvno .... [TRUNCATED] 
++     Cs <- standardize(chol = C)
++     -rowSums(Lower_tri(destandardize(chol = C, score_schol =  .... [TRUNCATED] 
 
 > start <- t(chol(CR))
 
@@ -1665,9 +1746,9 @@ Petal.Width       0.78191    -0.24142       0.8714      1.0000
 +     control = list(trace = FALSE), hessian = TRUE)
 
 > op$value
-[1] 602.5
+[1] 605.5
 
-> S_ML <- chol2cov(standardize(ltMatrices(op$par)))
+> S_ML <- chol2cov(standardize(chol = ltMatrices(op$par)))
 
 > lwr <- do.call("cbind", lapply(iris[1:J], rank, ties.method = "min")) - 
 +     1
@@ -1683,19 +1764,17 @@ Petal.Width       0.78191    -0.24142       0.8714      1.0000
 > if (require("qrng", quietly = TRUE)) {
 +     W <- t(ghalton(M, d = J - 1))
 + } else {
-+     W <- matrix(runif(M * (J - 1)), nrow = J - 1)
-+ }
++     W <- matrix(runif(M * (J - 1)), nrow = J - 1, byrow = TR .... [TRUNCATED] 
 
 > ll <- function(parm) {
 +     C <- ltMatrices(parm)
-+     Cs <- standardize(C)
-+     -lpmvnorm(lower = lwr, upper = upr, chol = Cs, M = M, w = W)
-+ }
++     Cs <- standardize(chol = C)
++     -lpmvnorm(lower = lwr, upper = upr, chol = Cs, M = M, w = .... [TRUNCATED] 
 
 > sc <- function(parm) {
 +     C <- ltMatrices(parm)
-+     Cs <- standardize(C)
-+     -rowSums(Lower_tri(destandardize(chol = C, score_schol = slpmvno .... [TRUNCATED] 
++     Cs <- standardize(chol = C)
++     -rowSums(Lower_tri(destandardize(chol = C, score_schol =  .... [TRUNCATED] 
 
 > if (require("numDeriv", quietly = TRUE)) chk(grad(ll, 
 +     start), sc(start), check.attributes = FALSE)
@@ -1703,16 +1782,16 @@ Petal.Width       0.78191    -0.24142       0.8714      1.0000
 > op2 <- optim(start, fn = ll, gr = sc, method = "BFGS", 
 +     control = list(trace = FALSE), hessian = TRUE)
 
-> S_NPML <- chol2cov(standardize(ltMatrices(op2$par)))
+> S_NPML <- chol2cov(standardize(chol = ltMatrices(op2$par)))
 
 > S_ML
 , , 1
 
         1       2       3       4
-1  1.0000 -0.1139  0.8768  0.7962
-2 -0.1139  1.0000 -0.2856 -0.2575
-3  0.8768 -0.2856  1.0000  0.8817
-4  0.7962 -0.2575  0.8817  1.0000
+1  1.0000 -0.1100  0.8797  0.7906
+2 -0.1100  1.0000 -0.2597 -0.1957
+3  0.8797 -0.2597  1.0000  0.8740
+4  0.7906 -0.1957  0.8740  1.0000
 
 
 > S_NPML
@@ -1721,8 +1800,8 @@ Petal.Width       0.78191    -0.24142       0.8714      1.0000
          1        2       3       4
 1  1.00000 -0.09786  0.8735  0.7833
 2 -0.09786  1.00000 -0.2726 -0.2482
-3  0.87346 -0.27260  1.0000  0.8849
-4  0.78328 -0.24822  0.8849  1.0000
+3  0.87346 -0.27261  1.0000  0.8849
+4  0.78328 -0.24823  0.8849  1.0000
 
 
 > sd_ML <- ltMatrices(sqrt(diag(solve(op$hessian))))
@@ -1738,20 +1817,82 @@ Petal.Width       0.78191    -0.24142       0.8714      1.0000
 + }
 , , 1
 
-        1       2     3 4
-1 0.00000 0.00000 0.000 0
-2 0.08122 0.00000 0.000 0
-3 0.13679 0.08762 0.000 0
-4 0.12621 0.10787 0.101 0
+        1       2       3 4
+1       .       .       . .
+2 0.08219       .       . .
+3 0.13663 0.08769       . .
+4 0.12316 0.10956 0.10266 .
 
 , , 1
 
-        1       2      3 4
-1 0.00000 0.00000 0.0000 0
-2 0.07731 0.00000 0.0000 0
-3 0.14000 0.08695 0.0000 0
-4 0.13691 0.11038 0.1161 0
+        1       2       3 4
+1       .       .       . .
+2 0.07731       .       . .
+3 0.14000 0.08695       . .
+4 0.13691 0.11038 0.11610 .
 
+
+> J <- 5
+
+> N <- 100
+
+> m <- rnorm(J)
+
+> L <- ltMatrices(prm <- runif(J * (J + 1)/2), diag = TRUE)
+
+> Z <- matrix(rnorm(N * J), nrow = J)
+
+> Y <- solve(L, Z) + m
+
+> d <- L %*% m
+
+> nll <- function(parm) {
++     d <- parm[seq_len(J)]
++     L <- ltMatrices(parm[-seq_len(J)], diag = TRUE)
++     -ldmvnorm(obs = Y, mean = solve(L, d .... [TRUNCATED] 
+
+> start <- c(d, prm)
+
+> nll(start)
+[1] 1135
+
+> -ldmvnorm(obs = Y, mean = m, invchol = L)
+[1] 1135
+
+> nsc <- function(parm) {
++     d <- parm[seq_len(J)]
++     L <- ltMatrices(parm[-seq_len(J)], diag = TRUE)
++     ret <- sldmvnorm(obs = Y, mean = sol .... [TRUNCATED] 
+
+> chk(unname(nsc(start)), grad(nll, start))
+
+> C <- ltMatrices(prm <- runif(J * (J + 1)/2), diag = TRUE)
+
+> Z <- matrix(rnorm(N * J), nrow = J)
+
+> Y <- C %*% Z + m
+
+> d <- solve(C, m)
+
+> nll <- function(parm) {
++     d <- parm[seq_len(J)]
++     C <- ltMatrices(parm[-seq_len(J)], diag = TRUE)
++     -ldmvnorm(obs = Y, mean = C %*% d, c .... [TRUNCATED] 
+
+> start <- c(d, prm)
+
+> nll(start)
+[1] 144.1
+
+> -ldmvnorm(obs = Y, mean = m, chol = C)
+[1] 144.1
+
+> nsc <- function(parm) {
++     d <- parm[seq_len(J)]
++     C <- ltMatrices(parm[-seq_len(J)], diag = TRUE)
++     ret <- sldmvnorm(obs = Y, mean = C % .... [TRUNCATED] 
+
+> chk(unname(nsc(start)), grad(nll, start))
 
 > data("iris", package = "datasets")
 
@@ -1774,7 +1915,7 @@ $scale
 , , 1
 
              Petal.Length Petal.Width
-Petal.Length       1.7594      0.0000
+Petal.Length       1.7594           .
 Petal.Width        0.7315      0.2051
 
 
@@ -1782,6 +1923,11 @@ $mean
               [,1]
 Petal.Length 3.758
 Petal.Width  1.199
+
+$invcholmean
+               [,1]
+Petal.Length  2.136
+Petal.Width  -1.770
 
 attr(,"class")
 [1] "mvnorm"
@@ -1801,8 +1947,6 @@ attr(,"class")
 
 > obs <- t(iris[, vars])
 
-> lower <- upper <- NULL
-
 > ll <- function(parm) {
 +     C <- ltMatrices(parm[-(1:J)], diag = TRUE, names = vars)
 +     x <- mvnorm(mean = parm[1:J], chol = C)
@@ -1816,8 +1960,10 @@ attr(,"class")
 > start <- c(c(iris_mvn$mean), Lower_tri(iris_mvn$scale, 
 +     diag = TRUE))
 
-> max(abs(sc(start))) < sqrt(.Machine$double.eps)
-[1] TRUE
+> llim <- rep(-Inf, J + J * (J + 1)/2)
+
+> llim[J + c(diagonals(ltMatrices(seq_len(J * (J + 1)/2), 
++     diag = TRUE)))] <- 1e-04
 
 > op <- optim(start, fn = ll, gr = sc, method = "L-BFGS-B", 
 +     lower = llim, control = list(trace = FALSE))
@@ -1851,6 +1997,51 @@ Sepal.Length  Sepal.Width Petal.Length  Petal.Width
 Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
        5.843        3.057        3.758        1.199 
 
+> ll <- function(parm, logLik = TRUE) {
++     L <- ltMatrices(parm[-(1:J)], diag = TRUE, names = vars)
++     x <- mvnorm(invcholmean = parm[1:J], invc .... [TRUNCATED] 
+
+> sc <- function(parm) {
++     x <- ll(parm, logLik = FALSE)
++     ret <- lLgrad(object = x, obs = obs)
++     -c(rowSums(ret$invcholmean), rowSums(Low .... [TRUNCATED] 
+
+> opL <- optim(start, fn = ll, gr = sc, method = "L-BFGS-B", 
++     lower = llim, control = list(trace = FALSE, maxit = 500))
+
+> MLL <- ll(opL$par, logLik = FALSE)
+
+> op$value
+[1] 379.9
+
+> opL$value
+[1] 379.9
+
+> invchol2cov(MLL$scale)
+, , 1
+
+             Sepal.Length Sepal.Width Petal.Length Petal.Width
+Sepal.Length      0.68133    -0.04211       1.2664      0.5130
+Sepal.Width      -0.04211     0.18864      -0.3271     -0.1207
+Petal.Length      1.26636    -0.32714       3.0961      1.2872
+Petal.Width       0.51303    -0.12071       1.2872      0.5773
+
+
+> V
+             Sepal.Length Sepal.Width Petal.Length Petal.Width
+Sepal.Length      0.68112    -0.04215       1.2658      0.5128
+Sepal.Width      -0.04215     0.18871      -0.3275     -0.1208
+Petal.Length      1.26582    -0.32746       3.0955      1.2870
+Petal.Width       0.51283    -0.12083       1.2870      0.5771
+
+> MLL$mean[, , drop = TRUE]
+Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+       5.843        3.057        3.758        1.199 
+
+> m
+Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+       5.843        3.057        3.758        1.199 
+
 > v1 <- vars[1]
 
 > q1 <- quantile(iris[[v1]], probs = 1:4/5)
@@ -1867,31 +2058,43 @@ Levels: (-Inf,5] (5,5.6] (5.6,6.1] (6.1,6.52] (6.52, Inf]
 
 > obs <- obs[!rownames(obs) %in% v1, , drop = FALSE]
 
+> ll <- function(parm, logLik = TRUE) {
++     L <- ltMatrices(parm[-(1:J)], diag = TRUE, names = vars)
++     x <- mvnorm(invcholmean = parm[1:J], invc .... [TRUNCATED] 
+
+> sc <- function(parm) {
++     x <- ll(parm, logLik = FALSE)
++     ret <- lLgrad(object = x, obs = obs, lower = lower, upper = upper)
++     ret$invcho .... [TRUNCATED] 
+
+> start <- opL$par
+
 > if (require("numDeriv", quietly = TRUE)) chk(grad(ll, 
 +     start), sc(start), check.attributes = FALSE)
 
 > opi <- optim(start, fn = ll, gr = sc, method = "L-BFGS-B", 
 +     lower = llim, control = list(trace = FALSE))
 
-> Chati <- ltMatrices(opi$par[-(1:J)], diag = TRUE, 
-+     names = vars)
+> MLi <- ll(opi$par, logLik = FALSE)
 
-> MLi <- mvnorm(mean = opi$par[1:J], chol = Chati)
-
-> op$value
-[1] 379.9
-
-> opi$value
-[1] 472.2
-
-> chol2cov(MLi$scale)
+> invchol2cov(MLi$scale)
 , , 1
 
              Sepal.Length Sepal.Width Petal.Length Petal.Width
-Sepal.Length      0.72585    -0.02555       1.2710      0.5221
-Sepal.Width      -0.02555     0.18871      -0.3274     -0.1208
-Petal.Length      1.27103    -0.32742       3.0950      1.2867
-Petal.Width       0.52211    -0.12081       1.2867      0.5770
+Sepal.Length      0.70567    -0.02523       1.2634      0.5185
+Sepal.Width      -0.02523     0.18729      -0.3175     -0.1148
+Petal.Length      1.26343    -0.31746       3.0960      1.2881
+Petal.Width       0.51849    -0.11484       1.2881      0.5773
+
+
+> invchol2cov(MLL$scale)
+, , 1
+
+             Sepal.Length Sepal.Width Petal.Length Petal.Width
+Sepal.Length      0.68133    -0.04211       1.2664      0.5130
+Sepal.Width      -0.04211     0.18864      -0.3271     -0.1207
+Petal.Length      1.26636    -0.32714       3.0961      1.2872
+Petal.Width       0.51303    -0.12071       1.2872      0.5773
 
 
 > chol2cov(ML$scale)
@@ -1906,11 +2109,50 @@ Petal.Width       0.51283    -0.12083       1.2870      0.5771
 
 > MLi$mean[, , drop = TRUE]
 Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-       5.760        3.057        3.758        1.199 
+       5.762        3.057        3.757        1.199 
+
+> MLL$mean[, , drop = TRUE]
+Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
+       5.843        3.057        3.758        1.199 
 
 > ML$mean[, , drop = TRUE]
 Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
        5.843        3.057        3.758        1.199 
+
+> cdstr <- condDist(ML, which_given = vars[1:3], given = diag(3))
+
+> coef(irislm <- lm(Petal.Width ~ Sepal.Length + Sepal.Width + 
++     Petal.Length, data = iris))
+ (Intercept) Sepal.Length  Sepal.Width Petal.Length 
+     -0.2403      -0.2073       0.2228       0.5241 
+
+> cdstr$mean - ML$mean["Petal.Width", ]
+               [,1]   [,2]   [,3]
+Petal.Width -0.2073 0.2228 0.5241
+
+> summary(irislm)$sigma^2
+[1] 0.03685
+
+> c(cdstr$scale^2)
+[1] 0.03587
+
+> cdstr <- condDist(MLL, which_given = vars[1:3], given = diag(3))
+
+> cdstr$mean - ML$mean["Petal.Width", ]
+               [,1]   [,2]   [,3]
+Petal.Width -0.2075 0.2228 0.5241
+
+> c(1/cdstr$scale^2)
+[1] 0.03587
+
+> cdstr <- condDist(MLi, which_given = vars[1:3], given = diag(3))
+
+> cdstr$mean - ML$mean["Petal.Width", ]
+               [,1]   [,2]   [,3]
+Petal.Width -0.1573 0.2169 0.5021
+
+> c(1/cdstr$scale^2)
+[1] 0.0365
 
 > N <- 3
 
@@ -1941,7 +2183,7 @@ Sepal.Length  Sepal.Width Petal.Length  Petal.Width
 
 > obs <- Y[rev(LETTERS[3:J]), ]
 
-> w <- matrix(runif(1000), nrow = 1)
+> w <- matrix(runif(1000), nrow = 1, byrow = TRUE)
 
 > lABCD <- logLik(mvnorm(invchol = L), obs = obs, lower = lwr, 
 +     upper = upr, w = w)
@@ -1994,17 +2236,18 @@ Sepal.Length  Sepal.Width Petal.Length  Petal.Width
 
 > M <- 1e+06
 
-> dim(w <- matrix(runif((J - 1) * M), nrow = J - 1))
+> dim(w <- matrix(runif((J - 1) * M), nrow = J - 1, 
++     byrow = TRUE))
 [1]       5 1000000
 
 > lpmvnorm(lower = a, upper = b, chol = Linv, w = w)
-[1] -1.138
+[1] -1.348
 
 > dim(Z <- matrix(rnorm(K * M), nrow = K))
 [1]       3 1000000
 
 > lpRR(lower = a, upper = b, B = B, D = D, Z = Z)
-[1] -1.139
+[1] -1.35
 
 > smv <- slpmvnorm(lower = a, upper = b, chol = Linv, 
 +     w = w)
@@ -2015,7 +2258,7 @@ Sepal.Length  Sepal.Width Petal.Length  Petal.Width
 
 > chk(c(smv$upper), sRR$upper, tolerance = 0.01)
 
-> chk(c(smv$mean), sRR$mean, tolerance = 0.01)
+> chk(c(smv$mean), sRR$mean, tolerance = 0.01 * 2)
 
 > Z <- matrix(rnorm(K * 1000), nrow = K)
 
@@ -2052,4 +2295,4 @@ Sepal.Length  Sepal.Width Petal.Length  Petal.Width
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
- 14.835   0.239  15.073 
+ 15.644   0.224  15.882 

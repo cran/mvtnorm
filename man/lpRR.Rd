@@ -39,12 +39,12 @@ recycled to length of \code{lower} and \code{upper}).
 }
 }
 \details{
-  Evaluates the multivariate normal log-likelihood defined by \code{means},
-  \code{B} and \code{D} when the covariance is \eqn{Sigma = B B^\top + D} 
+  Evaluates the multivariate normal log-likelihood defined by \code{mean},
+  \code{B} and \code{D} when the covariance is \eqn{\Sigma = B B^\top + D} 
   over boxes defined by \code{lower} and \code{upper}. Details are given
-  in Genz and Bretz (2009, Chapter 2.3.1.).
+  in \bibcitet{mvtnorm::Genz_Bretz_2009}, Chapter 2.3.1.
   
-  \code{slpmvnorm} computes 
+  \code{slpRR} computes 
   the corresponding score functions with respect to \code{lower},
   \code{upper}, \code{mean}, \code{B} and \code{D}.
 
@@ -56,13 +56,7 @@ The log-likelihood (\code{log.p = TRUE}) or corresponding probability.
 \code{slpRR} return the scores.
 }
 \seealso{\code{vignette("lmvnorm_src", package = "mvtnorm")}}
-\references{
-
-  Genz, A. and Bretz, F. (2009), \emph{Computation of Multivariate Normal and
-  t Probabilities}. Lecture Notes in Statistics, Vol. 195. Springer-Verlag,
-  Heidelberg.
-
-}
+\references{\bibshow{*}}
 \examples{
   J <- 6
   K <- 3
@@ -73,6 +67,9 @@ The log-likelihood (\code{log.p = TRUE}) or corresponding probability.
   b <- 2 + runif(J)
   M <- 1e4
   Z <- matrix(rnorm(K * M), nrow = K)
+  ## log-likelihood
   lpRR(lower = a, upper = b, B = B, D = D, Z = Z)
+  ## score wrt all arguments
+  slpRR(lower = a, upper = b, B = B, D = D, Z = Z)
 }
 \keyword{distribution}

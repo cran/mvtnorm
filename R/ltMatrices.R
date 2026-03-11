@@ -55,7 +55,7 @@ ltMatrices <- function(object, diag = FALSE, byrow = FALSE, names = TRUE) {
         else
             nonames <- TRUE
     } else {
-        names <- as.character(1:J)
+        names <- as.character(seq_len(J))
     }
 
     if (!nonames) {
@@ -187,8 +187,11 @@ as.array.ltMatrices <- function(x, symmetric = FALSE, ...) {
 as.array.syMatrices <- function(x, ...)
     return(as.array.ltMatrices(x, symmetric = TRUE))
 
-print.ltMatrices <- function(x, ...)
-    print(as.array(x))
+print.ltMatrices <- function(x, zero.print = ".", ...) {
+    if (is.null(attr(x, "dimnames")[[2L]]))
+        attr(x, "dimnames")[[2L]] <- as.character(seq_len(dim(x)[1L]))
+    print(as.table(as.array(x)), zero.print = zero.print, ...)
+}
 
 print.syMatrices <- function(x, ...)
     print(as.array(x))
@@ -575,6 +578,32 @@ Tcrossprod <- function(x, diag_only = FALSE)
 
 Crossprod <- function(x, diag_only = FALSE)
     .Tcrossprod(x, diag_only = diag_only, transpose = TRUE)
+
+# crossprod tcrossprod methods
+
+crossprod.ltMatrices <- function(x, y = NULL, ...) {
+
+    if (is.null(y))
+        return(Crossprod(x = x))
+    return(Mult(x, y, transpose = TRUE))
+}
+
+crossprod.syMatrices <- crossprod.ltMatrices
+
+tcrossprod.ltMatrices <- function(x, y = NULL, ...) {
+
+    if (is.null(y))
+        return(Tcrossprod(x = x))
+    return(Mult(x, y, transpose = FALSE))
+}
+
+tcrossprod.syMatrices <- tcrossprod.ltMatrices
+
+'%*%.ltMatrices' <- function(x, y)
+    Mult(x, y)
+
+'%*%.syMatrices' <- function(x, y)
+    Mult(x, y)
 
 # chol syMatrices
 
