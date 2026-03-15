@@ -225,8 +225,11 @@ slpmvnorm <- function(lower, upper, mean = 0, center = NULL,
     ll <- log(pmax(ret[1L,], tol)) - log(M)
     intsum <- ret[1L,]
     m <- matrix(intsum, nrow = nrow(ret) - 1, ncol = ncol(ret), byrow = TRUE)
-    ret <- ret[-1L,,drop = FALSE] / m ### NOTE: division by zero MAY happen,
-                                      ### catch outside
+    ret <- ret[-1L,,drop = FALSE] / m
+    ### NOTE: division by zero may have happened for observations with
+    ### probability < tol; the log-lik is constant in these cases
+    ### and thus the derivative = 0
+    ret[m < tol] <- 0
 
     # post differentiate mean score
     
@@ -388,7 +391,7 @@ sldmvnorm <- function(obs, mean = 0, chol, invchol, logLik = TRUE) {
         }
         ret <- list(obs = sobs, invchol = ret)
         if (logLik) 
-            ret$logLik <- ldmvnorm(obs = obs, mean = mean, 
+            ret$logLik <- ldmvnorm(obs = obs,
                                    invchol = invchol, logLik = FALSE)
         return(ret)
     }

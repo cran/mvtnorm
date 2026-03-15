@@ -405,10 +405,10 @@ L <- ltMatrices(rep(1, J * (J + 1) / 2), diag = TRUE)
 L[] <- 0
 diagonals(L) <- 1
 
+### constant b/c prob < .Machine$double.eps
 lpmvnorm(lower = yl, upper = yr, invchol = L, w = w)
 
 s <- slpmvnorm(lower = yl, upper = yr, invchol = L, w = w)[c("logLik", "invchol")]
 
-chk(c((dnorm(yr) * yr - dnorm(yl) * yl ) / (pnorm(yr) - pnorm(yl))),
-    c(diagonals(s$invchol)))
+chk(0, unique(c(diagonals(s$invchol))))
 }

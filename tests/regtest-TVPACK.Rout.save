@@ -1,6 +1,6 @@
 
-R version 4.4.0 Patched (2024-05-17 r86565) -- "Puppy Cup"
-Copyright (C) 2024 The R Foundation for Statistical Computing
+R Under development (unstable) (2026-03-12 r89611) -- "Unsuffered Consequences"
+Copyright (C) 2026 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -333,4 +333,4 @@ attr(,"msg")
 > 
 > proc.time()
    user  system elapsed 
-  4.669   0.044   4.716 
+  2.934   0.012   2.942 

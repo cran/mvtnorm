@@ -2,6 +2,22 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
+\section{Changes in Version 1.3-6 (2026-03-12)}{
+  \subsection{Bugfixes}{
+    \itemize{
+      \item \code{sldmvnorm} returned an incorrect log-likelihood
+            in the precence of means.
+      \item Observations with very small log-probabilities
+            are now treated the same in \code{lpmvnorm} and 
+            \code{slpmvnorm}.
+      \item This reduced differences observed on machines w/o 
+            long doubles considerably; still there were minor
+            diffs in the package vignette which we now
+            prevent from showing up.
+    }
+  }
+}
+
 \section{Changes in Version 1.3-5 (2026-03-10)}{
   \subsection{Documentation}{
     \itemize{
@@ -9,6 +25,7 @@
     }
   }
 }
+
 
 \section{Changes in Version 1.3-4 (2025-09-15)}{
   \subsection{Features}{

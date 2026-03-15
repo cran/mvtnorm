@@ -435,6 +435,9 @@ lLgrad.mvnorm <- function(object, obs, lower, upper, standardize = FALSE,
     ret <- do.call("sldpmvnorm", args)
     ### sldmvnorm returns mean score as -obs
     if (is.null(ret$mean)) ret$mean <- - ret$obs
+
+    # lLgrad invchol marginalisation
+
     om <- length(no) - length(nm)
     if (om > 0) {
         am <- matrix(0, nrow = om, ncol = ncol(ret$mean))
@@ -453,6 +456,8 @@ lLgrad.mvnorm <- function(object, obs, lower, upper, standardize = FALSE,
                                   names = perm)
         ret$invchol <- ltMatrices(ret$invchol, byrow = byrow_orig)
     }
+    
+
     if (!is.null(perm))
         ret$invchol <- deperma(invchol = si, permuted_invchol = pi, 
                                perm = match(perm, no), 
@@ -468,6 +473,8 @@ lLgrad.mvnorm <- function(object, obs, lower, upper, standardize = FALSE,
     ret$scale <- ret$invchol
     ret$invchol <- NULL
     ret$mean <- ret$mean[no,,drop = FALSE]
+    # lLgrad invchol post
+
     if (!is.null(object$invcholmean)) {
         J <- dim(si)[2L]
         M <- matrix(seq_len(J^2), nrow = J, byrow = FALSE)
@@ -490,6 +497,7 @@ lLgrad.mvnorm <- function(object, obs, lower, upper, standardize = FALSE,
         ret$invcholmean <- solve(si, X, transpose = TRUE)
         ret$mean <- FALSE
     }
+    
     return(ret)
     
 }

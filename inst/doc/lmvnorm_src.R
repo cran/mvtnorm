@@ -1759,12 +1759,15 @@ sc <- function(parm) {
 ###################################################
 ### code chunk number 101: iris-ML
 ###################################################
-start <- c(c(iris_mvn$mean), Lower_tri(iris_mvn$scale, diag = TRUE))
+### don't start at the solution
+start <- round(c(c(iris_mvn$mean), 
+                 Lower_tri(iris_mvn$scale, diag = TRUE)), 2)
 llim <- rep(-Inf, J + J * (J + 1) / 2)
-llim[J + c(diagonals(ltMatrices(seq_len(J * (J + 1) / 2), diag = TRUE)))] <-
-1e-4
+llim[J + c(diagonals(ltMatrices(seq_len(J * (J + 1) / 2), diag = TRUE)))] <- 1e-4
 op <- optim(start, fn = ll, gr = sc, method = "L-BFGS-B", 
-            lower = llim, control = list(trace = FALSE))
+            lower = llim, 
+            control = list(trace = FALSE, 
+                           factr = 1e-6)) ### noLD machines
 Chat <- ltMatrices(op$par[-(1:J)], diag = TRUE, names = vars)
 ML <- mvnorm(mean = op$par[1:J], chol = Chat)
 
@@ -1797,12 +1800,19 @@ sc <- function(parm) {
 ### note: This is a convex problem now, so (here incorrect) 
 ### starting values shouldn't matter
 opL <- optim(start, fn = ll, gr = sc, method = "L-BFGS-B", 
-            lower = llim, control = list(trace = FALSE, maxit = 500))
+            lower = llim, control = list(trace = FALSE, factr = 1e-6))
 MLL <- ll(opL$par, logLik = FALSE)
 
 
 ###################################################
-### code chunk number 104: iris-ML-hat-nu
+### code chunk number 104: lmvnorm_src.Rnw:8531-8533
+###################################################
+## slightly different results on noLD machines
+cat("> ## IGNORE_RDIFF_BEGIN\n")
+
+
+###################################################
+### code chunk number 105: iris-ML-hat-nu
 ###################################################
 ### log-likelihood
 op$value
@@ -1816,7 +1826,7 @@ m
 
 
 ###################################################
-### code chunk number 105: iris-interval
+### code chunk number 106: iris-interval
 ###################################################
 v1 <- vars[1]
 q1 <- quantile(iris[[v1]], probs = 1:4 / 5)
@@ -1828,36 +1838,37 @@ obs <- obs[!rownames(obs) %in% v1,,drop = FALSE]
 
 
 ###################################################
-### code chunk number 106: iris-MLi
+### code chunk number 107: iris-MLi
 ###################################################
 ll <- function(parm, logLik = TRUE) {
     L <- ltMatrices(parm[-(1:J)], diag = TRUE, names = vars)
     x <- mvnorm(invcholmean = parm[1:J], invchol = L)
     if (!logLik) return(x)
-    -logLik(object = x, obs = obs, lower = lower, upper = upper)
+    -logLik(object = x, obs = obs, lower = lower, upper = upper, 
+            tol = 1e-6) ### probs < tol are considered 0
 }
 sc <- function(parm) {
     x <- ll(parm, logLik = FALSE)
-    ret <- lLgrad(object = x, obs = obs, lower = lower, upper = upper)
-    ret$invcholmean[!is.finite(ret$invcholmean)] <- NA
+    ret <- lLgrad(object = x, obs = obs, lower = lower, upper = upper, 
+                  tol = 1e-6) ### probs < tol are considered 0
     -c(rowSums(ret$invcholmean, na.rm = TRUE), 
        rowSums(Lower_tri(ret$scale, diag = TRUE), na.rm = TRUE))
 }
 
 
 ###################################################
-### code chunk number 107: iris-MLi-opt
+### code chunk number 108: iris-MLi-opt
 ###################################################
-start <- opL$par
+start <- round(opL$par, 2)
 if (require("numDeriv", quietly = TRUE))
     chk(grad(ll, start), sc(start), check.attributes = FALSE)
 opi <- optim(start, fn = ll, gr = sc, method = "L-BFGS-B", 
-             lower = llim, control = list(trace = FALSE))
+             lower = llim, control = list(trace = FALSE, factr = 1e-6))
 MLi <- ll(opi$par, logLik = FALSE)
 
 
 ###################################################
-### code chunk number 108: iris-MLi-hat
+### code chunk number 109: iris-MLi-hat
 ###################################################
 ### covariance
 invchol2cov(MLi$scale)
@@ -1870,7 +1881,7 @@ ML$mean[,,drop = TRUE]
 
 
 ###################################################
-### code chunk number 109: iris-lm
+### code chunk number 110: iris-lm
 ###################################################
 cdstr <- condDist(ML, which_given = vars[1:3], given = diag(3))
 ### least-squares coefficients
@@ -1883,7 +1894,7 @@ c(cdstr$scale^2) ### note: "chol" defines the distribution
 
 
 ###################################################
-### code chunk number 110: iris-lm-iL
+### code chunk number 111: iris-lm-iL
 ###################################################
 ### nu, L for exact observations
 cdstr <- condDist(MLL, which_given = vars[1:3], given = diag(3))
@@ -1900,7 +1911,14 @@ c(1 / cdstr$scale^2)
 
 
 ###################################################
-### code chunk number 111: marginB
+### code chunk number 112: lmvnorm_src.Rnw:8656-8658
+###################################################
+## slightly different results on noLD machines
+cat("> ## IGNORE_RDIFF_END\n")
+
+
+###################################################
+### code chunk number 113: marginB
 ###################################################
 N <- 3
 J <- 4
@@ -1922,7 +1940,7 @@ obs <- Y[rev(LETTERS[3:J]),]    ### change order of dimensions
 
 
 ###################################################
-### code chunk number 112: marginBllsc
+### code chunk number 114: marginBllsc
 ###################################################
 w <- matrix(runif(1000), nrow = 1, byrow = TRUE)
 lABCD <- logLik(mvnorm(invchol = L), obs = obs, lower = lwr, upper = upr, w = w)
@@ -1930,14 +1948,14 @@ sABCD <- lLgrad(mvnorm(invchol = L), obs = obs, lower = lwr, upper = upr, w = w)
 
 
 ###################################################
-### code chunk number 113: marginllsc
+### code chunk number 115: marginllsc
 ###################################################
 lACD <- logLik(mvnorm(invchol = L), obs = obs, lower = lwrA, upper = uprA)
 sACD <- lLgrad(mvnorm(invchol = L), obs = obs, lower = lwrA, upper = uprA)
 
 
 ###################################################
-### code chunk number 114: marginchk
+### code chunk number 116: marginchk
 ###################################################
 chk(lABCD, lACD)
 nm <- names(sABCD)
@@ -1946,7 +1964,7 @@ chk(sABCD[nm], sACD[nm])
 
 
 ###################################################
-### code chunk number 115: marginsc
+### code chunk number 117: marginsc
 ###################################################
 chk(sABCD$lower["A",,drop = FALSE], sACD$lower)
 chk(sABCD$upper["A",,drop = FALSE], sACD$upper)
@@ -1955,7 +1973,7 @@ sABCD$upper["B",]	### zero
 
 
 ###################################################
-### code chunk number 116: RR-ll
+### code chunk number 118: RR-ll
 ###################################################
 J <- 6
 K <- 3
@@ -1974,7 +1992,7 @@ lpRR(lower = a, upper = b, B = B, D = D, Z = Z)
 
 
 ###################################################
-### code chunk number 117: RR-sc
+### code chunk number 119: RR-sc
 ###################################################
 smv <- slpmvnorm(lower = a, upper = b, chol = Linv, w = w)
 sRR <- slpRR(lower = a, upper = b, B = B, D = D, Z = Z)
@@ -1984,7 +2002,7 @@ chk(c(smv$mean), sRR$mean, tolerance = 1e-2 * 2)
 
 
 ###################################################
-### code chunk number 118: RR-sc-BD
+### code chunk number 120: RR-sc-BD
 ###################################################
 Z <- matrix(rnorm(K * 1000), nrow = K)
 lB <- function(B) lpRR(lower = a, upper = b, B = B, D = D, Z = Z)

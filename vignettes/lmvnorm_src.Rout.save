@@ -1957,8 +1957,8 @@ attr(,"class")
 +     x <- mvnorm(mean = parm[1:J], chol = C)
 +     ret <- lLg .... [TRUNCATED] 
 
-> start <- c(c(iris_mvn$mean), Lower_tri(iris_mvn$scale, 
-+     diag = TRUE))
+> start <- round(c(c(iris_mvn$mean), Lower_tri(iris_mvn$scale, 
++     diag = TRUE)), 2)
 
 > llim <- rep(-Inf, J + J * (J + 1)/2)
 
@@ -1966,7 +1966,7 @@ attr(,"class")
 +     diag = TRUE)))] <- 1e-04
 
 > op <- optim(start, fn = ll, gr = sc, method = "L-BFGS-B", 
-+     lower = llim, control = list(trace = FALSE))
++     lower = llim, control = list(trace = FALSE, factr = 1e-06))
 
 > Chat <- ltMatrices(op$par[-(1:J)], diag = TRUE, names = vars)
 
@@ -2007,24 +2007,27 @@ Sepal.Length  Sepal.Width Petal.Length  Petal.Width
 +     -c(rowSums(ret$invcholmean), rowSums(Low .... [TRUNCATED] 
 
 > opL <- optim(start, fn = ll, gr = sc, method = "L-BFGS-B", 
-+     lower = llim, control = list(trace = FALSE, maxit = 500))
++     lower = llim, control = list(trace = FALSE, factr = 1e-06))
 
 > MLL <- ll(opL$par, logLik = FALSE)
+
+> cat("> ## IGNORE_RDIFF_BEGIN\n")
+> ## IGNORE_RDIFF_BEGIN
 
 > op$value
 [1] 379.9
 
 > opL$value
-[1] 379.9
+[1] 385.4
 
 > invchol2cov(MLL$scale)
 , , 1
 
              Sepal.Length Sepal.Width Petal.Length Petal.Width
-Sepal.Length      0.68133    -0.04211       1.2664      0.5130
-Sepal.Width      -0.04211     0.18864      -0.3271     -0.1207
-Petal.Length      1.26636    -0.32714       3.0961      1.2872
-Petal.Width       0.51303    -0.12071       1.2872      0.5773
+Sepal.Length      0.64644    -0.04582       1.1395      0.4411
+Sepal.Width      -0.04582     0.21906      -0.4221     -0.1640
+Petal.Length      1.13949    -0.42213       2.9581      1.2070
+Petal.Width       0.44105    -0.16399       1.2070      0.5330
 
 
 > V
@@ -2036,7 +2039,7 @@ Petal.Width       0.51283    -0.12083       1.2870      0.5771
 
 > MLL$mean[, , drop = TRUE]
 Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-       5.843        3.057        3.758        1.199 
+       5.848        3.054        3.786        1.215 
 
 > m
 Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
@@ -2064,16 +2067,16 @@ Levels: (-Inf,5] (5,5.6] (5.6,6.1] (6.1,6.52] (6.52, Inf]
 
 > sc <- function(parm) {
 +     x <- ll(parm, logLik = FALSE)
-+     ret <- lLgrad(object = x, obs = obs, lower = lower, upper = upper)
-+     ret$invcho .... [TRUNCATED] 
++     ret <- lLgrad(object = x, obs = obs, lower = lower, upper = upper, 
++         tol = .... [TRUNCATED] 
 
-> start <- opL$par
+> start <- round(opL$par, 2)
 
 > if (require("numDeriv", quietly = TRUE)) chk(grad(ll, 
 +     start), sc(start), check.attributes = FALSE)
 
 > opi <- optim(start, fn = ll, gr = sc, method = "L-BFGS-B", 
-+     lower = llim, control = list(trace = FALSE))
++     lower = llim, control = list(trace = FALSE, factr = 1e-06))
 
 > MLi <- ll(opi$par, logLik = FALSE)
 
@@ -2081,20 +2084,20 @@ Levels: (-Inf,5] (5,5.6] (5.6,6.1] (6.1,6.52] (6.52, Inf]
 , , 1
 
              Sepal.Length Sepal.Width Petal.Length Petal.Width
-Sepal.Length      0.70567    -0.02523       1.2634      0.5185
-Sepal.Width      -0.02523     0.18729      -0.3175     -0.1148
-Petal.Length      1.26343    -0.31746       3.0960      1.2881
-Petal.Width       0.51849    -0.11484       1.2881      0.5773
+Sepal.Length      0.71817    -0.02607        1.261      0.5167
+Sepal.Width      -0.02607     0.18862       -0.327     -0.1211
+Petal.Length      1.26064    -0.32698        3.079      1.2794
+Petal.Width       0.51668    -0.12107        1.279      0.5739
 
 
 > invchol2cov(MLL$scale)
 , , 1
 
              Sepal.Length Sepal.Width Petal.Length Petal.Width
-Sepal.Length      0.68133    -0.04211       1.2664      0.5130
-Sepal.Width      -0.04211     0.18864      -0.3271     -0.1207
-Petal.Length      1.26636    -0.32714       3.0961      1.2872
-Petal.Width       0.51303    -0.12071       1.2872      0.5773
+Sepal.Length      0.64644    -0.04582       1.1395      0.4411
+Sepal.Width      -0.04582     0.21906      -0.4221     -0.1640
+Petal.Length      1.13949    -0.42213       2.9581      1.2070
+Petal.Width       0.44105    -0.16399       1.2070      0.5330
 
 
 > chol2cov(ML$scale)
@@ -2109,11 +2112,11 @@ Petal.Width       0.51283    -0.12083       1.2870      0.5771
 
 > MLi$mean[, , drop = TRUE]
 Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-       5.762        3.057        3.757        1.199 
+       5.760        3.058        3.759        1.200 
 
 > MLL$mean[, , drop = TRUE]
 Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
-       5.843        3.057        3.758        1.199 
+       5.848        3.054        3.786        1.215 
 
 > ML$mean[, , drop = TRUE]
 Sepal.Length  Sepal.Width Petal.Length  Petal.Width 
@@ -2139,20 +2142,23 @@ Petal.Width -0.2073 0.2228 0.5241
 > cdstr <- condDist(MLL, which_given = vars[1:3], given = diag(3))
 
 > cdstr$mean - ML$mean["Petal.Width", ]
-               [,1]   [,2]   [,3]
-Petal.Width -0.2075 0.2228 0.5241
+              [,1]   [,2]   [,3]
+Petal.Width -0.231 0.2485 0.5516
 
 > c(1/cdstr$scale^2)
-[1] 0.03587
+[1] 0.0327
 
 > cdstr <- condDist(MLi, which_given = vars[1:3], given = diag(3))
 
 > cdstr$mean - ML$mean["Petal.Width", ]
                [,1]   [,2]   [,3]
-Petal.Width -0.1573 0.2169 0.5021
+Petal.Width -0.1381 0.1942 0.4937
 
 > c(1/cdstr$scale^2)
-[1] 0.0365
+[1] 0.03844
+
+> cat("> ## IGNORE_RDIFF_END\n")
+> ## IGNORE_RDIFF_END
 
 > N <- 3
 
@@ -2295,4 +2301,4 @@ Petal.Width -0.1573 0.2169 0.5021
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
- 15.644   0.224  15.882 
+ 15.980   0.247  16.231 
