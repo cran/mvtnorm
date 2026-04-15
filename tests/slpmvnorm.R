@@ -70,6 +70,22 @@ chks <- function(dg, tolerance = .Machine$double.eps^(1 / 4)) {
     rs <- s(x)
     chk(rl, rs$logLik)
     chk(grad(l, x), c(rs$mean), tolerance = tolerance)
+
+    l <- function(x)
+        lpmvnorm(a, b, invcholmean = x, chol = L, M = M, seed = 29)
+    s <- function(x)
+        slpmvnorm(a, b, invcholmean = x, chol = L, M = M, seed = 29)
+
+    x <- numeric(J)
+    rl <- l(x)
+    rs <- s(x)
+    chk(rl, rs$logLik)
+    chk(grad(l, x), c(rs$invcholmean), tolerance = tolerance)
+    x <- 1:J
+    rl <- l(x)
+    rs <- s(x)
+    chk(rl, rs$logLik)
+    chk(grad(l, x), c(rs$invcholmean), tolerance = tolerance)
 }
 
 chks(TRUE)

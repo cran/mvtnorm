@@ -733,6 +733,7 @@ j <- 2:4
 y <- matrix(c(-1, 2, 1), nrow = 3)
 
 cm <- Sigma[-j, j,drop = FALSE] %*% solve(Sigma[j,j]) %*%  y
+colnames(cm) <- dimnames(lxd)[[1L]][1L]
 cS <- Sigma[-j, -j] - Sigma[-j,j,drop = FALSE] %*% 
       solve(Sigma[j,j]) %*% Sigma[j,-j,drop = FALSE]
 
@@ -746,6 +747,7 @@ j <- 2:4
 y <- matrix(c(-1, 2, 1), nrow = 3)
 
 cm <- Sigma[-j, j,drop = FALSE] %*% solve(Sigma[j,j]) %*%  y
+colnames(cm) <- dimnames(lxd)[[1L]][1L]
 cS <- Sigma[-j, -j] - Sigma[-j,j,drop = FALSE] %*% 
       solve(Sigma[j,j]) %*% Sigma[j,-j,drop = FALSE]
 
@@ -763,6 +765,7 @@ j <- 1:3
 y <- matrix(c(-1, 2, 1), nrow = 3)
 
 cm <- Sigma[-j, j,drop = FALSE] %*% solve(Sigma[j,j]) %*%  y
+colnames(cm) <- dimnames(lxd)[[1L]][1L]
 cS <- Sigma[-j, -j] - Sigma[-j,j,drop = FALSE] %*% 
       solve(Sigma[j,j]) %*% Sigma[j,-j,drop = FALSE]
 
@@ -776,6 +779,7 @@ j <- 1:3
 y <- matrix(c(-1, 2, 1), nrow = 3)
 
 cm <- Sigma[-j, j,drop = FALSE] %*% solve(Sigma[j,j]) %*%  y
+colnames(cm) <- dimnames(lxd)[[1L]][1L]
 cS <- Sigma[-j, -j] - Sigma[-j,j,drop = FALSE] %*% 
       solve(Sigma[j,j]) %*% Sigma[j,-j,drop = FALSE]
 
@@ -834,7 +838,13 @@ set.seed(270312)
 ### code chunk number 41: fct-lpmvnormR
 ###################################################
 
-lpmvnormR <- function(lower, upper, mean = 0, center = NULL, chol, logLik = TRUE, ...) {
+lpmvnormR <- function(lower, upper, mean = 0, invcholmean, center = NULL, chol, logLik = TRUE, ...) {
+
+    ### only needed for input checks
+    stopifnot(missing(invcholmean))
+
+    ### get access to internal mvtnorm functions
+    .check_obs_mean <- mvtnorm:::.check_obs_mean
 
     
     if (!is.matrix(lower)) lower <- matrix(lower, ncol = 1)
@@ -851,14 +861,16 @@ lpmvnormR <- function(lower, upper, mean = 0, center = NULL, chol, logLik = TRUE
 
     stopifnot(nrow(lower) == J && ncol(lower) == N)
     stopifnot(nrow(upper) == J && ncol(upper) == N)
-    if (is.matrix(mean)) {
-        if (ncol(mean) == 1L) 
-            mean <- mean[,rep(1, N),drop = FALSE]
-        stopifnot(nrow(mean) == J && ncol(mean) == N)
+
+    if (!missing(mean)) {
+        lower <- .check_obs_mean(lower, mean, J = J, N = N)
+        upper <- .check_obs_mean(upper, mean, J = J, N = N)
     }
 
-    lower <- lower - mean
-    upper <- upper - mean
+    if (!missing(invcholmean)) {
+        stopifnot(.check_obs_invcholmean(lower, invcholmean, J = J, N = N))
+        center <- - invcholmean
+    }
 
     if (!is.null(center)) {
         if (!is.matrix(center)) center <- matrix(center, ncol = 1)
@@ -1615,7 +1627,7 @@ m <- rnorm(J)
 L <- ltMatrices(prm <- runif(J * (J + 1) / 2), diag = TRUE)
 Z <- matrix(rnorm(N * J), nrow = J)
 Y <- solve(L, Z) + m
-### scaled mean
+### scaled mean; FIXME: update example using invcholmean args
 d <- L %*% m
 
 nll <- function(parm) {
@@ -1775,11 +1787,11 @@ ML <- mvnorm(mean = op$par[1:J], chol = Chat)
 ###################################################
 ### code chunk number 102: iris-ML-hat
 ###################################################
-### covariance
-chol2cov(ML$scale)
+### covariance (noLD brings up small differences)
+round(vcov(ML), 3)
 V
 ### mean
-ML$mean[,,drop = TRUE]
+mean(ML)[,,drop = TRUE]
 m
 
 
@@ -1805,28 +1817,21 @@ MLL <- ll(opL$par, logLik = FALSE)
 
 
 ###################################################
-### code chunk number 104: lmvnorm_src.Rnw:8531-8533
-###################################################
-## slightly different results on noLD machines
-cat("> ## IGNORE_RDIFF_BEGIN\n")
-
-
-###################################################
-### code chunk number 105: iris-ML-hat-nu
+### code chunk number 104: iris-ML-hat-nu
 ###################################################
 ### log-likelihood
 op$value
 opL$value
 ### covariance
-invchol2cov(MLL$scale)
+round(vcov(MLL), 3)
 V
 ### mean
-MLL$mean[,,drop = TRUE]
+mean(MLL)[,,drop = TRUE]
 m
 
 
 ###################################################
-### code chunk number 106: iris-interval
+### code chunk number 105: iris-interval
 ###################################################
 v1 <- vars[1]
 q1 <- quantile(iris[[v1]], probs = 1:4 / 5)
@@ -1838,7 +1843,7 @@ obs <- obs[!rownames(obs) %in% v1,,drop = FALSE]
 
 
 ###################################################
-### code chunk number 107: iris-MLi
+### code chunk number 106: iris-MLi
 ###################################################
 ll <- function(parm, logLik = TRUE) {
     L <- ltMatrices(parm[-(1:J)], diag = TRUE, names = vars)
@@ -1857,7 +1862,7 @@ sc <- function(parm) {
 
 
 ###################################################
-### code chunk number 108: iris-MLi-opt
+### code chunk number 107: iris-MLi-opt
 ###################################################
 start <- round(opL$par, 2)
 if (require("numDeriv", quietly = TRUE))
@@ -1868,50 +1873,48 @@ MLi <- ll(opi$par, logLik = FALSE)
 
 
 ###################################################
-### code chunk number 109: iris-MLi-hat
+### code chunk number 108: iris-MLi-hat
 ###################################################
 ### covariance
-invchol2cov(MLi$scale)
-invchol2cov(MLL$scale)
-chol2cov(ML$scale)
+round(vcov(MLi), 3)
+round(vcov(MLL), 3)
+round(vcov(ML), 3)
 ### mean
-MLi$mean[,,drop = TRUE]
-MLL$mean[,,drop = TRUE]
-ML$mean[,,drop = TRUE]
+mean(MLi)[,,drop = TRUE]
+mean(MLL)[,,drop = TRUE]
+mean(ML)[,,drop = TRUE]
 
 
 ###################################################
-### code chunk number 110: iris-lm
+### code chunk number 109: iris-lm
 ###################################################
-cdstr <- condDist(ML, which_given = vars[1:3], given = diag(3))
 ### least-squares coefficients
 coef(irislm <- lm(Petal.Width ~ Sepal.Length + Sepal.Width + Petal.Length, 
                   data = iris))
-cdstr$mean - ML$mean["Petal.Width",]
-### residual variance
-summary(irislm)$sigma^2
-c(cdstr$scale^2) ### note: "chol" defines the distribution
+### residual standard deviation
+summary(irislm)$sigma
+### compare with 
+round(coef(ML, which = "Petal.Width"), 3)
+
+
+###################################################
+### code chunk number 110: lmvnorm_src.Rnw:9120-9122
+###################################################
+# slightly different results on noLD machines
+cat("> ## IGNORE_RDIFF_BEGIN\n")
 
 
 ###################################################
 ### code chunk number 111: iris-lm-iL
 ###################################################
 ### nu, L for exact observations
-cdstr <- condDist(MLL, which_given = vars[1:3], given = diag(3))
-### least-squares coefficients
-cdstr$mean - ML$mean["Petal.Width",]
-### residual variance
-c(1 / cdstr$scale^2) ### note: "invchol" defines the distribution
+round(coef(MLL, which = "Petal.Width"), 3)
 ### nu, L for censored observations
-cdstr <- condDist(MLi, which_given = vars[1:3], given = diag(3))
-### least-squares coefficients
-cdstr$mean - ML$mean["Petal.Width",]
-### residual variance
-c(1 / cdstr$scale^2)
+round(coef(MLi, which = "Petal.Width"), 3)
 
 
 ###################################################
-### code chunk number 112: lmvnorm_src.Rnw:8656-8658
+### code chunk number 112: lmvnorm_src.Rnw:9130-9132
 ###################################################
 ## slightly different results on noLD machines
 cat("> ## IGNORE_RDIFF_END\n")
@@ -2019,5 +2022,3 @@ chk(glwr, c(sRR$lower))
 lupr <- function(b) lpRR(lower = a, upper = b, B = B, D = D, Z = Z)
 gupr <- grad(lupr, b)
 chk(gupr, c(sRR$upper))
-
-

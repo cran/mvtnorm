@@ -5,7 +5,7 @@ importFrom("stats",
 	   pnorm, qnorm, rnorm, dnorm, runif,
 	   pt, qt,
 	   rchisq, uniroot, simulate,
-	   cov2cor, optim, coef, glm, pcauchy, qcauchy, predict, quasi)
+	   cov2cor, optim, coef, glm, pcauchy, qcauchy, predict, quasi, logLik)
 
 export(rmvnorm, dmvnorm, pmvnorm, pmvt, rmvt, qmvnorm, qmvt, dmvt,
        GenzBretz, Miwa, TVPACK, ltMatrices, syMatrices, as.syMatrices, Tcrossprod, Crossprod, diagonals, 
@@ -47,6 +47,9 @@ S3method("margDist", "mvnorm")
 S3method("condDist", "mvnorm")
 S3method("logLik", "mvnorm")
 S3method("lLgrad", "mvnorm")
+S3method("mean", "mvnorm")
+S3method("vcov", "mvnorm")
+S3method("coef", "mvnorm")
 S3method("simulate", "mvnorm")
 S3method("Mult", "ltMatrices")
 S3method("Mult", "syMatrices")

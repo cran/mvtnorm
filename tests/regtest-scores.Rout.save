@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2026-03-12 r89611) -- "Unsuffered Consequences"
+R version 4.5.3 (2026-03-11) -- "Reassured Reassurer"
 Copyright (C) 2026 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu
 
@@ -438,4 +438,4 @@ Type 'q()' to quit R.
 > 
 > proc.time()
    user  system elapsed 
- 10.002   0.039  10.054 
+  9.826   0.020   9.841 

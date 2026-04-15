@@ -2,11 +2,29 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
+\section{Changes in Version 1.3-7 (2026-04-14)}{
+  \subsection{Features}{
+    \itemize{
+      \item Minor performance improvements in \code{sldmvnorm}.
+      \item Speed-up switching from row- to column major order and vice versa.
+      \item Add \code{invcholmean} argument where possible.
+      \item Improve documentation regarding marginal and conditional
+            distributions.
+      \item Ship nuweb source file in \code{inst/nuweb}
+    }
+  }
+  \subsection{Bugfixes}{
+    \itemize{
+      \item \code{simulate} ignored its \code{seed} argument.
+    }
+  }
+}
+
 \section{Changes in Version 1.3-6 (2026-03-12)}{
   \subsection{Bugfixes}{
     \itemize{
       \item \code{sldmvnorm} returned an incorrect log-likelihood
-            in the precence of means.
+            in the presence of means.
       \item Observations with very small log-probabilities
             are now treated the same in \code{lpmvnorm} and 
             \code{slpmvnorm}.

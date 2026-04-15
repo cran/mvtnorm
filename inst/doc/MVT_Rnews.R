@@ -42,5 +42,3 @@ cr <- cov2cor(cv)
 delta <- rep(0, 5)
 (qnt <- qmvt(0.95, df = df, delta = delta, corr = cr, 
              abseps = 0.0001, maxpts = 100000, tail = "both"))
-
-
