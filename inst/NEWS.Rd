@@ -2,6 +2,55 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
+\section{Changes in Version 1.4-0 (2026-05-29)}{
+  \subsection{Features}{
+    \itemize{
+      \item Add \code{invchol.syMatrices}, \code{cov2invchol}, and
+            \code{cov2chol}.
+      \item Avoid swapping data (row <-> column-major order) in a number of
+            places.
+      \item \code{Mult} now used \proglang{LAPACK}'s \code{dtpmv}.
+      \item Multiplication of lower triangular matrices with quadratic
+            matrices implemented in \code{Mult}.
+      \item \code{vectrick} is now based on \code{Mult} instead of
+            \proglang{LAPACK}'s\code{dtrmm}.
+      \item \code{*rossprod} is now based on \code{Mult} instead of
+            tailored \proglang{C} code.
+      \item \code{standardize} now also works for non-unit triangular
+            matrices.
+    }
+  }
+  \subsection{Bugfixes}{
+    \itemize{
+      \item Cleaned up the class structure and corrected constructors for
+            \code{syMatrices}.
+    }
+  }
+  \subsection{Other}{
+    \itemize{
+      \item After more than 15 years on R-forge, \pkg{mvtnorm} is now
+            hosted at codeberg. Thank you, WU Vienna, for the long-term
+            support!
+    }
+  }
+}
+
+\section{Changes in Version 1.3-8 (2026-05-05)}{
+  \subsection{Features}{
+    \itemize{
+      \item More careful checks of inputs.
+    }
+  }
+  \subsection{Bugfixes}{
+    \itemize{
+      \item \code{logLik} wasn't able to handle missing, continuous, and
+            interval-censored observations at once.
+      \item \code{lpmvnorm} failed when a non-missing \code{invcholmean} wasn't a matrix
+            with the same dimensions as \code{lower} and \code{upper}.
+    }
+  }
+}
+
 \section{Changes in Version 1.3-7 (2026-04-14)}{
   \subsection{Features}{
     \itemize{

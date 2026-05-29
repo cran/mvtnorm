@@ -7,15 +7,17 @@ importFrom("stats",
 	   rchisq, uniroot, simulate,
 	   cov2cor, optim, coef, glm, pcauchy, qcauchy, predict, quasi, logLik)
 
+importFrom("utils", "getFromNamespace")
+
 export(rmvnorm, dmvnorm, pmvnorm, pmvt, rmvt, qmvnorm, qmvt, dmvt,
        GenzBretz, Miwa, TVPACK, ltMatrices, syMatrices, as.syMatrices, Tcrossprod, Crossprod, diagonals, 
        is.ltMatrices, is.syMatrices, as.ltMatrices, is.chol, is.invchol, as.chol, as.invchol,
        chol2cov, invchol2chol, chol2invchol, invchol2cov, 
        invchol2pre, chol2pre, Dchol, invcholD, chol2cor, invchol2cor,
-       invchol2pc, chol2pc, "diagonals<-", vectrick, Lower_tri, logdet,
+       invchol2pc, chol2pc, cov2invchol, cov2chol, "diagonals<-", vectrick, Lower_tri, logdet,
        marg_mvnorm, cond_mvnorm, Mult, lpmvnorm, slpmvnorm,
        ldmvnorm, sldmvnorm, ldpmvnorm, sldpmvnorm, standardize, destandardize, deperma,
-       mvnorm, margDist, condDist, lLgrad, lpRR, slpRR)
+       mvnorm, margDist, condDist, lLgrad, lpRR, slpRR, invchol)
 
 S3method("as.array", "ltMatrices")
 S3method("as.array", "syMatrices")
@@ -63,6 +65,8 @@ S3method("tcrossprod", "syMatrices")
 S3method("as.ltMatrices", "default")
 S3method("as.ltMatrices", "ltMatrices")
 S3method("as.ltMatrices", "syMatrices")
+S3method("invchol", "default")
+S3method("invchol", "syMatrices")
 ### internal methods
 S3method("probval", "GenzBretz")
 S3method("probval", "Miwa")

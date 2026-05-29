@@ -344,8 +344,12 @@ E 0.4913541 0.2849 0.005961 0.8901458 1.000000
 
 > ltM <- ltMatrices(xn, byrow = FALSE, names = nm)
 
-> try(ltM[i, j])
-Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
+> print(try(ltM[i, j], silent = TRUE))
+[1] "Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in `[.ltMatrices`(ltM, i, j): invalid subset argument j>
 
 > ltM <- as.syMatrices(ltM)
 
@@ -461,12 +465,28 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(a, t(b), check.attributes = FALSE)
 
+> Y <- matrix(runif(N * J^2), nrow = J^2)
+
+> a <- Mult(lxn, Y)
+
+> b <- do.call("rbind", lapply(1:ncol(y), function(i) t(A[, 
++     , i] %*% matrix(Y[, i, drop = FALSE], nrow = J))))
+
+> chk(a, t(b), check.attributes = FALSE)
+
 > a <- Mult(lxd, y)
 
 > A <- as.array(lxd)
 
 > b <- do.call("rbind", lapply(1:ncol(y), function(i) t(A[, 
 +     , i] %*% y[, i, drop = FALSE])))
+
+> chk(a, t(b), check.attributes = FALSE)
+
+> a <- Mult(lxd, Y)
+
+> b <- do.call("rbind", lapply(1:ncol(y), function(i) t(A[, 
++     , i] %*% matrix(Y[, i, drop = FALSE], nrow = J))))
 
 > chk(a, t(b), check.attributes = FALSE)
 
@@ -579,6 +599,53 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(solve(lxn[1, ], y, transpose = TRUE), t(as.array(solve(lxn[1, 
 +     ]))[, , 1]) %*% y)
+
+> tn <- lxn
+
+> td <- lxd
+
+> lxn <- ltMatrices(lxn, byrow = !attr(lxn, "byrow"))
+
+> lxd <- ltMatrices(lxd, byrow = !attr(lxd, "byrow"))
+
+> A <- as.array(lxn)
+
+> a <- solve(lxn)
+
+> a <- as.array(a)
+
+> b <- array(apply(A, 3, function(x) solve(x), simplify = TRUE), 
++     dim = rev(dim(lxn)))
+
+> chk(a, b, check.attributes = FALSE)
+
+> A <- as.array(lxd)
+
+> a <- as.array(solve(lxd))
+
+> b <- array(apply(A, 3, function(x) solve(x), simplify = TRUE), 
++     dim = rev(dim(lxd)))
+
+> chk(a, b, check.attributes = FALSE)
+
+> chk(solve(lxn, y), Mult(solve(lxn), y))
+
+> chk(solve(lxd, y), Mult(solve(lxd), y))
+
+> chk(solve(lxn[1, ], y), as.array(solve(lxn[1, ]))[, 
++     , 1] %*% y)
+
+> chk(solve(lxn[rep(1, N), ], y), solve(lxn[1, ], y), 
++     check.attributes = FALSE)
+
+> chk(solve(lxn, y[, 1]), solve(lxn, y[, rep(1, N)]))
+
+> chk(solve(lxn[1, ], y, transpose = TRUE), t(as.array(solve(lxn[1, 
++     ]))[, , 1]) %*% y)
+
+> lxn <- tn
+
+> lxd <- td
 
 > chk(logdet(lxn), colSums(log(diagonals(lxn))))
 
@@ -733,9 +800,56 @@ Error in `[.ltMatrices`(ltM, i, j) : invalid subset argument j
 
 > chk(chol(Sigma), lxd)
 
+> chk(as.array(chol(Sigma)), as.array(chol(syMatrices(Sigma, 
++     byrow = !attr(Sigma, "byrow")))))
+
 > Sigma <- tcrossprod(lxn)
 
 > chk(as.array(chol(Sigma)), as.array(lxn))
+
+> x <- matrix(runif(21), ncol = 7)
+
+> S <- crossprod(x)
+
+> print(try(chol(S), silent = TRUE))
+[1] "Error in chol.default(S) : the leading minor of order 4 is not positive\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in chol.default(S): the leading minor of order 4 is not positive>
+
+> print(try(chol(as.syMatrices(S)), silent = TRUE))
+[1] "Error in chol.syMatrices(as.syMatrices(S)) : \n  the leading minor of order 4 is not positive definite\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in chol.syMatrices(as.syMatrices(S)): the leading minor of order 4 is not positive definite>
+
+> Sigma <- tcrossprod(lxd)
+
+> chk(invchol(Sigma), solve(lxd))
+
+> Sigma <- tcrossprod(lxn)
+
+> chk(as.array(invchol(Sigma)), as.array(solve(lxn)))
+
+> x <- matrix(runif(21), ncol = 7)
+
+> S <- crossprod(x)
+
+> print(try(solve(S), silent = TRUE))
+[1] "Error in solve.default(S) : \n  system is computationally singular: reciprocal condition number = 1.81736e-18\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in solve.default(S): system is computationally singular: reciprocal condition number = 1.81736e-18>
+
+> print(try(invchol(S), silent = TRUE))
+[1] "Error in invchol.syMatrices(as.syMatrices(as.matrix(x))) : \n  the leading minor of order 3 is not positive definite\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in invchol.syMatrices(as.syMatrices(as.matrix(x))): the leading minor of order 3 is not positive definite>
 
 > J <- 10
 
@@ -1718,6 +1832,15 @@ attr(,"rcnames")
 > chk(as.array(invchol2cov(standardize(invchol = L))), 
 +     as.array(invchol2cor(standardize(invchol = L))))
 
+> diagonals(C) <- 2
+
+> chk(as.array(chol2cov(standardize(chol = C))), as.array(chol2cor(standardize(chol = C))))
+
+> L <- solve(C)
+
+> chk(as.array(invchol2cov(standardize(invchol = L))), 
++     as.array(invchol2cor(standardize(invchol = L))))
+
 > data("iris", package = "datasets")
 
 > J <- 4
@@ -2295,7 +2418,16 @@ Petal.Width
 
 > chk(gupr, c(sRR$upper))
 
+> thisdir <- getwd()
+
+> bibfile <- system.file("REFERENCES.bib", package = "mvtnorm")
+
+> if (file.copy(bibfile, to = thisdir, overwrite = TRUE)) {
++     bibfile <- file.path(thisdir, "REFERENCES.bib")
++ } else {
++     bibfile <- file.pat .... [TRUNCATED] 
+
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
- 15.611   0.283  15.895 
+ 16.875   0.216  17.089 

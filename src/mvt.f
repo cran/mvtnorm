@@ -1,5 +1,5 @@
 *
-*    $Id: mvt.f 603 2023-08-17 06:39:20Z thothorn $
+*    $Id$
 *
       SUBROUTINE MVTDST( N, NU, LOWER, UPPER, INFIN, CORREL, DELTA, 
      &                   MAXPTS, ABSEPS, RELEPS, ERROR, VALUE, INFORM )       

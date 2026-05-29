@@ -52,6 +52,10 @@
 \alias{invchol2cor}
 \alias{invchol2pc}
 \alias{chol2pc}
+\alias{cov2chol}
+\alias{cov2invchol}
+\alias{invchol}
+\alias{invchol.syMatrices}
 \alias{vectrick}
 \alias{standardize}
 \alias{destandardize}
@@ -113,6 +117,10 @@ chol2cor(x)
 invchol2cor(x)
 chol2pc(x)
 invchol2pc(x)
+cov2invchol(x)
+cov2chol(x)
+invchol(x, ...)
+\S3method{invchol}{syMatrices}(x, ...)
 vectrick(C, S, A, transpose = c(TRUE, TRUE))
 standardize(chol, invchol)
 destandardize(chol = solve(invchol), invchol, score_schol)
@@ -149,7 +157,8 @@ if \code{TRUE}.
 }
   \item{D}{a matrix (of dimension \eqn{J \times N}) of diagonal elements to be multiplied with.
 }
-  \item{y}{matrix with \eqn{J} rows.
+  \item{y}{matrix with \eqn{J} or \eqn{J^2} rows, interpreted as matrix of
+           vectors or matrix of vectorised quadratic matrices.
 }
   \item{b}{matrix with \eqn{J} rows.
 }

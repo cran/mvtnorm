@@ -1,4 +1,4 @@
-# $Id: mvt.R 617 2024-05-18 18:04:21Z mmaechler $
+# $Id$
 
 ##' Do we have a correlation matrix?
 ##' @param x typically a matrix

@@ -1,6 +1,5 @@
 
 library("mvtnorm")
-library("numDeriv")
 
 options(digits = 3)
 tol <- 1e-1

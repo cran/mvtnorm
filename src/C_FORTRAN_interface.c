@@ -1,4 +1,4 @@
-/* $Id: C_FORTRAN_interface.c 357 2020-02-07 14:14:01Z thothorn $
+/* $Id$
 *
 *  wrapper for calling R's random number generator from
 *  the original FORTRAN code

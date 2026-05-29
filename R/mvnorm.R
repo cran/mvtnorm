@@ -1,4 +1,4 @@
-# $Id: mvnorm.R 601 2023-07-13 09:37:47Z thothorn $
+# $Id$
 
 rmvnorm <- function(n, mean = rep(0, nrow(sigma)), sigma = diag(length(mean)),
                     method=c("eigen", "svd", "chol"), pre0.9_9994 = FALSE, checkSymmetry = TRUE, 
