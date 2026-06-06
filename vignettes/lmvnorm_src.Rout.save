@@ -811,19 +811,11 @@ attr(,"condition")
 
 > S <- crossprod(x)
 
-> print(try(chol(S), silent = TRUE))
-[1] "Error in chol.default(S) : the leading minor of order 4 is not positive\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in chol.default(S): the leading minor of order 4 is not positive>
+> cat("> ## IGNORE_RDIFF_BEGIN\n")
+> ## IGNORE_RDIFF_BEGIN
 
-> print(try(chol(as.syMatrices(S)), silent = TRUE))
-[1] "Error in chol.syMatrices(as.syMatrices(S)) : \n  the leading minor of order 4 is not positive definite\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in chol.syMatrices(as.syMatrices(S)): the leading minor of order 4 is not positive definite>
+> cat("> ## IGNORE_RDIFF_END\n")
+> ## IGNORE_RDIFF_END
 
 > Sigma <- tcrossprod(lxd)
 
@@ -836,6 +828,9 @@ attr(,"condition")
 > x <- matrix(runif(21), ncol = 7)
 
 > S <- crossprod(x)
+
+> cat("> ## IGNORE_RDIFF_BEGIN\n")
+> ## IGNORE_RDIFF_BEGIN
 
 > print(try(solve(S), silent = TRUE))
 [1] "Error in solve.default(S) : \n  system is computationally singular: reciprocal condition number = 1.81736e-18\n"
@@ -850,6 +845,9 @@ attr(,"class")
 [1] "try-error"
 attr(,"condition")
 <simpleError in invchol.syMatrices(as.syMatrices(as.matrix(x))): the leading minor of order 3 is not positive definite>
+
+> cat("> ## IGNORE_RDIFF_END\n")
+> ## IGNORE_RDIFF_END
 
 > J <- 10
 
@@ -2423,11 +2421,11 @@ Petal.Width
 > bibfile <- system.file("REFERENCES.bib", package = "mvtnorm")
 
 > if (file.copy(bibfile, to = thisdir, overwrite = TRUE)) {
-+     bibfile <- file.path(thisdir, "REFERENCES.bib")
++     bibfile <- "REFERENCES.bib"
 + } else {
-+     bibfile <- file.pat .... [TRUNCATED] 
++     bibfile <- file.path("..", "inst", "REF ..." ... [TRUNCATED] 
 
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
- 16.875   0.216  17.089 
+ 15.562   0.312  15.869 

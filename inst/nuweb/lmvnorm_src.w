@@ -1118,7 +1118,7 @@ if (Rdiag) {
     di = 'U';
 }
 
-SEXP abyrow = getAttrib(C, Rf_install("byrow"));
+SEXP abyrow = PROTECT(getAttrib(C, Rf_install("byrow")));
 if (TYPEOF(abyrow) != LGLSXP) error("non-logical byrow attribute");
 if (LOGICAL(abyrow)[0]) {
     uplo = 'U';
@@ -1245,7 +1245,7 @@ SEXP R_ltMatrices_Mult (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpos
 
     @<mult workhorse@>
 
-    UNPROTECT(1);
+    UNPROTECT(2);
     return(ans);
 }
 @}
@@ -1945,8 +1945,17 @@ chk(as.array(chol(Sigma)), as.array(lxn))
 ### check singular matrices
 x <- matrix(runif(21), ncol = 7)
 S <- crossprod(x)
+@@
+with meaningful error messages
+<<echo = FALSE>>=
+cat("> ## IGNORE_RDIFF_BEGIN\n")
+@@
+<<cholerr>>
 print(try(chol(S), silent = TRUE))
 print(try(chol(as.syMatrices(S)), silent = TRUE))
+@@
+<<echo = FALSE>>=
+cat("> ## IGNORE_RDIFF_END\n")
 @@
 
 Alternatively, we might want to compute the decomposition $\mSigma_i =
@@ -1971,7 +1980,9 @@ $\mL$ of length $j$.
 That is, the joint log-likelihood is the sum the $\J$ log-likelihoods
 corresponding to the linear regressions of $Y_j$ on $Y_1, \dots, Y_{j - 1}$,
 with residual standard error $\diag(\mL)_j^{-1} = \lambda_{jj}^{-1}$ and
-least-square regression coefficients $\beta_\jmath = \lambda_{j\jmath} \lambda_{jj}$.
+least-square regression coefficients $\beta_\jmath = \lambda_{j\jmath} \lambda_{jj}$
+(NB: Veccia approximations use the same setup, but constrain some elements of
+$\beta$ to zero).
 
 Thus, in order to obtain $\mL$, 
 we only have to compute the whole series of linear regressions from
@@ -2145,10 +2156,19 @@ chk(as.array(invchol(Sigma)), as.array(solve(lxn)))
 ### check singular matrices
 x <- matrix(runif(21), ncol = 7)
 S <- crossprod(x)
+@@
+with meaningful error messages
+<<echo = FALSE>>=
+# condition number is different for different systems
+cat("> ## IGNORE_RDIFF_BEGIN\n")
+@@
+<<invcholerr>>=
 print(try(solve(S), silent = TRUE))
 print(try(invchol(S), silent = TRUE))
 @@
-
+<<echo = FALSE>>=
+cat("> ## IGNORE_RDIFF_END\n")
+@@
 
 \section{Kronecker Products} \label{sec:vectrick}
 
@@ -7359,7 +7379,7 @@ thisdir <- getwd()
 bibfile <- system.file("REFERENCES.bib", package = "mvtnorm")
 ### bibfile may contain spaces LaTeX is unable to deal with on MacOS it seems
 if (file.copy(bibfile, to = thisdir, overwrite = TRUE)) {
-    bibfile <- file.path(thisdir, "REFERENCES.bib")
+    bibfile <- "REFERENCES.bib"
 } else {
     ### hope for the best
     bibfile <- file.path("..", "inst", "REFERENCES.bib")

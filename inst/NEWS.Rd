@@ -2,6 +2,16 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
+\section{Changes in Version 1.4-1 (2026-05-06)}{
+  \subsection{Bugfixes}{
+    \itemize{
+      \item Add missing \code{PROTECT}.
+      \item Do not report diffs for condition numbers in 
+            vignette.
+    }
+  }
+}
+
 \section{Changes in Version 1.4-0 (2026-05-29)}{
   \subsection{Features}{
     \itemize{

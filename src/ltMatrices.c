@@ -109,7 +109,7 @@ SEXP R_ltMatrices_solve (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpo
         di = 'U';
     }
 
-    SEXP abyrow = getAttrib(C, Rf_install("byrow"));
+    SEXP abyrow = PROTECT(getAttrib(C, Rf_install("byrow")));
     if (TYPEOF(abyrow) != LGLSXP) error("non-logical byrow attribute");
     if (LOGICAL(abyrow)[0]) {
         uplo = 'U';
@@ -180,7 +180,7 @@ SEXP R_ltMatrices_solve_C (SEXP C, SEXP N, SEXP J, SEXP diag, SEXP transpose)
         di = 'U';
     }
 
-    SEXP abyrow = getAttrib(C, Rf_install("byrow"));
+    SEXP abyrow = PROTECT(getAttrib(C, Rf_install("byrow")));
     if (TYPEOF(abyrow) != LGLSXP) error("non-logical byrow attribute");
     if (LOGICAL(abyrow)[0]) {
         uplo = 'U';
@@ -308,7 +308,7 @@ SEXP R_ltMatrices_Mult (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpos
         di = 'U';
     }
 
-    SEXP abyrow = getAttrib(C, Rf_install("byrow"));
+    SEXP abyrow = PROTECT(getAttrib(C, Rf_install("byrow")));
     if (TYPEOF(abyrow) != LGLSXP) error("non-logical byrow attribute");
     if (LOGICAL(abyrow)[0]) {
         uplo = 'U';
@@ -367,7 +367,7 @@ SEXP R_ltMatrices_Mult (SEXP C, SEXP y, SEXP N, SEXP J, SEXP diag, SEXP transpos
     }
     
 
-    UNPROTECT(1);
+    UNPROTECT(2);
     return(ans);
 }
 
