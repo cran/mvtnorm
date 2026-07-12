@@ -1,5 +1,5 @@
 
-R version 4.5.3 (2026-03-11) -- "Reassured Reassurer"
+R Under development (unstable) (2026-07-10 r90226) -- "Unsuffered Consequences"
 Copyright (C) 2026 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu
 
@@ -491,7 +491,7 @@ attr(,"msg")
 + 0.5, 6.88015972259993e-17, 0, -0.5, 0.5, -6.88015972259993e-17, 
 + -0.5, 0.5, -0.5, 0.5), DELTA = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 + ), MAXPTS = 25000L, ABSEPS = 0.001, RELEPS = 0, error = NaN, 
-+     value = NaN, inform = 0L), .Names = c("N", "NU", "LOWER", 
++     value = NaN, inform = 0L), names = c("N", "NU", "LOWER", 
 + "UPPER", "INFIN", "CORREL", "DELTA", "MAXPTS", "ABSEPS", "RELEPS", 
 + "error", "value", "inform"))
 > 
@@ -720,4 +720,4 @@ attr(,"msg")
 > 
 > proc.time()
    user  system elapsed 
-  3.359   0.031   3.385 
+  3.334   0.030   3.354 

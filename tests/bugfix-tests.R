@@ -360,7 +360,7 @@ structure(list(N = 10L, NU = 25L, LOWER = c(-0.430060315238938,
 0.5, 6.88015972259993e-17, 0, -0.5, 0.5, -6.88015972259993e-17, 
 -0.5, 0.5, -0.5, 0.5), DELTA = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 ), MAXPTS = 25000L, ABSEPS = 0.001, RELEPS = 0, error = NaN, 
-    value = NaN, inform = 0L), .Names = c("N", "NU", "LOWER", 
+    value = NaN, inform = 0L), names = c("N", "NU", "LOWER", 
 "UPPER", "INFIN", "CORREL", "DELTA", "MAXPTS", "ABSEPS", "RELEPS", 
 "error", "value", "inform"))
 

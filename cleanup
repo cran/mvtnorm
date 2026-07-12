@@ -20,6 +20,10 @@ for f in ./R/*~; do
     rm -f $f
 done
 
+for f in ./vignettes/*~; do
+    rm -f $f
+done
+
 for f in ./R/*.ps; do
     rm -f $f
 done

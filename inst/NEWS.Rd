@@ -2,6 +2,14 @@
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
 
+\section{Changes in Version 1.4-2 (2026-07-10)}{
+  \subsection{Other}{
+    \itemize{
+      \item Update \code{structure} calls.
+    }
+  }
+}
+
 \section{Changes in Version 1.4-1 (2026-05-06)}{
   \subsection{Bugfixes}{
     \itemize{
