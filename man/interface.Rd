@@ -1,6 +1,6 @@
 \name{interface}
 \alias{mvnorm}
-\alias{aperm.mvnorm}
+\alias{perm.mvnorm}
 \alias{simulate.mvnorm}
 \alias{logLik.mvnorm}
 \alias{lLgrad}
@@ -18,15 +18,16 @@
 }
 \usage{
 mvnorm(mean, invcholmean, chol, invchol)
-\S3method{aperm}{mvnorm}(a, perm, ...)
-margDist(object, which, ...)
-\S3method{margDist}{mvnorm}(object, which, ...)
-condDist(object, which_given, given, ...)
-\S3method{condDist}{mvnorm}(object, which_given, given, ...)
+\S3method{perm}{mvnorm}(a, perm, \dots)
+margDist(object, which, \dots)
+\S3method{margDist}{mvnorm}(object, which, \dots)
+condDist(object, which_given, given, \dots)
+\S3method{condDist}{mvnorm}(object, which_given, given, \dots)
 \S3method{simulate}{mvnorm}(object, nsim = dim(object$scale)[1L], seed = NULL, 
-                            standardize = FALSE, as.data.frame = FALSE, ...)
-\S3method{logLik}{mvnorm}(object, obs, lower, upper, standardize = FALSE, ...)
-\S3method{lLgrad}{mvnorm}(object, obs, lower, upper, standardize = FALSE, ...)
+                            standardize = FALSE, as.data.frame = FALSE, \dots)
+\S3method{logLik}{mvnorm}(object, obs, lower, upper, standardize = FALSE, \dots)
+lLgrad(object, \dots)
+\S3method{lLgrad}{mvnorm}(object, obs, lower, upper, standardize = FALSE, \dots)
 }
 \arguments{
   \item{chol}{either an \code{ltMatrices} object specifying (multiple)

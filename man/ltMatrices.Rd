@@ -34,10 +34,11 @@
 \alias{as.invchol}
 \alias{Lower_tri}
 \alias{chol.syMatrices}
-\alias{aperm.chol}
-\alias{aperm.invchol}
-\alias{aperm.ltMatrices}
-\alias{aperm.syMatrices}
+\alias{perm}
+\alias{perm.chol}
+\alias{perm.invchol}
+\alias{perm.ltMatrices}
+\alias{perm.syMatrices}
 \alias{deperma}
 \alias{adddiag}
 \alias{chol2cov}
@@ -70,6 +71,7 @@ ltMatrices(object, diag = FALSE, byrow = FALSE, names = TRUE)
 syMatrices(object, diag = FALSE, byrow = FALSE, names = TRUE)
 \S3method{as.array}{ltMatrices}(x, symmetric = FALSE, \dots)
 \S3method{as.array}{syMatrices}(x, \dots)
+diagonals(x, \dots)
 \S3method{diagonals}{ltMatrices}(x, \dots)
 \S3method{diagonals}{syMatrices}(x, \dots)
 \S3method{diagonals}{matrix}(x, \dots)
@@ -79,12 +81,14 @@ diagonals(x) <- value
 \S3method{diagonals}{syMatrices}(x) <- value
 \S3method{solve}{ltMatrices}(a, b, transpose = FALSE, \dots)
 \S3method{chol}{syMatrices}(x, \dots)
-\S3method{aperm}{chol}(a, perm, \dots)
-\S3method{aperm}{invchol}(a, perm, \dots)
-\S3method{aperm}{ltMatrices}(a, perm, \dots)
-\S3method{aperm}{syMatrices}(a, perm, \dots)
+perm(a, perm, \dots)
+\S3method{perm}{chol}(a, perm, \dots)
+\S3method{perm}{invchol}(a, perm, \dots)
+\S3method{perm}{ltMatrices}(a, perm, \dots)
+\S3method{perm}{syMatrices}(a, perm, \dots)
 deperma(chol = solve(invchol), permuted_chol = solve(permuted_invchol), 
         invchol, permuted_invchol, perm, score_schol)
+Mult(x, y, \dots)
 \S3method{Mult}{ltMatrices}(x, y, transpose = FALSE, \dots)
 \S3method{Mult}{syMatrices}(x, y, \dots)
 Tcrossprod(x, diag_only = FALSE)

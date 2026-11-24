@@ -2,7 +2,7 @@
 useDynLib(mvtnorm, .registration = TRUE, .fixes = "mvtnorm_")
 
 importFrom("stats",
-	   pnorm, qnorm, rnorm, dnorm, runif,
+	   pnorm, qnorm, rnorm, dnorm, runif, pexp,
 	   pt, qt,
 	   rchisq, uniroot, simulate,
 	   cov2cor, optim, coef, glm, pcauchy, qcauchy, predict, quasi, logLik)
@@ -17,7 +17,7 @@ export(rmvnorm, dmvnorm, pmvnorm, pmvt, rmvt, qmvnorm, qmvt, dmvt,
        invchol2pc, chol2pc, cov2invchol, cov2chol, "diagonals<-", vectrick, Lower_tri, logdet,
        marg_mvnorm, cond_mvnorm, Mult, lpmvnorm, slpmvnorm,
        ldmvnorm, sldmvnorm, ldpmvnorm, sldpmvnorm, standardize, destandardize, deperma,
-       mvnorm, margDist, condDist, lLgrad, lpRR, slpRR, invchol)
+       mvnorm, margDist, condDist, lLgrad, lpRR, slpRR, invchol, perm)
 
 S3method("as.array", "ltMatrices")
 S3method("as.array", "syMatrices")
@@ -39,11 +39,11 @@ S3method("diagonals", "integer")
 S3method("diagonals<-", "ltMatrices")
 S3method("diagonals<-", "syMatrices")
 S3method("chol", "syMatrices")
-S3method("aperm", "chol")
-S3method("aperm", "invchol")
-S3method("aperm", "ltMatrices")
-S3method("aperm", "syMatrices")
-S3method("aperm", "mvnorm")
+S3method("perm", "chol")
+S3method("perm", "invchol")
+S3method("perm", "ltMatrices")
+S3method("perm", "syMatrices")
+S3method("perm", "mvnorm")
 S3method("names", "mvnorm")
 S3method("margDist", "mvnorm")
 S3method("condDist", "mvnorm")

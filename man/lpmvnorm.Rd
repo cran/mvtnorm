@@ -68,11 +68,10 @@ drawn for each observation.
           should be initialized, see \code{\link[stats]{simulate}}. Only 
           applied when \code{w} is \code{NULL}.
 }
-  \item{tol}{tolerance limit, values smaller than \code{tol} are interpreted
-as zero.
+  \item{tol}{unused; retained for backwards compatibility. Log-scale
+calculations are used internally without a probability floor.
 }
-  \item{fast}{logical, if \code{TRUE}, a faster but less accurate version 
-              of \code{pnorm} is used internally.
+  \item{fast}{unused; retained for backwards compatibility.
 }
   \item{\dots}{additional arguments to \code{lpmvnorm}.
 }

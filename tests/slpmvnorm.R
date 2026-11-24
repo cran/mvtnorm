@@ -421,10 +421,13 @@ L <- ltMatrices(rep(1, J * (J + 1) / 2), diag = TRUE)
 L[] <- 0
 diagonals(L) <- 1
 
-### constant b/c prob < .Machine$double.eps
-lpmvnorm(lower = yl, upper = yr, invchol = L, w = w)
+### exact independence ground truth (prob << .Machine$double.eps, no floor)
+lp0 <- log(pnorm(yr[1]) - pnorm(yl[1]))
+chk(lpmvnorm(lower = yl, upper = yr, invchol = L, w = w), J * lp0)
 
 s <- slpmvnorm(lower = yl, upper = yr, invchol = L, w = w)[c("logLik", "invchol")]
-
-chk(0, unique(c(diagonals(s$invchol))))
+chk(s$logLik, J * lp0)
+sc0 <- (yr[1] * dnorm(yr[1]) - yl[1] * dnorm(yl[1])) / (pnorm(yr[1]) - pnorm(yl[1]))
+chk(rep(sc0, J), c(diagonals(s$invchol)))
+chk(rep(0, J * (J - 1) / 2), c(Lower_tri(s$invchol, diag = FALSE)))
 }

@@ -102,11 +102,11 @@ mvnorm <- function(mean, invcholmean, chol, invchol) {
 names.mvnorm <- function(x)
     dimnames(x$scale)[[2L]]
 
-aperm.mvnorm <- function(a, perm, ...) {
+perm.mvnorm <- function(a, perm, ...) {
 
     if (!is.null(a$invcholmean))
         a$mean <- .i2m(a)
-    ret <- list(scale = aperm(a$scale, perm = perm, ...))
+    ret <- list(scale = perm(a$scale, perm = perm, ...))
     if (!is.null(a$mean))
         ret$mean <- a$mean[perm,,drop = FALSE]
     if (!is.null(a$invcholmean)) {
@@ -412,7 +412,7 @@ lLgrad.mvnorm <- function(object, obs, lower, upper, standardize = FALSE,
                 diagonals(args$chol) <- 1
                 sc <- args$chol
             }
-            args$chol <- pc <- aperm(as.chol(args$chol), perm = perm)
+            args$chol <- pc <- perm(as.chol(args$chol), perm = perm)
             if (length(nm) < length(no))
                 args$chol <- marg_mvnorm(chol = args$chol, which = nm)$chol
             args$mean <- args$mean[nm,,drop = FALSE]
@@ -507,7 +507,7 @@ lLgrad.mvnorm <- function(object, obs, lower, upper, standardize = FALSE,
             diagonals(args$invchol) <- 1
             si <- args$invchol
         }
-        args$invchol <- pi <- aperm(as.invchol(args$invchol), perm = perm)
+        args$invchol <- pi <- perm(as.invchol(args$invchol), perm = perm)
         if (length(nm) < length(no))
             args$invchol <- marg_mvnorm(invchol = args$invchol,
                                         which = nm)$invchol

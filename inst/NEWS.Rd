@@ -1,6 +1,32 @@
-
 \name{NEWS}
 \title{NEWS file for the \pkg{mvtnorm} package}
+
+\section{Changes in Version 1.5-0 (2026-11-23)}{
+  \subsection{Bugfixes}{
+    \itemize{
+      \item Numerical robustness of \code{lpRR} and \code{slpRR} improved 
+            -- underflow issues and \code{NaN} issues were adressed.
+      \item \code{lpRR} and \code{slpRR} now compute on probabilities on the 
+            log-scale and differences via A - B = A * (1 - exp(B - A)) 
+            to avoid underflow.
+      \item \code{lpmvnorm} and \code{slpmvnorm} now compute on the log-scale
+            and no longer floor probabilities at \code{tol}: log-likelihoods
+            and scores remain finite far in the tails, and empty intervals
+            give log-likelihood \code{-Inf} with zero scores. Arguments
+            \code{tol} and \code{fast} are unused. The original
+            probability-scale implementation is kept for reference in the
+            \code{lmvnorm_src} vignette.
+      \item The \code{C} function \code{R_slpmvnorm} (registered as
+            callable) now returns log-likelihood contributions and scores
+            of the log-likelihood.
+    }
+  }
+  \subsection{API Changes}{
+    \itemize{
+      \item \code{perm} is now introduced as a new generic replacing \code{aperm} methods.
+    }
+  }
+}
 
 \section{Changes in Version 1.4-2 (2026-07-10)}{
   \subsection{Other}{
